@@ -1,37 +1,47 @@
-# Tuned YAML and version history
+# SIEM II service saturation rules
 
-`tuned_rules.yaml` is a **proposed** complete snapshot. Its attack and service
-mapping sections reproduce `config/attack_rules.json` and
-`config/service_rules.json`, including the explicit unmapped-service default.
-The SHA-256 values bind it to those source files. JSON remains the runtime source
-for Adel's baseline scorer; this PR does not change Python calculation modules.
+`tuned_rules.yaml` contains **only `N_sat` per service type**. Its one mapping,
+`n_sat_by_service`, uses the exact `service` names in
+`config/service_rules.json`, including the `Unmapped asset` default. Every
+value is an integer at least 2. `N_sat` controls the logarithmic score rise;
+at `n >= N_sat` the unrounded score reaches the cap. Rounding or an already
+capped base score can produce 10 earlier. It is not a minimum count before an
+alert exists.
 
-The current `app.calculation_base.siem2_calculation_base.group_events()` uses
-`window_minutes` and `n_sat` per `attack_type|service` rule. Its current defaults
-are 5 minutes and 60 events, recorded under `policy` in the YAML. The `rules`
-mapping is empty until a measured tuning proposal supplies per-rule values.
-The PDF does not define candidate windows or the maximum window for high scores;
-those fields remain unset. `changes` and `evaluation` truthfully record that no
-proposal has been evaluated or approved. **Do not activate this snapshot.**
+The application counts `n` from the current group of events. `W` is owned by
+the calculation flow (the current prototype defaults to 5 minutes), **not by
+this YAML**. Attack and service weights `A` and `C` still come from the two
+canonical JSON files. Runtime must never choose a threshold from `demo.label`.
 
-## Archive a version
+The current main grouping function expects an `attack_type|service` lookup.
+It does not load this service-level YAML directly. Adel and Melvin can adapt
+the service value during their application integration; this PR leaves their
+Python calculation functions unchanged.
 
-From the repository root, after editing `tuned_rules.yaml` and assigning a new
-`version.id` and `version.parent_id`:
+For this draft, each observed service's `N_sat` is the nearest-rank p95 of
+per-event trailing five-minute counts, with a floor of 2. The two services
+without demo events retain the existing prototype default of 60. These are
+proposals, not approved thresholds. On the same 5,483-event replay, expanding
+the service values into the current function produced 174 groups and raised
+28 all-benign groups. The guardrail therefore fails; baseline rules stay
+active. Attack-group recall remains undefined in the current evaluator.
+
+## Version history
+
+Version identity, parent, status, source hashes, and checksums live **outside**
+the runtime YAML, in `tuning/history/<id>.json`. A matching `<id>.yaml` is the
+immutable snapshot. For a future candidate, archive it from the repository
+root with a fresh ID, for example:
 
 ```powershell
-pwsh -NoProfile -File scripts/archive_tuned_rules.ps1
+pwsh -NoProfile -File scripts/archive_tuned_rules.ps1 -VersionId draft-0004 -ParentVersionId draft-0003 -Status proposed
 ```
 
-The command saves an immutable copy to `tuning/history/<id>.yaml` and a record
-containing its parent ID, SHA-256, and archive time to
-`tuning/history/<id>.json`. It refuses to overwrite an ID or refer to a missing
-parent. Commit both files with the YAML change. Git also preserves the edit
-history of `tuned_rules.yaml` (`git log -- tuned_rules.yaml`). To inspect an old
-snapshot, open its archived YAML or run `git show <commit>:tuned_rules.yaml`.
+The script refuses duplicate IDs and missing parents, and hashes LF-normalized
+UTF-8 so Windows and LF checkouts agree. Earlier `draft-0001` and `draft-0002`
+record the previous configuration shapes; `draft-0003` is the first
+service-only shape. Git also retains the file history. The existing SQLite
+`rule_versions` table is not populated by this file archive.
 
-`main` already has an immutable SQLite `rule_versions` table with `parent_id`,
-`rules_json`, `changes_json`, and status fields. When the existing backend flow
-later loads and validates YAML, it can store the parsed snapshot there and link
-new runs through `rule_version_id`. This archive is file history only; it does
-not register a DB version, run the guardrail, or change the active rules.
+The offline AI loop may later propose revised service thresholds. A
+deterministic evaluator and guardrail must accept them before activation.
