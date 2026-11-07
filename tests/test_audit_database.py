@@ -71,8 +71,12 @@ class AuditDatabaseTests(unittest.TestCase):
                 db.execute("DELETE FROM ground_truth.event_labels")
         # Even a DB copy without its label store cannot access ground truth.
         exported = self.root / "tools.sqlite3"
-        with connect(self.main) as db, sqlite3.connect(exported) as destination:
-            db.backup(destination)
+        with connect(self.main) as db:
+            destination = sqlite3.connect(exported)
+            try:
+                db.backup(destination)
+            finally:
+                destination.close()
         with connect(exported, read_only=True) as db:
             self.assertEqual(db.execute("SELECT count(*) FROM events").fetchone()[0], 1)
             self.assertIsNone(db.execute("SELECT name FROM sqlite_master WHERE name='event_labels'").fetchone())
