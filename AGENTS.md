@@ -8,7 +8,7 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 
 ## Current repository
 
-- `app/` is the backend for processing, database access, and future HTTP API handlers. `siem/` is the frontend for all client-facing SIEM UI. The frontend requests data through the backend API; it must not connect to SQLite directly. No frontend framework or API endpoints are implemented yet. Do not recreate root `backend/` or `frontend/` folders or frontend/template/view placeholders inside `app/`.
+- `app/` is the backend for processing, database access, and future HTTP API handlers. `fe/` is the frontend for all client-facing SIEM UI (Next.js + Tailwind; rules in fe/AGENTS.md). The frontend requests data through the backend API; it must not connect to SQLite directly. No API endpoints are implemented yet. Do not recreate root `backend/` or `frontend/` or `siem/` folders or frontend/template/view placeholders inside `app/`.
 - `app/db.py` provides shared SQLite connections and transactional migrations; `app/import_events.py` imports EVE JSON Lines. `app/labels.py` writes the separate label store; only `app/evaluate.py` attaches it read-only. This is an evaluation access layer, not a complete scoring/recall evaluator.
 - `config/attack_rules.json` and `config/service_rules.json` are the canonical attack and service mappings; no runtime loader has been implemented. Keep mappings out of `data/` and use `demo_freeze/eve_demo_FINAL.json` as the canonical demo source rather than creating a copy beside mappings.
 - `migrations/` contains ordered SQL schema changes. Never edit an applied migration; add a new numbered file. Backend workers use `app.db.connect()` and the same `DATABASE_PATH` (process environment, then root `.env`, then `data/aids.sqlite3`). Relative paths resolve from the repository root. Live databases must reside on one host and outside synchronized/network storage.
@@ -20,7 +20,6 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 - Rule versions, lineage/diffs, rule flow statistics, score trajectories, run errors, and tuning iteration reports have schema support. New runs need `rule_version_id` matching their snapshot; new alerts need an application `rule_id`. Membership triggers maintain `event_count`; new memberships require rolling count and per-event score. Do not invent missing historical trajectory or version lineage.
 - Approval/activation workflows are intentionally not implemented, per the user. Lifecycle fields are storage metadata only. The frozen dataset is for tuning, versions are unknown until supplied, and live-demo/heldout data is undecided.
 - Preserve existing user files and untracked artifacts. Treat `demo_freeze/` and its archive as frozen inputs; write derived outputs elsewhere unless the user requests regeneration.
-- The dashboard frontend lives in `fe/` (Next.js + Tailwind); its rules are in `fe/AGENTS.md`.
 
 ## Architecture
 
