@@ -1,0 +1,174 @@
+{
+  "sample": true,
+  "default_run_id": "sample-tuning-003",
+  "runs": [
+    {
+      "alerts_before": 5483,
+      "observed_per_hour": 373,
+      "benign_raised": 0,
+      "recall": {
+        "caught": 7,
+        "total": 7
+      },
+      "before_files": [
+        "original_alerts.json",
+        "flow_table.json"
+      ],
+      "change_files": [
+        "tuned_rules.yaml",
+        "codex_log.txt"
+      ],
+      "after_files": [
+        "tuned_groups.json",
+        "evaluate.json"
+      ],
+      "run_id": "sample-tuning-003",
+      "number": 3,
+      "started_at": "2026-11-07T13:40:00+07:00",
+      "started_label": "7 Nov, 13:40 WIB",
+      "budget_per_hour": 20,
+      "attempts": 2,
+      "result": "passed",
+      "alerts_after": 46,
+      "active_alerts": 46,
+      "rules_changed": 4,
+      "values_changed": 5,
+      "accepted_attempt": 2,
+      "burn_rate": 18.65,
+      "before_notes": [
+        "Largest positive gap: Brute force at web server, +191.1/h.",
+        "Spare budget share: Exploit at Windows Vista host, −1.2/h."
+      ],
+      "change_notes": [
+        "Window W changed on 3 rules.",
+        "N_sat changed on 2 rules.",
+        "Immediate exploit policy remains unchanged."
+      ],
+      "outcome_note": "Sample attempt 2 passed all illustrative checks. No live rules were loaded.",
+      "attempt_history": [
+        {
+          "n": 1,
+          "result": "failed",
+          "reason": "High-rule window 15 min exceeded the sample five-minute maximum."
+        },
+        {
+          "n": 2,
+          "result": "passed",
+          "reason": "Revised High-rule window to 5 min; all sample checks passed."
+        }
+      ]
+    },
+    {
+      "alerts_before": 5483,
+      "observed_per_hour": 373,
+      "benign_raised": 0,
+      "recall": {
+        "caught": 6,
+        "total": 7
+      },
+      "before_files": [
+        "original_alerts.json",
+        "flow_table.json"
+      ],
+      "change_files": [
+        "tuned_rules.yaml",
+        "codex_log.txt"
+      ],
+      "after_files": [
+        "tuned_groups.json",
+        "evaluate.json"
+      ],
+      "run_id": "sample-tuning-002",
+      "number": 2,
+      "started_at": "2026-11-07T12:55:00+07:00",
+      "started_label": "7 Nov, 12:55 WIB",
+      "budget_per_hour": 10,
+      "attempts": 3,
+      "result": "failed",
+      "alerts_after": 31,
+      "active_alerts": 5483,
+      "rules_changed": 8,
+      "values_changed": 14,
+      "accepted_attempt": null,
+      "burn_rate": 37.3,
+      "before_notes": [
+        "Original inputs retained for all three attempts.",
+        "Tighter sample budget: 10 alerts/hour."
+      ],
+      "change_notes": [
+        "8 rule changes proposed, never activated.",
+        "14 candidate parameter changes retained for inspection.",
+        "The original rules remain active in this sample outcome."
+      ],
+      "outcome_note": "Rejected after three attempts: attack-group recall was 6 of 7. Baseline retained; the proposed 31 groups were not used.",
+      "attempt_history": [
+        {
+          "n": 1,
+          "result": "failed",
+          "reason": "Attack-group recall 5 of 7; proposal rejected."
+        },
+        {
+          "n": 2,
+          "result": "failed",
+          "reason": "Attack-group recall 6 of 7; proposal rejected."
+        },
+        {
+          "n": 3,
+          "result": "failed",
+          "reason": "Attack-group recall remained 6 of 7. Iteration limit reached; baseline retained."
+        }
+      ]
+    },
+    {
+      "alerts_before": 5483,
+      "observed_per_hour": 373,
+      "benign_raised": 0,
+      "recall": {
+        "caught": 7,
+        "total": 7
+      },
+      "before_files": [
+        "original_alerts.json",
+        "flow_table.json"
+      ],
+      "change_files": [
+        "tuned_rules.yaml",
+        "codex_log.txt"
+      ],
+      "after_files": [
+        "tuned_groups.json",
+        "evaluate.json"
+      ],
+      "run_id": "sample-tuning-001",
+      "number": 1,
+      "started_at": "2026-11-07T12:10:00+07:00",
+      "started_label": "7 Nov, 12:10 WIB",
+      "budget_per_hour": 20,
+      "attempts": 1,
+      "result": "passed",
+      "alerts_after": 58,
+      "active_alerts": 58,
+      "rules_changed": 6,
+      "values_changed": 9,
+      "accepted_attempt": 1,
+      "burn_rate": 18.65,
+      "before_notes": [
+        "Original alerts retained with their event identities.",
+        "Sample asset map and rule inputs recorded."
+      ],
+      "change_notes": [
+        "6 rules changed in the illustrative proposal.",
+        "9 parameter changes retained in the sample audit trail.",
+        "No sample score below its base S."
+      ],
+      "outcome_note": "Sample attempt 1 passed all illustrative checks. This older result is retained for comparison.",
+      "attempt_history": [
+        {
+          "n": 1,
+          "result": "passed",
+          "reason": "Attack-group recall 7 of 7; no benign groups raised; all sample checks passed."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Brute force",
+    "start_t": 300,
+    "end_t": 900
+  },
+  {
+    "name": "Web probe",
+    "start_t": 1200,
+    "end_t": 1800
+  },
+  {
+    "name": "Port scan",
+    "start_t": 6600,
+    "end_t": 6850
+  },
+  {
+    "name": "Exploit",
+    "start_t": 6900,
+    "end_t": 7200
+  }
+]

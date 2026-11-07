@@ -1,0 +1,179 @@
+[
+  {
+    "group_id": "g-0001",
+    "rule_id": "exploit@windows_vista_host",
+    "title": "Exploit on Windows Vista host",
+    "key_type": "target",
+    "key": "192.168.10.8",
+    "attack_type": "exploit",
+    "alert_ids": [
+      "a-000001"
+    ],
+    "first_t": 6900,
+    "last_t": 6900,
+    "base_score": 9,
+    "score": 9,
+    "band": "High",
+    "raised_from": null,
+    "benign_rule": false,
+    "label": "attack",
+    "email_t": 6900,
+    "timeline": [
+      {
+        "t": 6900,
+        "n": 1,
+        "score": 9
+      }
+    ]
+  },
+  {
+    "group_id": "g-0002",
+    "rule_id": "web_probe@web_server",
+    "title": "Web probe on web server",
+    "key_type": "target",
+    "key": "192.168.10.50",
+    "attack_type": "web_probe",
+    "alert_ids": [
+      "a-000002",
+      "a-000003",
+      "a-000004"
+    ],
+    "first_t": 1200,
+    "last_t": 1220,
+    "base_score": 8,
+    "score": 9,
+    "band": "High",
+    "raised_from": null,
+    "benign_rule": false,
+    "label": "attack",
+    "email_t": 1200,
+    "timeline": [
+      {
+        "t": 1200,
+        "n": 1,
+        "score": 8
+      },
+      {
+        "t": 1210,
+        "n": 2,
+        "score": 8
+      },
+      {
+        "t": 1220,
+        "n": 3,
+        "score": 9
+      }
+    ]
+  },
+  {
+    "group_id": "g-0003",
+    "rule_id": "brute_force@web_server",
+    "title": "Brute force at web server",
+    "key_type": "target",
+    "key": "192.168.10.50",
+    "attack_type": "brute_force",
+    "alert_ids": [
+      "a-000005",
+      "a-000006",
+      "a-000007",
+      "a-000008"
+    ],
+    "first_t": 300,
+    "last_t": 330,
+    "base_score": 5,
+    "score": 8,
+    "band": "High",
+    "raised_from": "Medium",
+    "benign_rule": false,
+    "label": "attack",
+    "email_t": 330,
+    "timeline": [
+      {
+        "t": 300,
+        "n": 1,
+        "score": 5
+      },
+      {
+        "t": 310,
+        "n": 2,
+        "score": 5
+      },
+      {
+        "t": 320,
+        "n": 3,
+        "score": 5
+      },
+      {
+        "t": 330,
+        "n": 4,
+        "score": 8
+      }
+    ]
+  },
+  {
+    "group_id": "g-0004",
+    "rule_id": "port_scan@internal_host",
+    "title": "Port scan from 172.16.0.1",
+    "key_type": "source",
+    "key": "172.16.0.1",
+    "attack_type": "port_scan",
+    "alert_ids": [
+      "a-000009",
+      "a-000010"
+    ],
+    "first_t": 6800,
+    "last_t": 6810,
+    "base_score": 3,
+    "score": 6,
+    "band": "Medium",
+    "raised_from": "Low",
+    "benign_rule": false,
+    "label": "attack",
+    "email_t": null,
+    "timeline": [
+      {
+        "t": 6800,
+        "n": 1,
+        "score": 3
+      },
+      {
+        "t": 6810,
+        "n": 2,
+        "score": 6
+      }
+    ]
+  },
+  {
+    "group_id": "g-0005",
+    "rule_id": "benign_policy@internal_host",
+    "title": "Benign policy at internal host",
+    "key_type": "target",
+    "key": "192.168.10.30",
+    "attack_type": "benign_policy",
+    "alert_ids": [
+      "a-000011",
+      "a-000012"
+    ],
+    "first_t": 100,
+    "last_t": 110,
+    "base_score": 2,
+    "score": 2,
+    "band": "Low",
+    "raised_from": null,
+    "benign_rule": true,
+    "label": "benign",
+    "email_t": null,
+    "timeline": [
+      {
+        "t": 100,
+        "n": 1,
+        "score": 2
+      },
+      {
+        "t": 110,
+        "n": 2,
+        "score": 2
+      }
+    ]
+  }
+]
