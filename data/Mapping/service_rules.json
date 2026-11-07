@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "cidr": "192.168.10.0/24",
+      "service": "Internal LAN and user endpoint zone",
+      "weight": 3,
+      "basis": "network-zone baseline"
+    },
+    {
+      "cidr": "172.16.0.0/12",
+      "service": "Secondary private network zone",
+      "weight": 3,
+      "basis": "network-zone baseline"
+    },
+    {
+      "cidr": "192.168.10.255/32",
+      "service": "Limited broadcast / non-service traffic",
+      "weight": 1,
+      "basis": "special-address safeguard"
+    },
+    {
+      "cidr": "192.168.10.3/32",
+      "service": "Core identity and DNS service",
+      "weight": 10,
+      "basis": "traffic-derived hypothesis"
+    },
+    {
+      "cidr": "192.168.10.1/32",
+      "service": "Gateway and DNS resolver service",
+      "weight": 9,
+      "basis": "traffic-derived hypothesis"
+    },
+    {
+      "cidr": "192.168.10.50/32",
+      "service": "Application and file-transfer service",
+      "weight": 8,
+      "basis": "traffic-derived hypothesis"
+    },
+    {
+      "cidr": "172.16.0.1/32",
+      "service": "Secondary web and file-transfer service",
+      "weight": 6,
+      "basis": "traffic-derived hypothesis"
+    }
+  ]
+}

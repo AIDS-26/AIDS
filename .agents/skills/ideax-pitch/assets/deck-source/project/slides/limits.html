@@ -1,0 +1,17 @@
+<section id="limits" data-transition="fade" style="background:#F2F2F2;color:#0B1420;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;color:#5A6878;text-transform:uppercase">Backup · what we don’t claim</p>
+<h2 style="font-family:'Oswald', 'Arial Narrow', sans-serif;font-size:72px;font-weight:500;line-height:1.1;color:#0B1420">Limits we state up front.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px 64px">
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #CBD5E0;padding:20px 0 0 0"><h3 style="font-size:32px;font-weight:600;color:#0B1420">Labels only grade the result</h3><p style="font-size:28px;line-height:1.4;color:#3B4A5C">CIC-IDS2017 labels are used for evaluation and the offline evidence weight, never by runtime scoring.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #CBD5E0;padding:20px 0 0 0"><h3 style="font-size:32px;font-weight:600;color:#0B1420">Budget and weights are inputs</h3><p style="font-size:28px;line-height:1.4;color:#3B4A5C">B = 20 per hour and the 0.2 benign weight are operator choices, not facts.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #CBD5E0;padding:20px 0 0 0"><h3 style="font-size:32px;font-weight:600;color:#0B1420">One day of traffic</h3><p style="font-size:28px;line-height:1.4;color:#3B4A5C">A clean run on Thursday’s data is not a promise about future attacks.</p></div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:2px solid #CBD5E0;padding:20px 0 0 0"><h3 style="font-size:32px;font-weight:600;color:#0B1420">No response actions</h3><p style="font-size:28px;line-height:1.4;color:#3B4A5C">IDEA-X reads alerts and sends email. It blocks nothing. Codex sees counts per rule, never raw traffic.</p></div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">Suricata detection rules are never changed</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">15</p>
+</div>
+<aside>Backup, Q&A only. The most likely hard question is the first card: “Doesn’t the tuned system cheat by using labels?” Answer: “No. Runtime scoring never reads the labels; benign comes from the rule definition. Labels only grade the result and set the offline 0.2 evidence weight, which in production would come from analysts.”</aside>
+</section>

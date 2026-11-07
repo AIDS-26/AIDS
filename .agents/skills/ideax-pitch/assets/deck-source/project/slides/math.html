@@ -1,0 +1,33 @@
+<section id="math" data-transition="fade" style="background:#F2F2F2;color:#0B1420;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:40px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;color:#5A6878;text-transform:uppercase">Backup · the math</p>
+<h2 style="font-family:'Oswald', 'Arial Narrow', sans-serif;font-size:72px;font-weight:500;line-height:1.1;color:#0B1420">Code scores. Codex picks W and N_sat.</h2>
+</div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #CBD5E0;padding:20px 0 20px 0">
+<p style="font-size:30px;font-weight:600;color:#0B1420;width:360px">Base score</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#004488">S = min(10, A + C)</p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #CBD5E0;padding:20px 0 20px 0">
+<p style="font-size:30px;font-weight:600;color:#0B1420;width:360px">Group score</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#004488">X = round(S + (10 − S) × min(1, ln n ÷ ln N_sat))</p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #CBD5E0;padding:20px 0 20px 0">
+<p style="font-size:30px;font-weight:600;color:#0B1420;width:360px">Group key</p>
+<p style="font-size:30px;color:#3B4A5C">target + attack type · scanners: source + attack type</p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #CBD5E0;padding:20px 0 20px 0">
+<p style="font-size:30px;font-weight:600;color:#0B1420;width:360px">Bands</p>
+<p style="font-size:30px;color:#3B4A5C">Low 1–4 · Medium 5–7 · High 8–10 · benign keeps S</p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #CBD5E0;border-bottom:2px solid #CBD5E0;padding:20px 0 20px 0">
+<p style="font-size:30px;font-weight:600;color:#0B1420;width:360px">Codex’s budget split</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#004488">w = S × evidence · allowed = B × w ÷ Σw · gap = observed − allowed</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">A = attack weight · C = service weight · n = events in window W · evidence 1.0 attack, 0.2 benign</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">14</p>
+</div>
+<aside>Backup, Q&A only. If asked “why a logarithm?”: the first few repeats matter most; going from 1 to 10 events should count more than going from 100 to 110. If asked “can it ever lower a score?”: no. With one event, ln 1 = 0, so X = S, and the guardrail also checks this. N_sat must be at least 2.</aside>
+</section>
