@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppHeader from "@/app/components/app-header";
+import SavedSourceTabs from "@/app/components/saved-source-tabs";
 import ChatAssistant from "@/app/components/chat-assistant";
 import type { AuditData } from "@/lib/data";
 import { recallLabel } from "@/lib/tuning";
@@ -24,6 +25,7 @@ export default function Audit({ data }: { data: AuditData }) {
     <AppHeader active="audit" source="Design examples · 5,483 alerts"/>
     <ChatAssistant context={{ source: "audit", sample: true, run_id: selected }}/>
     <main id="audit">
+      <SavedSourceTabs screen="audit"/>
       <header className="audit-title"><h1>Audit log</h1><p>Every tuning run is kept, including failed ones. Original alerts are never deleted.</p></header>
       <section className="panel" aria-label="Sample tuning runs">
         <div className="table-scroll" tabIndex={0} role="region" aria-label="Select a sample tuning run">

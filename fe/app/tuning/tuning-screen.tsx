@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppHeader from "@/app/components/app-header";
+import SavedSourceTabs from "@/app/components/saved-source-tabs";
 import ChatAssistant from "@/app/components/chat-assistant";
 import type { TuningData } from "@/lib/data";
 import { recallLabel } from "@/lib/tuning";
@@ -25,6 +26,7 @@ export default function Tuning({ data }: { data: TuningData }) {
     <AppHeader active="tuning" source="Design example · 5,483 alerts"/>
     <ChatAssistant context={{ source: "tuning", sample: true, run_id: run.run_id, attempt: selected }}/>
     <main id="tuning">
+      <SavedSourceTabs screen="tuning"/>
       <div className="tuning-title-row">
         <div><h1>Tuning run #3</h1><p>{run.started_label} · {run.attempts.length} sample attempts · {run.duration_label} · <span className="mono">{run.run_id}</span></p></div>
         <div className="tuning-actions">

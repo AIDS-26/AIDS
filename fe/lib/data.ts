@@ -52,3 +52,8 @@ export async function getBaselineData(query: import("./backend-client").Baseline
   const { readBaseline } = await import("./backend-client");
   return readBaseline(query, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
 }
+
+export async function getSavedTuningData(query: import("./saved-tuning").SavedQuery) {
+  const { readSavedTuning } = await import("./saved-tuning");
+  return readSavedTuning(query, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
+}

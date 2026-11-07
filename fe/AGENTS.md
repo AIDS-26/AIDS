@@ -132,3 +132,10 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - `/replay/comparison` uses shared Replay rendering with sample dataset/pair selectors and explicit SAMPLE labels. Failed pairs cannot play; actual backend results are never mixed with fixtures.
 - `lib/comparison.ts` defines the provisional presentation boundary. Real tuned comparison integration still needs paired saved outputs and evaluator metrics from Melvin.
 - Public API baseline verified: dataset/run 1, 5,483 alerts, duration 9,600 seconds, evidence available. Connection URL belongs in ignored `.env.local`. No keys in Git.
+
+## Backend saved Tuning / Audit (7 Nov 2026)
+
+- `/tuning/backend` and `/audit/backend` read saved attempts through `GET /api/saved-tuning`, using the shared `lib/data.ts` source module. Samples remain separate at `/tuning` and `/audit`.
+- Nested iteration pagination, ownership/selection checks, allowlisted flow/evaluation/guardrail/change fields, failure retention, and explicit empty states. No backend paths or raw provider diagnostics forwarded.
+- Run tuning is disabled. Accepted-in-attempt history is distinct from current activation. Zero-denominator recall is N/A; benign raised > 0 is red.
+- Build, lint, TypeScript, 27 tests, and browser checks passed. The public API currently returns no attempts; populated-state UI checks used test-only browser responses, not shipped fixtures.
