@@ -342,6 +342,15 @@ button:not(:disabled):hover { filter: brightness(.94); }
 .comparison-provenance dt { color: var(--color-muted); font-size: 11px; }
 .comparison-provenance dd { overflow-wrap: anywhere; }
 .comparison-failed { color: var(--color-accent); }
+.saved-version { overflow-wrap: anywhere; max-width: 420px; white-space: normal; }
+.saved-iteration h3 { font-size: 16px; font-weight: 600; }
+.saved-iteration h4 { margin: 20px 0 8px; font-weight: 600; }
+.saved-iteration ul { list-style: disc; padding-left: 20px; }
+.saved-stats { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.saved-stats .stat { flex-wrap: wrap; }
+.saved-iteration-select { display: grid; gap: 8px; margin: 16px 0; }
+.saved-iteration-select select { padding: 10px; border: 1px solid var(--color-border); border-radius: 4px; }
+#saved-results button:disabled { background: var(--color-surface); color: var(--color-muted); }
 .baseline-message a { text-decoration: underline; }
 #baseline .speed { overflow: visible; }
 @media (max-width: 600px) {

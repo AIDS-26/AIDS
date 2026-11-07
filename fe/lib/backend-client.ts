@@ -82,7 +82,7 @@ export async function readPages<T extends { id: number }>(origin: string, path: 
       cache: "no-store", redirect: "error", signal,
       headers: new URL(origin).hostname.endsWith(".ngrok-free.dev") ? { "ngrok-skip-browser-warning": "true" } : undefined,
     }); }
-    catch { throw new BackendError(signal.aborted ? "Backend request timed out. Retry when the API is ready." : "Backend unavailable. Start the read API and check its configuration.", 503); }
+    catch (error) { if (error instanceof BackendError) throw error; throw new BackendError(signal.aborted ? "Backend request timed out. Retry when the API is ready." : "Backend unavailable. Start the read API and check its configuration.", 503); }
     if (!response.ok) throw new BackendError(response.status === 404 ? "Selected dataset or run was not found. Refresh the list." : response.status === 400 ? "Backend rejected this selection. Refresh and choose a completed run." : "Backend unavailable. Retry when the API is ready.", response.status === 404 ? 404 : 503);
     let payload: Row;
     try { payload = object(await response.json()); } catch { throw new BackendError("Backend returned invalid JSON."); }
@@ -100,12 +100,16 @@ export async function readPages<T extends { id: number }>(origin: string, path: 
   throw new BackendError("Dataset exceeds the supported 100,000-record load. No partial results were used.");
 }
 
-export async function readBaseline(query: BaselineQuery, baseUrl: string, fetcher: typeof fetch = fetch) {
+export function backendOrigin(baseUrl: string) {
   let url: URL;
   try { url = new URL(baseUrl); } catch { throw new BackendError("Backend URL is not configured correctly.", 503); }
   if (url.username || url.password || url.search || url.hash || url.pathname !== "/" ||
     !(url.protocol === "https:" || (url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)))) throw new BackendError("Backend URL must be an HTTP loopback or HTTPS origin.", 503);
-  const origin = url.origin;
+  return url.origin;
+}
+
+export async function readBaseline(query: BaselineQuery, baseUrl: string, fetcher: typeof fetch = fetch) {
+  const origin = backendOrigin(baseUrl);
   if (query.resource === "datasets") return { kind: "datasets" as const, items: await readPages(origin, "/api/datasets", parseDataset, fetcher) };
   const runs = await readPages(origin, `/api/datasets/${query.dataset_id}/runs`, parseRun, fetcher);
   if (runs.some(run => run.dataset_id !== query.dataset_id)) throw new BackendError("Backend returned runs for a different dataset.");
