@@ -2,9 +2,9 @@
 
 ## Project and scope
 
-AIDS means Agentic Intrusion Detection System. Build an SRE-style SIEM tuning demo that reduces analyst alert load while preserving attack visibility.
+IDEA-X means Intrusion Detection Escalation through Agentic reasoning with Codex, eXtended (renamed from AIDS at the organizers' request; don't use the old name in code, UI or docs). Build an SRE-style SIEM tuning demo that reduces analyst alert load while preserving attack visibility.
 
-Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: the delta gap calculation," supplied by the user. Treat its example Codex prompt as the specification for an offline tuning run, not as an instruction to execute tuning during unrelated development. Follow the user's current request when defining task scope.
+Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: the delta gap calculation," supplied by the user (copy in the repo: `docs/reference/codex-sre-delta-gap.pdf`). Treat its example Codex prompt as the specification for an offline tuning run, not as an instruction to execute tuning during unrelated development. Follow the user's current request when defining task scope.
 
 ## Current repository
 
@@ -13,8 +13,10 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 - `config/service_rules.json` contains CIDR-to-service mappings and service weights.
 - `data/eve_demo_FINAL.json` is Suricata EVE JSON Lines: one JSON event per line, despite its `.json` extension.
 - `siem/scoring.py` implements deterministic per-group runtime scoring. Its focused tests are in `tests/test_scoring.py` and run with `python -m unittest discover -s tests -v`.
-- No dependency manifest, runnable application, or evaluator has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist. Update this section with verified setup and test commands when implementation adds them.
+- `tuner/rules.py` builds complete YAML snapshots and validates bounds and canonical JSON hashes; `tuner/history.py` provides SQLite version storage. `requirements.txt` installs PyYAML. See `docs/yaml-rules.md`.
+- No integrated Python application or evaluator has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist.
 - Preserve existing user files and untracked artifacts. Treat source datasets as immutable inputs and write derived outputs elsewhere unless the user requests regeneration.
+- The dashboard frontend lives in `fe/` (Next.js + Tailwind); its rules are in `fe/AGENTS.md`.
 
 ## Architecture
 
@@ -33,6 +35,7 @@ Codex writes and tests the rules. It does not assign per-event scores at runtime
 - Attack score: `X = round(S + (cap - S) * min(1, ln(n) / ln(N_sat)))`.
 - Benign alerts retain `S`. Never reduce a score below `S` or exceed the cap.
 - Severity bands: Low 1-4, Medium 5-7, High 8-10.
+- At runtime, "benign" comes from the rule definition (rules marked benign in `base_rules.yaml`), never from evaluation labels.
 - Runtime grouping key: target plus attack type; scanners use source plus attack type. Per-rule tuning aggregates attack type plus service. Keep these two concepts distinct.
 - Document timestamp ordering, window boundaries, percentile calculation, and rounding so replay is reproducible. Handle `n = 1` explicitly; reject or explicitly resolve `N_sat <= 1`, which makes the logarithmic formula undefined. Validate weights, windows, and asset mappings rather than silently inventing values.
 
@@ -66,3 +69,28 @@ Keep changes focused on the requested component. Prefer small deterministic func
 For scoring or tuning changes, add or run focused tests covering score floors/caps, benign non-escalation, grouping keys and time boundaries, singleton groups, invalid saturation values, budget arithmetic, high-severity window limits, immediate exploit alerts, and guardrail failure. Use the same-event replay to verify recall and alert reduction when the evaluator exists. Do not change labels or weaken checks to make a proposal pass.
 
 Report what changed, the checks actually run, their outcomes, and any remaining limitations. When a command or evaluator is unavailable, state that clearly instead of inventing successful validation. Keep this file current as real entry points, schemas, and commands are added.
+
+## Hackathon context (added from Tina's handoff)
+
+- Sea × OpenAI Codex Hackathon, Jakarta, Sat 7 Nov 2026. Build direction: Autonomous & Adaptive AI. Pitch line: "Codex doesn't score alerts. It writes and tests the rules that do."
+- All code is written on 7 Nov; never copy in pre-written code. Docs, designs, instruction-only skills and the frozen dataset were prepared earlier and are declared in the submission.
+- Submission deadline 16:30 sharp (Google Form): public repo, writeup, optional demo link, declarations. Presentations and UI text in English.
+- UI names: "Original rules" (SIEM I) and "Tuned rules" (SIEM II), "grouped alerts". No human approval step in this version; the guardrail is the gate. Failed runs stay visible in the audit log and the UI.
+- The frontend displays scores from pipeline/run outputs and never recomputes them. Use one rounding rule (round half up) in one place.
+
+## Team (added from Tina's handoff)
+
+| Person | Builds | Reviews |
+|---|---|---|
+| Adel | PCAP → Suricata → normalized alerts | — |
+| Melvin | Scoring, grouping, Codex tuner, evaluator, guardrail | — |
+| Tina | Dashboard design (Figma) and frontend in `fe/` | Grouping/incident output |
+| Faris | Ground-truth attacker-IP labels, scorecard support, pitch deck | Tuner + evaluator |
+
+Files that cross these boundaries follow skill `ideax-data-contracts` (a proposal until the team confirms it).
+
+## Docs and skills (added from Tina's handoff)
+
+- `docs/HANDOFF.md`: decisions, open questions, plan for the day. `docs/design/`: Figma page "IDEA-X", component list, Scripter scripts. `assets/brand/`: logos.
+- `.agents/skills/`: `ideax-domain` (formulas, glossary, Codex task prompt), `ideax-data-contracts` (JSON/YAML shapes), `ideax-frontend` (UI spec), `ideax-qa` (checks), `ideax-submission` (README, writeup, declarations), `ideax-pitch` (deck).
+- Links: GitHub https://github.com/AIDS-26/AIDS · Data (Drive) https://drive.google.com/drive/folders/1scvfMqdjjL7q0mBEkJpO17ZVkm8XyRP7 · Event https://seaxopenai-hackathon-id.sea.com/

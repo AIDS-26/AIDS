@@ -1,0 +1,22 @@
+<section id="gaps" data-transition="fade" style="background:#F2F2F2;color:#0B1420;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:36px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;color:#5A6878;text-transform:uppercase">Backup · the delta gap, per rule</p>
+<h2 style="font-family:'Oswald', 'Arial Narrow', sans-serif;font-size:64px;font-weight:500;line-height:1.1;color:#0B1420">Not every rule gets the same fix.</h2>
+</div>
+<table style="font-size:26px;color:#0B1420;font-family:'IBM Plex Sans', Arial, sans-serif;font-variant-numeric:tabular-nums">
+<tr><th style="width:36%">Rule</th><th style="width:13%;text-align:right">Observed/h</th><th style="width:13%;text-align:right">Allowed/h</th><th style="width:11%;text-align:right">Gap</th><th style="width:27%">Codex’s move</th></tr>
+<tr><td>Brute force at web server</td><td style="text-align:right">194</td><td style="text-align:right">3.2</td><td style="text-align:right;color:#BD2024">+191</td><td>Heavy grouping</td></tr>
+<tr><td>Benign policy at internal hosts</td><td style="text-align:right">83</td><td style="text-align:right">0.3</td><td style="text-align:right;color:#BD2024">+83</td><td>Group, never raise</td></tr>
+<tr><td>Web probe at web server</td><td style="text-align:right">51</td><td style="text-align:right">2.6</td><td style="text-align:right;color:#BD2024">+49</td><td>Heavy grouping</td></tr>
+<tr><td>Benign policy at web server</td><td style="text-align:right">25</td><td style="text-align:right">0.4</td><td style="text-align:right;color:#BD2024">+24</td><td>Group, never raise</td></tr>
+<tr><td>SQL injection at web server</td><td style="text-align:right">9.1</td><td style="text-align:right">4.5</td><td style="text-align:right;color:#BD2024">+4.6</td><td>Light grouping</td></tr>
+<tr><td>Port scan, internal</td><td style="text-align:right">4.3</td><td style="text-align:right">1.9</td><td style="text-align:right;color:#BD2024">+2.4</td><td>Group by source</td></tr>
+<tr style="background:#E3EDF8"><td><b>Exploit at Windows Vista host</b></td><td style="text-align:right">3.9</td><td style="text-align:right">5.8</td><td style="text-align:right;color:#004488">−1.9</td><td><b>Stay instant, escalate fast</b></td></tr>
+<tr><td>Ping sweep, internal</td><td style="text-align:right">2.2</td><td style="text-align:right">1.3</td><td style="text-align:right;color:#BD2024">+0.9</td><td>Light grouping</td></tr>
+</table>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">Budget B = 20/h · total 373/h · burn rate 18.6× · sample figures from the design notes</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">16</p>
+</div>
+<aside>Backup, Q&A only. Positive gap means the rule is too noisy for its share of the analysts’ time, so Codex groups it harder. The exploit row is the one negative gap: it is under-alerting for how dangerous it is, so Codex keeps its window small and makes it escalate sooner. Replace these numbers with the real flow table from tomorrow’s run.</aside>
+</section>

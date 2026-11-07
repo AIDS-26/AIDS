@@ -1,0 +1,28 @@
+<section id="different" data-transition="fade" style="background:#004488;color:#F2F2F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;color:#A9C8EA;text-transform:uppercase">What is new here</p>
+<h2 style="font-family:'Oswald', 'Arial Narrow', sans-serif;font-size:72px;font-weight:500;line-height:1.1;color:#F2F2F2;width:1500px">Others judge each alert. We look across them.</h2>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px;border:2px solid #3A6FA8;border-radius:8px;padding:36px">
+<x-icon name="Link" style="color:#A9C8EA;width:56px;height:56px"></x-icon>
+<h3 style="font-size:40px;font-weight:600;line-height:1.15;color:#F2F2F2">Correlates</h3>
+<p style="font-size:30px;line-height:1.35;color:#D5E3F2">Groups alerts by target and attack type. Volume changes severity.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;border:2px solid #3A6FA8;border-radius:8px;padding:36px">
+<x-icon name="Clock" style="color:#A9C8EA;width:56px;height:56px"></x-icon>
+<h3 style="font-size:40px;font-weight:600;line-height:1.15;color:#F2F2F2">Off the hot path</h3>
+<p style="font-size:30px;line-height:1.35;color:#D5E3F2">Codex runs once, offline. No model call per alert. The output is a diff you can review.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;border:2px solid #3A6FA8;border-radius:8px;padding:36px">
+<x-icon name="Warning" style="color:#A9C8EA;width:56px;height:56px"></x-icon>
+<h3 style="font-size:40px;font-weight:600;line-height:1.15;color:#F2F2F2">Escalates</h3>
+<p style="font-size:30px;line-height:1.35;color:#D5E3F2">Repeated hits on one target climb to High. It can raise severity, not only hide noise.</p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A9C8EA">Compared with per-alert LLM triage, e.g. TriageWall, from its public README</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A9C8EA">12</p>
+</div>
+<aside>5:30–5:45. One sentence per card, then move on. If a judge asks about TriageWall in Q&A: “TriageWall decides whether each alert is noise. We look across alerts: we group them per target and attack type and raise severity with volume, using thresholds Codex tunes offline.” Don’t claim others can’t backtest or tune; just say where we focus.</aside>
+</section>

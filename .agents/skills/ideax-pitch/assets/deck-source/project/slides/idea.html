@@ -1,0 +1,29 @@
+<section id="idea" data-transition="fade" style="background:#004488;color:#F2F2F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;color:#A9C8EA;text-transform:uppercase">The idea</p>
+<h2 style="font-family:'Oswald', 'Arial Narrow', sans-serif;font-size:80px;font-weight:500;line-height:1.1;color:#F2F2F2;width:1500px">Treat the alert stream like production traffic.</h2>
+</div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #3A6FA8;padding:22px 0 22px 0">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#A9C8EA;width:520px">Traffic</p>
+<p style="font-size:38px;line-height:1.3;color:#F2F2F2">Alerts per hour, for each rule</p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #3A6FA8;padding:22px 0 22px 0">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#A9C8EA;width:520px">Capacity</p>
+<p style="font-size:38px;line-height:1.3;color:#F2F2F2">Analyst budget: <b>B alerts per hour</b></p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #3A6FA8;padding:22px 0 22px 0">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#A9C8EA;width:520px">Burn rate</p>
+<p style="font-size:38px;line-height:1.3;color:#F2F2F2">373 per hour ÷ budget 20 = <b>18.6× overloaded</b></p>
+</div>
+<div style="display:flex;flex-direction:row;align-items:baseline;gap:40px;border-top:2px solid #3A6FA8;border-bottom:2px solid #3A6FA8;padding:22px 0 22px 0">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:30px;color:#A9C8EA;width:520px">Rate-based alerting</p>
+<p style="font-size:38px;line-height:1.3;color:#F2F2F2">Grouping window + saturation point, <b>per rule</b></p>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A9C8EA">Left: how site reliability engineers run on-call · Right: what IDEA-X does</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A9C8EA">06</p>
+</div>
+<aside>1:10–1:35. “Engineers who keep apps like Shopee up have solved this for years: measure the traffic, set a capacity, and tune the alarms so on-call people aren’t woken by noise. We do the same for security alerts.” Point at the burn-rate row: “Our sample sends 373 alerts an hour to a team that can read 20.” Replace 373 / 20 / 18.6× with the real run if they change.</aside>
+</section>

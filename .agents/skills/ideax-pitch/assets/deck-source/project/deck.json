@@ -1,0 +1,23 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-11-06T15:18:59Z" },
+  "lists": "css",
+  "title": "IDEA-X Pitch Deck",
+  "order": ["cover", "story", "problem", "blind", "region", "idea", "pipeline", "demo", "collapse", "results", "codex", "different", "close", "math", "limits", "gaps"],
+  "sections": {
+    "s1": { "description": "Open: name, promise and team in one frame.", "start": "cover" },
+    "s2": { "description": "Problem: the CCTV-room story, too many alerts, the real attack gets missed, and it hits our region.", "start": "story" },
+    "s3": { "description": "Idea: treat the alert stream like production traffic, with one model step and code everywhere else.", "start": "idea" },
+    "s4": { "description": "Live demo of the replay: the same alerts through the original and the tuned rules.", "start": "demo" },
+    "s5": { "description": "Proof: the before and after numbers from the real run.", "start": "collapse" },
+    "s6": { "description": "Codex: how it built the product and how it runs inside it, and what sets us apart.", "start": "codex" },
+    "s7": { "description": "Close: the promise again and the build direction.", "start": "close" },
+    "s8": { "description": "Backup for Q&A: the math, the limits and the full gap table.", "start": "math" }
+  },
+  "faces": {
+    "oswald": { "family": "Oswald", "href": "https://fonts.googleapis.com/css2?family=Oswald:wght@400..700&display=swap" },
+    "ibm-plex-sans": { "family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" },
+    "jetbrains-mono": { "family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" }
+  },
+  "designSystems": []
+}
