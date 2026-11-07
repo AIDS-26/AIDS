@@ -104,3 +104,10 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - All four navigation tabs are enabled. The preview links to Replay; no inbox connection, backend integration, or email sending exists.
 - `npm test` includes email identity/count consistency and notification-time snapshot checks.
 - Verification: production build, lint, TypeScript, all ten tests, and browser checks passed for every email preview, keyboard selection, notification-time values, all four navigation tabs, and 1440/1280/400px layouts. No runtime exceptions or backend mutation requests were observed.
+
+## Implemented Ask IDEA-X frontend (7 Nov 2026)
+
+- Floating chat follows the supplied Chat screenshots, with suggestions, keyboard/pointer Pick on Replay alerts/groups, frozen snapshot context, in-memory history, source references, cancellation, retry and edit recovery.
+- Available on sample Replay, a loaded backend baseline run, Tuning, Audit log and Emails. Selected run/attempt/email changes reset the conversation.
+- Frontend only by explicit team split: no OpenAI key, provider call or chat server route is implemented. `lib/chat.ts` calls the proposed same-origin `POST /api/chat`; `CHATBOT.md` defines the teammate handoff contract. Until connected, the UI reports that chat is not connected and never fabricates answers.
+- Production build, lint, TypeScript and all 20 tests passed. Browser checks covered keyboard picking, questions/error recovery, selected-attempt context, Emails integration and 400/1280px layouts. Live OpenAI answers remain unverified until the teammate connects the endpoint.

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import AppHeader from "@/app/components/app-header";
+import ChatAssistant from "@/app/components/chat-assistant";
 import type { EmailsData } from "@/lib/data";
 
 type Email = EmailsData["original"][number] | EmailsData["tuned"][number];
@@ -34,6 +35,7 @@ export default function Emails({ data }: { data: EmailsData }) {
   return <>
     <a href="#emails" className="skip-link">Skip to email previews</a>
     <AppHeader active="emails" source="Synthetic fixtures · 12 alerts"/>
+    <ChatAssistant context={{ source: "emails", sample: true, run_id: data.run_id, item_id: selectedId }}/>
     <main id="emails">
       <header className="audit-title"><h1>Emails to the on-call analyst</h1><p>Saved sample snapshot ({data.snapshot_clock}). Original rules notify for each High alert; Tuned rules notify once per High group.</p></header>
       <p className="email-disclosure">Preview only · No emails sent, no inbox connected · Run <span className="mono">{data.run_id}</span></p>

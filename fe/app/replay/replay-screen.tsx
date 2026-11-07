@@ -4,6 +4,7 @@ import { useEffect, useReducer } from "react";
 import { initialPlayback, playbackReducer, selectFrame, type Speed } from "@/lib/replay";
 import type { ReplayData } from "@/lib/data";
 import AppHeader from "@/app/components/app-header";
+import ChatAssistant from "@/app/components/chat-assistant";
 
 function clock(seconds: number) {
   return `${Math.floor(seconds / 3600)}:${String(Math.floor(seconds / 60) % 60).padStart(2, "0")}:${String(Math.floor(seconds) % 60).padStart(2, "0")}`;
@@ -14,7 +15,7 @@ function Badge({ band }: { band: string }) {
 }
 
 function AlertRow({ alert }: { alert: ReplayData["alerts"][number] }) {
-  return <li className="alert-row">
+  return <li className="alert-row" data-chat-id={alert.id}>
     <time className="mono">{clock(alert.t)}</time>
     <span>{alert.rule_name}</span>
     <span className="host mono">{alert.dest_ip}</span>
@@ -106,7 +107,7 @@ export default function Replay({ data }: { data: ReplayData }) {
         <section className="panel lane" aria-label="Tuned rules grouped alerts"><LaneSummary data={snapshot.tuned} tuned/><div className="groups">
           {groups.length === 0 && <p className="empty-state">Groups appear as sample events arrive.</p>}
           {groups.map(group => <details key={group.group_id} className="group">
-            <summary className={`group-card ${group.benign_rule ? "benign" : group.band.toLowerCase()}`}>
+            <summary data-chat-id={group.group_id} className={`group-card ${group.benign_rule ? "benign" : group.band.toLowerCase()}`}>
               <span><strong>{group.title}</strong><small>{group.alert_ids.length} {group.alert_ids.length === 1 ? "event" : "events"} · {group.raised_from ? `raised from ${group.raised_from} to ${group.band}` : group.band}{group.benign_rule ? " · benign, not raised" : group.email_t !== null ? " · email (dry-run)" : ""}</small></span>
               <span className="score">{group.score}<span className="chevron" aria-hidden="true">⌄</span></span>
             </summary>
@@ -117,5 +118,6 @@ export default function Replay({ data }: { data: ReplayData }) {
       <aside className="notice">Attack/benign labels from CIC-IDS2017 are used only to grade results and to weight the offline tuning. At runtime, benign comes from the rule definition.</aside>
       <p className="sample-note">Sample preview · Synthetic data, not CIC-IDS2017 results. No evaluator has run and no emails have been sent.</p>
     </main>
+    <ChatAssistant context={{ source: "replay", sample: true, run_id: data.run_id, replay_time_s: playback.t }} targets={[...alerts.map(alert => ({ id: alert.id, label: `${alert.rule_name} · ${alert.dest_ip}` })), ...groups.map(group => ({ id: group.group_id, label: group.title }))]}/>
   </>;
 }

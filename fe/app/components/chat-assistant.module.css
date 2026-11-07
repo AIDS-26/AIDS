@@ -1,0 +1,34 @@
+.launcher { position: fixed; right: 24px; bottom: 22px; z-index: 42; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-color: var(--color-secondary); border-radius: 30px; font-weight: 600; }
+.panel { position: fixed; right: 24px; bottom: 88px; z-index: 41; width: 400px; height: min(620px, calc(100dvh - 110px)); display: flex; flex-direction: column; border: 1px solid var(--color-border); border-radius: 6px; background: white; overflow: hidden; }
+.header { display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--color-border); }
+.header div { flex: 1; }
+.header button { border: 0; padding: 5px; color: var(--color-muted); font-size: 19px; }
+.header small, .footer small, .contextMeta, .answer small, .muted { color: var(--color-muted); }
+.context { display: flex; align-items: center; gap: 6px; padding: 16px 16px 6px; }
+.context > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--color-blue-tint); padding: 6px 10px; border-radius: 4px; color: var(--color-muted); font-size: 11px; }
+.context b { color: var(--color-primary); font-weight: 500; }
+.context button { padding: 5px 9px; border-radius: 4px; white-space: nowrap; }
+.contextMeta { padding: 0 16px 8px; font-size: 11px; }
+.transcript { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 6px 16px 16px; }
+.empty p { margin-bottom: 10px; }
+.suggestions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.suggestions button { padding: 6px 12px; border-radius: 20px; font-size: 12px; }
+.question { margin: 8px 0 14px 44px; background: var(--color-blue-tint); border-radius: 4px; padding: 9px 12px; }
+.answer { border-left: 2px solid var(--color-secondary); padding-left: 12px; margin-bottom: 14px; }
+.answer p, .question p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.answer small { display: block; margin-top: 7px; overflow-wrap: anywhere; }
+.footer { padding: 12px 16px; border-top: 1px solid var(--color-border); }
+.footer form { display: flex; gap: 8px; margin-bottom: 10px; align-items: stretch; }
+.footer textarea { flex: 1; width: 0; min-height: 40px; max-height: 110px; resize: vertical; font: inherit; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 4px; }
+.footer textarea::placeholder { color: var(--color-muted); }
+.footer form button { background: var(--color-primary); color: white; padding: 6px 12px; border-radius: 4px; }
+.panel button:disabled { opacity: .5; }
+.footer small { display: block; }
+.footer .newChat { padding: 2px 0; border: 0; margin-bottom: 8px; font-size: 11px; }
+.error { padding: 10px; background: var(--color-red-tint); border-left: 2px solid var(--color-accent); margin-top: 10px; }
+.error button { padding: 4px 10px; margin-top: 8px; }
+.pickNotice { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 45; border-radius: 6px; background: var(--color-ink); color: white; padding: 10px 16px; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 24px); }
+.pickNotice button { background: transparent; color: white; padding: 3px 6px; white-space: nowrap; }
+.pickable { outline: 2px dashed var(--color-secondary); outline-offset: -3px; cursor: crosshair; }
+.pickable:hover, .pickable:focus { outline: 2px solid var(--color-primary); background: var(--color-blue-tint); }
+@media (max-width: 600px) { .panel { right: 12px; bottom: 80px; width: calc(100% - 24px); height: min(620px, calc(100dvh - 96px)); } .launcher { right: 12px; bottom: 14px; } .header { padding: 12px; gap: 8px; } .header small { font-size: 10px; } .pickNotice { width: calc(100% - 24px); } }

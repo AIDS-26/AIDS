@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppHeader from "@/app/components/app-header";
+import ChatAssistant from "@/app/components/chat-assistant";
 import type { TuningData } from "@/lib/data";
 import { recallLabel } from "@/lib/tuning";
 
@@ -22,6 +23,7 @@ export default function Tuning({ data }: { data: TuningData }) {
   return <>
     <a href="#tuning" className="skip-link">Skip to tuning</a>
     <AppHeader active="tuning" source="Design example · 5,483 alerts"/>
+    <ChatAssistant context={{ source: "tuning", sample: true, run_id: run.run_id, attempt: selected }}/>
     <main id="tuning">
       <div className="tuning-title-row">
         <div><h1>Tuning run #3</h1><p>{run.started_label} · {run.attempts.length} sample attempts · {run.duration_label} · <span className="mono">{run.run_id}</span></p></div>
