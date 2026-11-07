@@ -151,7 +151,7 @@ def replay_version(baseline_run_id, version_id, path=None):
 
 def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
          evaluation_manifest=None, evaluation_session_minutes=None, label_provenance=None,
-         output_directory=None, from_version_id=None):
+         output_directory=None, from_version_id=None, on_attempt_created=None):
     """Try at most three proposals. Only a passing child version becomes active.
 
     Each model request and replay happens outside write transactions. Failed
@@ -179,6 +179,8 @@ def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
                'artifact_directory': str(directory) if directory else None}
     parent = from_version_id or run['rule_version_id']
     try:
+        if on_attempt_created is not None:
+            on_attempt_created(attempt_id)
         scorecard = load_scorecard(events, run['dataset_id'], path, labels_path=labels_path,
                                    manifest=evaluation_manifest, session_minutes=evaluation_session_minutes,
                                    provenance=label_provenance)

@@ -67,3 +67,8 @@ export async function getRuleHistoryData(datasetId: number, runId: number) {
   const { readRuleHistory } = await import("./rule-history");
   return readRuleHistory(datasetId, runId, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
 }
+
+export async function getTuningJobData(jobId?: string, body?: unknown) {
+  const { tuningRequest } = await import("./tuning-jobs");
+  return tuningRequest(process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000", jobId, body);
+}

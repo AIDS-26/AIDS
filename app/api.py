@@ -1,4 +1,4 @@
-"""Local read-only SIEM API: python -m app.api --help (standard library only)."""
+"""Local SIEM read API and tuning control: python -m app.api --help."""
 
 from __future__ import annotations
 
@@ -13,12 +13,14 @@ from urllib.parse import parse_qs, urlsplit
 from app.db import connect, database_path
 from app import siem
 from app.replay_view import replay_view
+from app.tuning.jobs import JobError, TuningJobs
 
 
 def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                 port: int = 8000, allowed_origin: str | None = None) -> ThreadingHTTPServer:
-    """No import, migration, scoring, label access or writes in request handlers."""
+    """Read routes plus a local-only tuning control; scoring runs in a worker."""
     target = Path(path).resolve() if path is not None else database_path()
+    jobs = TuningJobs(target)
     # Fail before listening if setup has not completed; never create an empty DB.
     with connect(target, read_only=True) as db:
         db.execute("SELECT dest_port FROM events LIMIT 0")
@@ -52,7 +54,15 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                     raise ValueError("Supported query parameters: limit, after_id (once each)")
                 paging = {key: int(values[0]) for key, values in query.items()}
                 siem.page_bounds(paging.get("limit", 100), paging.get("after_id", 0))
-                if url.path in ("/api/health", "/health"):
+                if url.path == '/api/tuning-jobs':
+                    if paging:
+                        raise ValueError('Tuning settings do not accept pagination')
+                    result = jobs.settings()
+                elif match := re.fullmatch(r'/api/tuning-jobs/([a-f0-9]{32})', url.path):
+                    if paging:
+                        raise ValueError('Tuning jobs do not accept pagination')
+                    result = jobs.get(match[1])
+                elif url.path in ("/api/health", "/health"):
                     with connect(target, read_only=True) as db:
                         db.execute("SELECT 1").fetchone()
                     result = {"status": "ok", "database": "ok"}
@@ -78,12 +88,44 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                     self.reply(404, {"error": "Route not found"})
                     return
                 self.reply(200, result)
+            except JobError as error:
+                self.reply(error.status, {'error': str(error)})
             except LookupError as error:
                 self.reply(404, {"error": str(error)})
             except (ValueError, OverflowError) as error:
                 self.reply(400, {"error": str(error)})
             except sqlite3.Error:
                 self.reply(503, {"error": "Database unavailable"})
+
+        def do_POST(self):
+            if self.path != '/api/tuning-jobs':
+                self.reply(404, {'error': 'Route not found'})
+                return
+            # This demo control is for the same-host Next.js server. Browsers use
+            # its same-origin proxy; ordinary read routes are unchanged.
+            if (self.client_address[0] not in ('127.0.0.1', '::1')
+                    or self.headers.get('X-IDEAX-Control') != 'local-tuning'
+                    or self.headers.get('Origin')
+                    or any(self.headers.get(name) for name in
+                           ('Forwarded', 'X-Forwarded-For', 'X-Forwarded-Host', 'X-Forwarded-Proto'))):
+                self.reply(403, {'error': 'Tuning control requires the local dashboard proxy'})
+                return
+            try:
+                size = int(self.headers.get('Content-Length', '0'))
+                if not 0 < size <= 1024 or self.headers.get('Content-Type') != 'application/json':
+                    raise ValueError('Expected a small JSON tuning request')
+                payload = json.loads(self.rfile.read(size))
+                if not isinstance(payload, dict) or set(payload) != {'baseline_run_id', 'request_id'}:
+                    raise ValueError('Expected baseline_run_id and request_id')
+                if not isinstance(payload['request_id'], str) or not re.fullmatch('[a-f0-9]{32}', payload['request_id']):
+                    raise ValueError('Invalid tuning request ID')
+                self.reply(202, jobs.start(payload['baseline_run_id'], payload['request_id']))
+            except JobError as error:
+                self.reply(error.status, {'error': str(error)})
+            except (ValueError, UnicodeError) as error:
+                self.reply(400, {'error': str(error) if not isinstance(error, json.JSONDecodeError) else 'Invalid JSON'})
+            except sqlite3.Error:
+                self.reply(503, {'error': 'Database unavailable'})
 
     return ThreadingHTTPServer((host, port), Handler)
 

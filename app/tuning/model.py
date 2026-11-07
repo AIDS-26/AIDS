@@ -13,14 +13,15 @@ from app.tuning.policy import parse_document
 
 
 class ResponsesProposer:
-    def __init__(self, model, *, timeout=60):
+    def __init__(self, model, *, timeout=60, api_key=None):
         if not isinstance(model, str) or not model.strip():
             raise ValueError('Select an explicit API model (--model or CODEX_MODEL)')
         self.model_name = model
         self.timeout = timeout
+        self._api_key = api_key
 
     def __call__(self, context):
-        key = os.environ.get('CODEX_API_KEY')
+        key = self._api_key or os.environ.get('CODEX_API_KEY')
         if not key:
             raise ValueError('Set CODEX_API_KEY in the process environment')
         rule_schema = {'type': 'object', 'additionalProperties': False,

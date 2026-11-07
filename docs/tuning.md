@@ -19,8 +19,10 @@ Use the dataset and baseline run IDs returned by these commands. The manifest's
 160-minute observation duration is an explicitly approved demo assumption. The
 model never chooses duration or budget. A source file remains frozen.
 
-Set `CODEX_API_KEY` and `CODEX_MODEL` in the **process environment**. The API key
-is not loaded from `.env`, printed, included in model context, or stored. Select
+Set `CODEX_API_KEY` and `CODEX_MODEL` in the **process environment** or the root
+`.env`. `app/tuning/settings.py` loads only those two settings, with process values
+taking precedence. The API key is never printed, included in model context, or
+stored in run artifacts. Select
 an API model that supports Responses Structured Outputs; no model is silently
 substituted. The adapter uses the fixed `https://api.openai.com/v1/responses`
 endpoint, `store=false`, a strict output schema, and a 60-second request timeout,
@@ -197,9 +199,47 @@ All routes are read-only and accept `limit`/`after_id` pagination:
   `event_rule_id`, `event_base_score`, `window_minutes`, `n_sat`, `alert_score`;
   these fields remain null for unavailable historical/baseline details.
 
-No label attachment, migration, computation, activation or model call occurs in
-the HTTP API. The frontend needs to consume these new audit read models; this
-change does not replace its fixture-based tuning UI or add an HTTP write trigger.
+GET data routes remain read-only: they do not attach labels, migrate, calculate
+scores, activate versions or call a model. The dashboard now consumes saved
+results and has the separate local control described below.
+
+## Play and local background tuning
+
+On `/replay`, **Play** starts saved alert playback when an accepted tuned run is
+available. Otherwise it opens a prompt with **Start tuning and play**, **Play
+original alerts**, and **Cancel**. The first action starts an asynchronous Python
+worker, shows proposal progress, and automatically reloads and plays accepted
+results. Failure keeps the saved original alerts and offers original-only playback.
+The Replay header's **Run tuning** button opens the same prompt, including when
+rerunning an accepted baseline. No candidate-approval workflow is introduced;
+the deterministic guardrail remains the activation gate.
+
+The same-origin Next.js `/api/tuning-jobs` proxy forwards only a baseline run ID
+and an idempotency request ID. Python `POST /api/tuning-jobs` returns a job status
+immediately; `GET /api/tuning-jobs/{id}` polls progress and safe attempt/run IDs.
+`GET /api/tuning-jobs` supplies model/readiness information, never credentials.
+The worker loads the fixed demo policy and approved 10-minute evaluation sessions;
+the browser cannot choose a model, change policy, supply labels or bypass checks.
+Model configuration comes from `CODEX_MODEL`, defaulting to the selected
+`gpt-6.1-sol` for dashboard jobs. CLI model selection stays explicit.
+
+Control is restricted to a loopback backend and a same-origin dashboard. The
+backend rejects browser origins and forwarded/proxied control requests; remote
+saved-result reads remain available. A database-adjacent OS file lock serializes
+dashboard jobs across API processes. Duplicate active requests on the same
+baseline reuse the job. CLI operators must avoid running a separate CLI tuning
+command concurrently with a dashboard job.
+
+Job polling state is transient and bounded to 64 jobs per API process; restart
+recovery is through saved attempts/runs in Audit and Reload saved results. Avoid
+restarting the backend during a running job. Keys stay in Python; they are never
+copied into frontend configuration. Artifacts remain under `output/tuning/`.
+
+Live Play verification on baseline run #2 called `gpt-6.1-sol` for three proposals.
+Each produced 1,656 groups from 5,483 alerts and raised 33 benign-labeled groups;
+all three were rejected and no tuned version was activated. These are rejected
+diagnostics, not accepted tuning performance. Accepted-result autoplay was checked
+separately with a temporary test database response, without another paid call.
 
 ```powershell
 python -m unittest discover -s tests -v

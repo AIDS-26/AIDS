@@ -17,7 +17,10 @@ defaulting to `http://127.0.0.1:8000`; no CORS changes are required.
 
 Replay selects the canonical imported demo dataset and latest completed baseline
 by default, and initially shows the saved final counts. Choose another dataset or
-baseline with the selectors. Play replay starts from the beginning; Restart pauses
+baseline with the selectors. Play starts from the beginning when tuned results
+exist. Otherwise it prompts to start tuning, show its progress, then automatically
+load and play a passing run. The prompt also offers original-only playback.
+Restart pauses
 at zero; Show final returns to the complete result. All three speeds use the same
 saved score histories and count frames. The list initially renders 50 rows to keep
 playback responsive; Show 50 more reveals additional rows without changing totals.
@@ -36,6 +39,33 @@ pauses playback, and preserves the existing Ask IDEA-X interface. Full-run saved
 evaluation results are labeled with their evaluated run ID. Empty attack sets
 display N/A. Email delivery counts and attack-window overlays are unavailable in
 this read model; no emails or model calls are made by loading the dashboard.
+
+### Play starts tuning when needed
+
+Replay's primary button is always labeled **Play** (or **Pause** while playing).
+With no accepted tuned run, it opens **Tune and play these alerts?**. **Start tuning
+and play** starts a paid backend job with up to three proposals; **Play original
+alerts** plays the saved baseline directly; **Cancel** makes no model call. The
+Replay header's Run tuning button uses the same prompt. Tuning/Audit remain saved
+history views. The prompt requests starting a run, not approving a candidate;
+the guardrail still controls activation automatically.
+
+The same-origin `/api/tuning-jobs` proxy forwards only validated baseline/request
+IDs to the loopback Python backend. The browser polls safe progress, showing
+attempt and proposal numbers. A passing job reloads its tuned snapshot and starts
+playback. Failure keeps the original alerts and audit records. Duplicate active
+clicks reuse the same job, and a backend OS lock blocks overlapping dashboard jobs.
+The frontend never reads the backend key or root `.env`; only Python loads
+`CODEX_API_KEY` / `CODEX_MODEL`, with `gpt-6.1-sol` as the dashboard default model.
+Remote read APIs remain supported, but tuning control requires the backend on
+the same computer. Polling jobs are transient across a backend restart; reload
+saved results and use Audit for durable history.
+
+Verification: 70 backend tests, 38 frontend tests, lint, TypeScript and production
+build pass. The live model attempt on baseline #2 completed three proposals;
+each raised 33 benign-labeled groups and was rejected. Baseline alerts stayed
+available. Accepted-result autoplay was verified with a temporary test database
+response, without activating a test version in the live database.
 
 Live verification: dataset/run #1 contains 5,483 alerts over 9,600 seconds and no
 accepted tuned run. Chrome checks passed for initial totals, playback, loading
