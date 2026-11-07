@@ -25,6 +25,11 @@ def main() -> None:
     metadata.add_argument("--suricata-version")
     metadata.add_argument("--et-open-version")
     commands.add_parser("status", help="Show applied migrations and row counts")
+    baseline = commands.add_parser('score-baseline', help='Score an imported dataset and persist SIEM I results')
+    baseline.add_argument('dataset_id', type=int)
+    baseline.add_argument('--observation-seconds', type=float, required=True)
+    baseline.add_argument('--attack-rules', type=Path)
+    baseline.add_argument('--service-rules', type=Path)
     args = parser.parse_args()
     path = args.database.resolve() if args.database else database_path()
     if args.command == "migrate":
@@ -34,6 +39,12 @@ def main() -> None:
         result = {"database": str(path), **import_eve(
             args.source, path, labels_path=args.labels_database, split=args.split,
             suricata_version=args.suricata_version, et_open_version=args.et_open_version)}
+    elif args.command == 'score-baseline':
+        from app.baseline import score_baseline
+        options = {key: value for key, value in {
+            'attack_rules': args.attack_rules, 'service_rules': args.service_rules}.items() if value is not None}
+        result = score_baseline(args.dataset_id, path,
+                                observation_seconds=args.observation_seconds, **options)
     elif args.command == "dataset-metadata":
         values = {key: value for key, value in {
             "split": args.split, "suricata_version": args.suricata_version,
