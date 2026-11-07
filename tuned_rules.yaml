@@ -1,0 +1,158 @@
+# IDEA-X proposed rule snapshot. Do not activate before deterministic evaluation.
+schema_version: 1
+version:
+  id: draft-0001
+  parent_id: null
+  status: proposed
+source:
+  attack_rules_path: config/attack_rules.json
+  attack_sha256: 49dc8819a3e5d28b9f8bf370894a795e92e0e3b5596a168baf2de587784146e7
+  service_rules_path: config/service_rules.json
+  service_sha256: b1408b228778730486d34a299e40b321ee48be2dd7f73d59811cf21461f9c895
+policy:
+  score_cap: 10
+  default_window_minutes: 5
+  default_n_sat: 60
+  high_severity_max_window_minutes: null
+  candidate_windows_minutes: []
+attack_mapping:
+  version: 1
+  description: Canonical attack-type weights for IDS alerts. Rules are ordered from
+    highest-confidence/highest-impact matches to lower-confidence matches.
+  tiers:
+    Low:
+    - 1
+    - 4
+    Medium:
+    - 5
+    - 7
+    High:
+    - 8
+    - 10
+  rules:
+  - attack_type: malware_or_reverse_shell
+    weight: 10
+    tier: High
+    match:
+      category_exact:
+      - A Network Trojan was detected
+      signature_contains:
+      - Reverse Shell
+      - DOS prompt command
+    basis: malware or command-shell behavior is a high-impact compromise indicator
+  - attack_type: web_application_attack
+    weight: 8
+    tier: High
+    match:
+      category_exact:
+      - Web Application Attack
+      signature_contains:
+      - Cross Site Scripting
+      - SQL Errors
+      - SQL injection
+    basis: direct attack against an application-facing endpoint
+  - attack_type: credential_brute_force
+    weight: 7
+    tier: Medium
+    match:
+      signature_contains:
+      - Brute-Force
+      - Brute Force
+      - Password Guess
+    basis: repeated authentication attempts can lead to account compromise
+  - attack_type: reconnaissance_or_port_scan
+    weight: 5
+    tier: Medium
+    match:
+      signature_contains:
+      - Nmap
+      - Port Scan
+      - Suspicious inbound to
+      - VNC Scan
+    basis: probing indicates discovery or preparation, but not necessarily compromise
+  - attack_type: authentication_protocol_anomaly
+    weight: 5
+    tier: Medium
+    match:
+      signature_contains:
+      - NTLMv1
+      - NTLM Session Setup
+      - TLS Handshake Failure
+    basis: legacy authentication or protocol failure requires investigation
+  - attack_type: suspicious_external_communication
+    weight: 4
+    tier: Low
+    match:
+      category_exact:
+      - Potentially Bad Traffic
+      - Attempted Information Leak
+      - Potential Corporate Privacy Violation
+      signature_contains:
+      - RMM Domain
+      - Reverse Shell Connection
+    basis: suspicious communication is important but has lower confidence without
+      corroboration
+  - attack_type: suspicious_dns_or_web_request
+    weight: 3
+    tier: Low
+    match:
+      signature_contains:
+      - DNS Query
+      - Domain in DNS Lookup
+      - HTTP Request to
+      - User-Agent Outbound
+    basis: indicator-level traffic needs correlation before being treated as an attack
+  - attack_type: informational_or_benign
+    weight: 1
+    tier: Low
+    severity_override: S
+    match:
+      category_exact:
+      - Not Suspicious Traffic
+    basis: informational detection; keep benign severity S
+  fallback:
+    attack_type: unclassified_detection
+    weight: 3
+    tier: Low
+    evidence: 0.2
+    basis: unmatched or unconfirmed IDS detection; review before escalation
+service_mapping:
+  default:
+    service: Unmapped asset
+    weight: 0
+    basis: Default service contribution for unmapped assets
+  rules:
+  - cidr: 192.168.10.0/24
+    service: Internal LAN and user endpoint zone
+    weight: 3
+    basis: network-zone baseline
+  - cidr: 172.16.0.0/12
+    service: Secondary private network zone
+    weight: 3
+    basis: network-zone baseline
+  - cidr: 192.168.10.255/32
+    service: Limited broadcast / non-service traffic
+    weight: 1
+    basis: special-address safeguard
+  - cidr: 192.168.10.3/32
+    service: Core identity and DNS service
+    weight: 10
+    basis: traffic-derived hypothesis
+  - cidr: 192.168.10.1/32
+    service: Gateway and DNS resolver service
+    weight: 9
+    basis: traffic-derived hypothesis
+  - cidr: 192.168.10.50/32
+    service: Application and file-transfer service
+    weight: 8
+    basis: traffic-derived hypothesis
+  - cidr: 172.16.0.1/32
+    service: Secondary web and file-transfer service
+    weight: 6
+    basis: traffic-derived hypothesis
+rules: {}
+changes: []
+evaluation:
+  status: not_run
+  attack_group_recall: null
+  benign_groups_raised: null

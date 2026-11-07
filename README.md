@@ -9,9 +9,8 @@ Original-rule scoring is integrated with SQLite and the API. `app/calculation_ba
 also contains prototype grouping, flow, evaluation, guardrail and tuner helpers;
 the complete tuned replay/acceptance loop remains unfinished. `app/evaluate.py`
 provides trusted label access, not attack-group recall calculations.
-It requires Python 3.10+ and SQLite 3.31+ with JSON functions. YAML snapshot
-tools additionally require PyYAML (`python -m pip install -r requirements.txt`).
-No database service is required.
+It requires Python 3.10+ and SQLite 3.31+ with JSON functions. No
+third-party Python packages or database service are required.
 
 ## Project structure
 
@@ -24,7 +23,7 @@ config/               attack_rules.json and service_rules.json
 migrations/           Runtime schema and separate label-store migrations
 scripts/              Database administration commands
 tests/                Backend/database tests
-tuner/                YAML snapshot builder and validator
+tuner/                Future offline tuning component
 demo_freeze/          Canonical frozen demo source and manifest
 data/                 Local databases and other input data
 output/               Generated reports and run artifacts
@@ -36,12 +35,6 @@ in file order, case-insensitively, with category/signature OR semantics. Service
 use destination IP, longest CIDR prefix, then the configured default. Use
 `demo_freeze/eve_demo_FINAL.json` as the single canonical extracted demo dataset.
 The existing `demo_freeze.zip` archive is retained.
-
-`tuner/rules.py` builds and validates complete YAML rule snapshots from the
-canonical JSON, including the unmapped-service default. It binds snapshots to
-source hashes and translates per-rule window and saturation settings for the
-prototype SIEM II grouping function. See [YAML rule snapshots](docs/yaml-rules.md).
-The tuned persistence and guardrail workflow remains unfinished.
 
 The reviewed Windows checkout has CRLF source lines: its actual SHA-256 is
 `8ed31f8aa0cb716d4773d4c87621ca543353160ee2719994c8067dd66ca1883b`.

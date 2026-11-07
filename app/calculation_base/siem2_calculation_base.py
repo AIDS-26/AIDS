@@ -56,11 +56,3 @@ def group_events(events, rules, default_window=5, default_n_sat=60):
                        'event_ids': [e['id'] for e in group],
                        'window_minutes': window, 'first_timestamp': group[0]['timestamp']})
     return sorted(output, key=lambda x: datetime.fromisoformat(x['first_timestamp'].replace('Z', '+00:00')))
-
-
-def group_events_with_yaml(events, snapshot, attack_path, service_path):
-    """Run SIEM II grouping with validated full YAML settings."""
-    from tuner.rules import to_siem2_settings
-
-    rules, window, n_sat = to_siem2_settings(snapshot, attack_path, service_path)
-    return group_events(events, rules, default_window=window, default_n_sat=n_sat)

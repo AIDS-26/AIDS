@@ -1,0 +1,17 @@
+{
+  "sample": true,
+  "run_id": "sample-001",
+  "clock": "1:55:26", "clock_t": 6926,
+  "duration_s": 9660, "duration": "2:41:00",
+  "reduction": "58.3%", "groups_raised": 2, "benign_raised": 0,
+  "original": { "total": 12, "high": 4, "medium": 4, "low": 4, "emails": 4 },
+  "tuned": { "total": 5, "high": 3, "medium": 1, "low": 1, "emails": 3 },
+  "points": [[0,0,0],[100,1,1],[110,2,1],[300,3,2],[310,4,2],[320,5,2],[330,6,2],[1200,7,3],[1210,8,3],[1220,9,3],[6800,10,4],[6810,11,4],[6900,12,5],[6926,12,5]],
+  "explanations": {
+    "g-0001": "Base score 9. This High alert is shown immediately and is not merged with other exploit events.",
+    "g-0002": "Base score 8. Three related web probes are retained in this sample group.",
+    "g-0003": "Base score 5. Four related events; the supplied sample score is 8 (High).",
+    "g-0004": "Base score 3. Scanner alerts are grouped by source and attack type.",
+    "g-0005": "The rule is marked benign. Both events retain the base score of 2."
+  }
+}

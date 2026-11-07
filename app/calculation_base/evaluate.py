@@ -8,8 +8,8 @@ certify a tuned proposal or replace a defined attack-group recall evaluator.
 from collections import Counter
 from .siem2_calculation_base import group_events
 
-def evaluate(events, rules, *, labels, default_window=5, default_n_sat=60):
-    groups = group_events(events, rules, default_window, default_n_sat)
+def evaluate(events, rules, *, labels):
+    groups = group_events(events, rules)
     ids = [e['id'] for e in events]
     if len(set(ids)) != len(ids):
         raise ValueError('Event IDs must be unique')
@@ -32,11 +32,3 @@ def evaluate(events, rules, *, labels, default_window=5, default_n_sat=60):
             'baseline_high': sum(e['base_score'] >= 8 for e in events),
             'grouped_high': sum(g['score'] >= 8 for g in groups),
             'groups': groups}
-
-
-def evaluate_with_yaml(events, snapshot, attack_path, service_path, *, labels):
-    """Evaluate validated YAML settings with separately supplied labels."""
-    from tuner.rules import to_siem2_settings
-
-    rules, window, n_sat = to_siem2_settings(snapshot, attack_path, service_path)
-    return evaluate(events, rules, labels=labels, default_window=window, default_n_sat=n_sat)

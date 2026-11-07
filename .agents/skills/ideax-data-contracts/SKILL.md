@@ -50,20 +50,13 @@ Source: `demo_freeze/eve_demo_FINAL.json` (JSON Lines, frozen). Keep `ts` = `dem
 ```
 
 ## tuning/tuned_rules.yaml  (written by Codex only)
-The YAML is a **complete rule snapshot**, not a changes-only fragment. It
-contains the canonical attack and service definitions copied from the source
-JSON, their hashes, policy bounds, every per-rule override, and an audit entry
-for each changed override. The authoritative schema and validator are in
-`tuner/rules.py`; see `docs/yaml-rules.md`. The earlier fragment below is an
-illustration of one audit entry, not the whole file.
 ```yaml
-changes:
-  - attack_type: exploit
-    service_cidr: 192.168.10.8/32
-    old: {window_min: 5, n_sat: 60}
-    new: {window_min: 2, n_sat: 3}
+rules:
+  exploit@win_vista_host:
+    window_min: { old: 5, new: 2 }
+    n_sat: { old: 60, new: 3 }
     gap: -1.9
-    rationale: "Keep the exploit window short and escalate quickly."
+    rationale: "Under-alerting for its priority: alert at once, escalate after 3 events."
 ```
 
 ## runs/<run_id>/tuning_run.json  (owner: Melvin; written by the API route / runner)

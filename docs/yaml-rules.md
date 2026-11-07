@@ -1,48 +1,37 @@
-# IDEA-X rule snapshots
+# Tuned YAML and version history
 
-`config/attack_rules.json` and `config/service_rules.json` are the canonical
-source for attack matching, asset mapping, and weights. The YAML snapshots
-contain the complete definitions plus runtime tuning settings. Source SHA-256
-hashes bind each snapshot to the exact JSON inputs. The loader validates these
-before accepting a snapshot. More specific CIDRs must win when the application
-resolves service weights; the YAML file preserves all source entries.
+`tuned_rules.yaml` is a **proposed** complete snapshot. Its attack and service
+mapping sections reproduce `config/attack_rules.json` and
+`config/service_rules.json`, including the explicit unmapped-service default.
+The SHA-256 values bind it to those source files. JSON remains the runtime source
+for Adel's baseline scorer; this PR does not change Python calculation modules.
 
-`base_rules.yaml` is generated from the JSON after an operator supplies the
-default window, saturation count, candidate windows, and the high-severity
-window limit. None of those values is provided by the PDF, so this repository
-does not commit invented defaults. For example, after the team chooses values:
+The current `app.calculation_base.siem2_calculation_base.group_events()` uses
+`window_minutes` and `n_sat` per `attack_type|service` rule. Its current defaults
+are 5 minutes and 60 events, recorded under `policy` in the YAML. The `rules`
+mapping is empty until a measured tuning proposal supplies per-rule values.
+The PDF does not define candidate windows or the maximum window for high scores;
+those fields remain unset. `changes` and `evaluation` truthfully record that no
+proposal has been evaluated or approved. **Do not activate this snapshot.**
+
+## Archive a version
+
+From the repository root, after editing `tuned_rules.yaml` and assigning a new
+`version.id` and `version.parent_id`:
 
 ```powershell
-python -m tuner --window-min <W> --n-sat <N> --max-high-window-min <MAX> --candidate-windows-min <W1> <W2> --output base_rules.yaml
+pwsh -NoProfile -File scripts/archive_tuned_rules.ps1
 ```
 
-The complete snapshot has `schema_version`, `kind`, `source`, `policy`,
-`attack_rules`, `attack_fallback`, `service_rules`, `service_default`,
-`overrides`, and `changes`. The default service entry retains its explicit
-zero weight for unmapped endpoints.
-`overrides` select an attack type and a service CIDR and supply per-rule `W`
-and `N_sat`. A tuned snapshot retains the full baseline definitions; each
-changed override has an audit entry with `old`, `new`, `gap`, and `rationale`.
-See `tuner.rules.validate(candidate, attack_json, service_json, base)`.
+The command saves an immutable copy to `tuning/history/<id>.yaml` and a record
+containing its parent ID, SHA-256, and archive time to
+`tuning/history/<id>.json`. It refuses to overwrite an ID or refer to a missing
+parent. Commit both files with the YAML change. Git also preserves the edit
+history of `tuned_rules.yaml` (`git log -- tuned_rules.yaml`). To inspect an old
+snapshot, open its archived YAML or run `git show <commit>:tuned_rules.yaml`.
 
-`tuner.rules.to_siem2_settings` converts validated overrides to Adel's
-`attack_type|service` lookup and returns the YAML defaults. Call
-`app.calculation_base.siem2_calculation_base.group_events_with_yaml` for tuned
-groups or `app.calculation_base.evaluate.evaluate_with_yaml` for its preliminary
-evaluation report, supplying labels separately as an event-ID mapping. The
-current evaluator reports event coverage, not the PDF's
-attack-group recall; it cannot yet certify a tuned proposal for activation.
-
-The application's `rule_versions`, `tuning_attempts`, `tuning_iterations`, and
-`evaluations` tables in `migrations/` own version history and iteration reports.
-Store the parsed, validated YAML mapping serialized as JSON in the existing
-`rule_versions.rules_json` column, with its parent and structured changes. Keep
-the human-readable YAML file as the rule artifact. There is no activation API yet: the
-deterministic evaluator and guardrail must be integrated before a tuned snapshot
-can be loaded as active.
-The current frontend displays pipeline outputs; it must not recalculate scores.
-
-The tuning loop is offline and has at most three proposals per run. It does
-not run once per alert. The current team handoff makes the deterministic
-guardrail the activation gate. A human can inspect YAML, diffs, metrics, and
-history; a required manual approval gate would be a separate product decision.
+`main` already has an immutable SQLite `rule_versions` table with `parent_id`,
+`rules_json`, `changes_json`, and status fields. When the existing backend flow
+later loads and validates YAML, it can store the parsed snapshot there and link
+new runs through `rule_version_id`. This archive is file history only; it does
+not register a DB version, run the guardrail, or change the active rules.
