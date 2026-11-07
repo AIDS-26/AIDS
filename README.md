@@ -180,6 +180,7 @@ const alerts = await fetch(`http://127.0.0.1:8000/api/runs/${run.id}/alerts?limi
 
 | GET route | Contents |
 | --- | --- |
+| `/api/health` (alias `/health`) | API and read-only database connectivity; HTTP 200 with `{"status":"ok","database":"ok"}`, or HTTP 503 if the database is unavailable |
 | `/api/datasets` | Source IDs, hashes, counts, split and known versions; no local paths |
 | `/api/datasets/{id}/alerts` | Imported source alerts with event IDs and source-line provenance |
 | `/api/datasets/{id}/runs` | Calculation run IDs, status, mode and rule-version IDs |

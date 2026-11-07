@@ -51,7 +51,11 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                     raise ValueError("Supported query parameters: limit, after_id (once each)")
                 paging = {key: int(values[0]) for key, values in query.items()}
                 siem.page_bounds(paging.get("limit", 100), paging.get("after_id", 0))
-                if url.path == "/api/datasets":
+                if url.path in ("/api/health", "/health"):
+                    with connect(target, read_only=True) as db:
+                        db.execute("SELECT 1").fetchone()
+                    result = {"status": "ok", "database": "ok"}
+                elif url.path == "/api/datasets":
                     result = siem.datasets(target, **paging)
                 elif match := re.fullmatch(r"/api/datasets/([1-9][0-9]*)/(alerts|runs|tuning-attempts)", url.path):
                     reader = {'alerts': siem.source_alerts, 'runs': siem.runs,
