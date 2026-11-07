@@ -1,11 +1,16 @@
 """Local demo control jobs. Existing GET data routes remain read-only."""
 
 import os
+import logging
+from datetime import datetime, timezone
 from pathlib import Path
 import threading
 
 from app.db import PROJECT_ROOT, connect
 from app.tuning.settings import tuning_settings
+from app.tuning.diagnostics import failure_reason
+
+logger = logging.getLogger(__name__)
 
 
 class JobError(Exception):
@@ -78,7 +83,7 @@ class TuningJobs:
             lease = _acquire(self.path)
             job = {'id': request_id, 'baseline_run_id': baseline_id, 'status': 'running',
                    'model': settings['model'], 'attempt_id': None, 'tuned_run_id': None,
-                   'error': None, 'iteration': 0, 'iteration_status': 'starting'}
+                   'error': None, 'iteration': 0, 'iteration_status': 'starting', 'logs': []}
             # Bound transient status storage; durable attempts stay in SQLite.
             if len(self._jobs) >= 64:
                 self._jobs.pop(next(iter(self._jobs)))
@@ -90,7 +95,18 @@ class TuningJobs:
                 lease.close()
                 self._jobs.pop(request_id, None)
                 raise JobError('Unable to start the tuning worker.', 503) from None
-            return dict(job)
+            return self.get(request_id)
+
+    def _progress(self, job_id, stage, iteration, message):
+        entry = {'timestamp': datetime.now(timezone.utc).isoformat(),
+                 'stage': stage, 'iteration': iteration, 'message': message}
+        with self._mutex:
+            job = self._jobs[job_id]
+            job['logs'].append(entry)
+            job['logs'] = job['logs'][-100:]
+            job.update(iteration=iteration, iteration_status=stage)
+        log = logger.error if stage in ('failed', 'iteration_failed') else logger.info
+        log('Tuning job %s | %s | iteration %s | %s', job_id, stage, iteration, message)
 
     def _run(self, job_id, settings, lease):
         def created(attempt_id):
@@ -98,6 +114,7 @@ class TuningJobs:
                 self._jobs[job_id]['attempt_id'] = attempt_id
 
         try:
+            self._progress(job_id, 'preparing', 0, 'Validating policy and loading the original-rule baseline.')
             from app.tuning.model import ResponsesProposer
             from app.tuning.policy import load_document
             from app.tuning.runner import tune
@@ -107,16 +124,21 @@ class TuningJobs:
                           proposer=ResponsesProposer(settings['model'], api_key=settings['api_key']),
                           evaluation_session_minutes=10,
                           label_provenance='Curated demo.label; signature-derived preparation, not independent ground truth',
-                          output_directory=PROJECT_ROOT / 'output/tuning', on_attempt_created=created)
+                          output_directory=PROJECT_ROOT / 'output/tuning', on_attempt_created=created,
+                          on_progress=lambda stage, iteration, message: self._progress(job_id, stage, iteration, message))
+            reason = None if result['status'] == 'completed' else failure_reason(RuntimeError(result.get('error', '')))
+            self._progress(job_id, result['status'], result.get('attempts', 0),
+                           'Accepted rules saved. Loading synchronized replay.' if reason is None else reason)
             with self._mutex:
                 self._jobs[job_id].update(status=result['status'],
                     tuned_run_id=result.get('tuned_run_id'),
-                    error=None if result['status'] == 'completed' else
-                    'No proposal passed tuning. Original alerts remain available; see Audit log for the saved checks.')
-        except Exception:
+                    error=reason)
+        except Exception as error:
             # Provider/filesystem/credential diagnostics are never browser output.
+            reason = failure_reason(error)
+            self._progress(job_id, 'failed', self._jobs[job_id]['iteration'], reason)
             with self._mutex:
-                self._jobs[job_id].update(status='failed', error='Tuning could not complete. Original alerts remain available; see Audit log.')
+                self._jobs[job_id].update(status='failed', error=reason)
         finally:
             lease.close()
 
@@ -125,6 +147,7 @@ class TuningJobs:
             if job_id not in self._jobs:
                 raise JobError('Tuning job not found. Reload saved results and check Audit log after a backend restart.', 404)
             job = dict(self._jobs[job_id])
+            job['logs'] = [dict(entry) for entry in job['logs']]
         if job['attempt_id'] is not None:
             with connect(self.path, read_only=True) as db:
                 iteration = db.execute('''SELECT iteration,status FROM tuning_iterations

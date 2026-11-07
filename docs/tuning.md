@@ -160,9 +160,42 @@ workload counts each group once. Do not sum shared per-rule counts as workload.
 The guardrail validates complete rule coverage, supported parameters/windows,
 N_sat bounds, high-severity limits, keys, immediate exploit behavior, evidence,
 score floors/caps, trajectory, runtime benign non-escalation, the stated retention
-gate and zero benign raised. It also requires positive alert reduction. A passing
+gate and the configured benign evaluation policy. It also requires positive alert reduction. A passing
 candidate may leave an unmet budget: this is reported with `budget_met=false` and
 a remaining gap, never described as meeting the budget.
+
+The current operator-requested demo policy uses
+`benign_evaluation: warn-any-benign-member-raised`: score increases on
+benign-labeled members are reported as warnings rather than rejecting grouping.
+The count remains visible, including mixed groups. Runtime rules marked benign
+still cannot escalate; every event must remain visible exactly once, with its
+baseline score or higher. The legacy `any-benign-member-raised` policy remains
+available for strict rejection. The chosen policy is saved in each new evaluation
+and snapshot; historical failed attempts are unchanged. This change reduces the
+acceptance constraint on benign-label escalation and can admit more noisy groups.
+
+Replay starts paused at zero. Play offers tuning when accepted results are
+missing; both lanes wait while tuning and then start together on one clock.
+Repeated alerts are grouped, never deleted, and remain expandable inside each
+group and visible in Original rules. The separate Run tuning header button has
+been removed; the Play flow still starts the real background job.
+
+Verification on the frozen demo source in disposable databases, with the
+deterministic development proposer (no model call): 5,483 original alerts became
+1,656 groups, all 7 defined attack groups were retained, 33 groups had raised
+benign-labeled members, and there were no integrity errors. The warning policy
+accepted the first proposal. These are grouping/curated-evidence results, not a
+new live Codex tuning result or independent detection recall.
+
+Dashboard tuning status now includes a bounded timestamped `logs` list with
+setup, proposal, validation, replay, evaluation and terminal stages. These
+messages also go to the backend logger. Safe failure reasons cover outdated
+policy, model HTTP status/quota/access and network errors without exposing
+credentials or raw provider responses. Setup failures before an attempt exists
+are logged too; only attempts already created can appear in Audit. Transient
+job logs disappear after an API restart; saved iterations remain in SQLite.
+Run only one backend on port 8000. Windows uses exclusive socket binding to
+prevent two processes from silently serving different versions on that port.
 
 Every returned proposal, including invalid configurations, has an immutable
 child version, parent link and audit. A malformed proposal keeps its raw proposal

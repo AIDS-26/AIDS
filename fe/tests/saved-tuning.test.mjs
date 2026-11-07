@@ -6,6 +6,15 @@ const attempt = { id: 2, baseline_run_id: 1, status: 'completed', created_at: '2
 const run = { id: 1, dataset_id: 1, mode: 'baseline', status: 'completed', rule_version_id: 'baseline/test', observation_seconds: 60, created_at: 'now', completed_at: 'now' };
 const iteration = { id: 1, iteration: 1, status: 'evaluated', rule_version_id: 'tuned/test', tuned_run_id: 3, guardrail: { passed: true, errors: [], budget_met: false, remaining_budget_gap: 5 }, report: { evaluation: { baseline_alerts: 10, grouped_alerts: 4, reduction_pct: 60, attack_groups_total: 2, attack_groups_retained: 2, attack_group_recall: 1, benign_groups_raised: 0 }, changes: [] } };
 const query = {dataset_id:1,attempt_id:2};
+test('accepted grouping keeps benign escalation warnings visible in saved audit data', () => {
+  const parsed = parseIteration({ ...iteration,
+    guardrail: { ...iteration.guardrail, warnings: ['1 group contains raised benign-labeled evidence'] },
+    report: { ...iteration.report, evaluation: { ...iteration.report.evaluation, benign_groups_raised: 1 } },
+  });
+  assert.equal(iterationAccepted(attempt, parsed), true);
+  assert.equal(parsed.evaluation.benign_groups_raised, 1);
+  assert.deepEqual(parsed.guardrail.warnings, ['1 group contains raised benign-labeled evidence']);
+});
 const fetcher = async url => {
   if (url.includes('/tuning-attempts?')) return response({ items: [attempt], next_after_id: null });
   if (url.includes('/runs?')) return response({ items: [run], next_after_id: null });

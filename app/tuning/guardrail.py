@@ -23,10 +23,16 @@ def check(events, groups, rules, base_rules, policy, evaluation):
         if members and group['score'] < max(e['base_score'] for e in members):
             errors.append('Alert score downgraded a member')
     if evaluation['acceptance_status'] != 'passed':
-        errors.append('Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised')
+        errors.append('Evaluation requires a nonempty attack denominator, full retention, known labels, and the configured benign policy')
+    if evaluation.get('benign_evaluation', 'any-benign-member-raised') != policy['benign_evaluation']:
+        errors.append('Evaluation benign policy does not match operator policy')
+    if policy['benign_evaluation'] == 'any-benign-member-raised' and evaluation['benign_groups_raised']:
+        errors.append('Strict policy requires zero benign groups raised')
     errors.extend(evaluation['integrity_errors'])
     if evaluation['alert_reduction'] is None or evaluation['alert_reduction'] <= 0:
         errors.append('Candidate does not reduce analyst alert count')
-    return {'passed': not errors, 'errors': sorted(set(errors)),
+    warnings = ([f"{evaluation['benign_groups_raised']} groups contain benign-labeled events raised above baseline; all evidence remains visible"]
+                if evaluation['benign_groups_raised'] else [])
+    return {'passed': not errors, 'errors': sorted(set(errors)), 'warnings': warnings,
             'remaining_budget_gap': evaluation['remaining_budget_gap'],
             'budget_met': evaluation['remaining_budget_gap'] == 0}

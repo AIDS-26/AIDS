@@ -67,11 +67,12 @@ def validate_policy(policy):
             raise ValueError(f'{name} must contain unique attack type names')
     semantics = {'group_lifetime': 'session-open-left',
                  'cross_service': 'strictest-attack-settings',
-                 'retention': 'all-members-at-baseline',
-                 'benign_evaluation': 'any-benign-member-raised'}
+                 'retention': 'all-members-at-baseline'}
     for name, supported in semantics.items():
         if policy[name] != supported:
             raise ValueError(f'{name}: supported policy is {supported}')
+    if policy['benign_evaluation'] not in ('any-benign-member-raised', 'warn-any-benign-member-raised'):
+        raise ValueError('Unsupported benign_evaluation policy')
     for name in ('attack_evidence', 'other_evidence'):
         value = policy[name]
         if type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1:

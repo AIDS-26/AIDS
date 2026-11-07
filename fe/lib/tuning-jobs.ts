@@ -4,6 +4,7 @@ export type TuningJob = {
   id: string; baseline_run_id: number; status: "running" | "completed" | "failed";
   model: string; attempt_id: number | null; tuned_run_id: number | null;
   iteration: number; iteration_status: string; error: string | null;
+  logs: { timestamp: string; stage: string; iteration: number; message: string }[];
 };
 export type TuningSettings = { model: string; ready: boolean; max_iterations: number; evaluation_session_minutes: number };
 
@@ -17,9 +18,16 @@ export function parseJob(value: unknown): TuningJob {
       || typeof r.iteration !== "number" || !Number.isInteger(r.iteration) || r.iteration < 0 || r.iteration > 3
       || typeof r.iteration_status !== "string" || !(r.error === null || typeof r.error === "string")
       || (r.status === "completed" && r.tuned_run_id === null)) throw new BackendError("Invalid tuning job response.");
+  const logs = r.logs == null ? [] : r.logs;
+  if (!Array.isArray(logs) || logs.length > 100 || logs.some(entry => !entry || typeof entry !== "object"
+      || typeof entry.timestamp !== "string" || typeof entry.stage !== "string" || typeof entry.message !== "string"
+      || !Number.isInteger(entry.iteration) || entry.iteration < 0 || entry.iteration > 3)) {
+    throw new BackendError("Invalid tuning progress log.");
+  }
   return { id: r.id, baseline_run_id: r.baseline_run_id as number, status: r.status as TuningJob["status"],
     model: r.model, attempt_id: r.attempt_id as number | null, tuned_run_id: r.tuned_run_id as number | null,
-    iteration: r.iteration, iteration_status: r.iteration_status, error: r.error as string | null };
+    iteration: r.iteration, iteration_status: r.iteration_status, error: r.error as string | null,
+    logs: logs.map(entry => ({ timestamp: entry.timestamp, stage: entry.stage, iteration: entry.iteration, message: entry.message })) };
 }
 
 export async function tuningRequest(baseUrl: string, jobId?: string, body?: unknown, fetcher: typeof fetch = fetch) {

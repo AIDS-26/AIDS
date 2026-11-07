@@ -42,7 +42,16 @@ export function getAuditData() {
 export type AuditData = ReturnType<typeof getAuditData>;
 
 export function getEmailsData() {
-  return emails;
+  const replay = getReplayData();
+  return {
+    ...emails,
+    tuned: emails.tuned.map(email => {
+      const group = replay.groups.find(group => group.group_id === email.group_id) ?? null;
+      return { ...email, group, clustered_logs: replay.alerts
+        .filter(alert => group?.alert_ids.includes(alert.id))
+        .sort((a, b) => a.t - b.t || a.id.localeCompare(b.id)) };
+    }),
+  };
 }
 
 export type EmailsData = ReturnType<typeof getEmailsData>;

@@ -5,6 +5,16 @@ import { parseJob, tuningRequest } from '../lib/tuning-jobs.ts';
 const job = { id: 'a'.repeat(32), baseline_run_id: 1, model: 'test-model', status: 'running', attempt_id: null,
   tuned_run_id: null, iteration: 0, iteration_status: 'starting', error: null, api_key: 'must-not-forward' };
 
+test('progress logs survive polling while unrecognized fields are excluded', () => {
+  const entry = { timestamp: '2026-11-07T08:00:00Z', stage: 'proposing', iteration: 1,
+    message: 'Requesting model proposal.', api_key: 'must-not-forward' };
+  const parsed = parseJob({ ...job, logs: [entry] });
+  assert.equal(parsed.logs[0].message, entry.message);
+  assert(!JSON.stringify(parsed).includes('must-not-forward'));
+  assert.deepEqual(parseJob(job).logs, []);
+  assert.throws(() => parseJob({ ...job, logs: [{ ...entry, iteration: 4 }] }), /Invalid/);
+});
+
 test('tuning proxy forwards only the baseline and idempotency ID to local control', async () => {
   let request;
   const result = await tuningRequest('http://127.0.0.1:8000', undefined, { baseline_run_id: 1, request_id: job.id }, async (url, init) => {

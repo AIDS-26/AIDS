@@ -69,9 +69,43 @@ class TuningJobTests(unittest.TestCase):
         self.assertIsNotNone(completed['tuned_run_id'])
         self.assertIsNotNone(completed['attempt_id'])
         self.assertNotIn('private-test-key', json.dumps(completed))
+        self.assertTrue(any(entry['stage'] == 'proposing' for entry in completed['logs']))
+        self.assertTrue(any(entry['stage'] == 'checked' for entry in completed['logs']))
         with connect(self.path, read_only=True) as db:
             self.assertEqual(db.execute('SELECT status FROM runs WHERE id=?', (completed['tuned_run_id'],)).fetchone()[0], 'completed')
             self.assertEqual(db.execute('SELECT count(*) FROM evaluations').fetchone()[0], 1)
+
+    def test_setup_failure_is_logged_even_before_an_audit_attempt_exists(self):
+        with patch('app.tuning.runner.tune', side_effect=ValueError('benign_evaluation: unsupported')):
+            with self.assertLogs('app.tuning.jobs', level='INFO') as captured:
+                jobs = TuningJobs(self.path)
+                failed = self.wait(jobs, jobs.start(self.run, '1' * 32)['id'])
+        self.assertEqual(failed['status'], 'failed')
+        self.assertIsNone(failed['attempt_id'])
+        self.assertIn('Restart the backend', failed['error'])
+        self.assertEqual(failed['logs'][-1]['stage'], 'failed')
+        self.assertTrue(any('Restart the backend' in line for line in captured.output))
+        self.assertNotIn('private-test-key', json.dumps(failed))
+
+    def test_provider_failure_has_actionable_log_without_exposing_secrets(self):
+        class Unavailable(DeterministicProposer):
+            def __call__(self, context):
+                raise RuntimeError('Model API returned HTTP 429')
+        with patch('app.tuning.model.ResponsesProposer', return_value=Unavailable()):
+            jobs = TuningJobs(self.path)
+            failed = self.wait(jobs, jobs.start(self.run, '2' * 32)['id'])
+        failures = [entry for entry in failed['logs'] if entry['stage'] == 'iteration_failed']
+        self.assertEqual(len(failures), 3)
+        self.assertIn('quota', failures[0]['message'])
+        self.assertNotIn('private-test-key', json.dumps(failed))
+
+    def test_second_api_cannot_bind_the_same_port(self):
+        server = make_server(self.path, port=0)
+        try:
+            with self.assertRaises(OSError):
+                make_server(self.path, port=server.server_port)
+        finally:
+            server.server_close()
 
     def test_duplicate_clicks_and_other_process_manager_cannot_start_overlapping_jobs(self):
         entered, release = threading.Event(), threading.Event()

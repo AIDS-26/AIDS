@@ -8,12 +8,26 @@ import json
 from pathlib import Path
 import re
 import sqlite3
+import socket
+import os
+import logging
 from urllib.parse import parse_qs, urlsplit
 
 from app.db import connect, database_path
 from app import siem
 from app.replay_view import replay_view
 from app.tuning.jobs import JobError, TuningJobs
+
+
+class LocalAPIServer(ThreadingHTTPServer):
+    # Windows SO_REUSEADDR can allow multiple listeners to silently serve
+    # different code on the same port. One API must own the loopback endpoint.
+    allow_reuse_address = os.name != 'nt'
+
+    def server_bind(self):
+        if os.name == 'nt':
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
 
 def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
@@ -127,10 +141,11 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
             except sqlite3.Error:
                 self.reply(503, {'error': 'Database unavailable'})
 
-    return ThreadingHTTPServer((host, port), Handler)
+    return LocalAPIServer((host, port), Handler)
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
     parser = argparse.ArgumentParser(description="Local SIEM read API; migrate/import separately")
     parser.add_argument("--database", type=Path)
     parser.add_argument("--host", default="127.0.0.1")

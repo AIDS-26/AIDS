@@ -1,5 +1,5 @@
 {
-  "budget_per_hour": 20,
+  "budget_per_hour": 1000,
   "initial_window_minutes": 5,
   "initial_n_sat": 60,
   "candidate_windows_minutes": [1, 2, 5, 10],
@@ -10,7 +10,7 @@
   "group_lifetime": "session-open-left",
   "cross_service": "strictest-attack-settings",
   "retention": "all-members-at-baseline",
-  "benign_evaluation": "any-benign-member-raised",
+  "benign_evaluation": "warn-any-benign-member-raised",
   "attack_evidence": 1.0,
   "other_evidence": 0.2,
   "evidence_provenance": "Curated demo.label aggregates; arithmetic mean per attack/service rule. Frozen manifest ATTACK_RE indicates Suricata-signature-derived preparation; not independent ground truth."

@@ -54,7 +54,7 @@ Expected logical inputs are `base_rules.yaml`, `asset_map.yaml`, `siem1_results.
 4. For negative gaps, keep the window small and consider increasing sensitivity. A negative gap alone is not proof of a missed attack; never fabricate events to consume spare budget. The PDF's under-budget exploit example must alert immediately and must not be merged.
 5. Enforce an explicit maximum `W` for rules with `S >= 8`. The PDF does not supply the numeric maximum or candidate windows. The operator approved the demo configuration in `config/tuning_policy.json`: B=20/hour, initial W=5/N_sat=60, candidates [1,2,5,10] minutes, N_sat maximum 10,000, high-severity maximum W=10 minutes, and observation duration 9600 seconds. These are disclosed demo assumptions; models cannot change them.
 6. Produce `tuned_rules.yaml` with each changed parameter's old value, new value, addressed delta gap, and one-sentence rationale. Retain compatibility with the runtime schema; use a supported audit section or YAML comments for metadata.
-7. Run the deterministic evaluator and report every iteration: alert reduction, attack-group recall, and benign groups raised. Accept only 100% attack-group recall and zero benign groups raised. Define and report the attack-group denominator and what counts as a raised benign group; an empty attack set cannot substantiate a recall claim.
+7. Run the deterministic evaluator and report every iteration: alert reduction, attack-group recall, and benign groups raised. Require 100% attack-group evidence retention. The current operator-requested policy `warn-any-benign-member-raised` reports benign-label score increases as visible warnings rather than blocking grouping; legacy `any-benign-member-raised` still requires zero. Runtime benign rules must retain S under either policy. Define and report the attack-group denominator and what counts as a raised benign group; an empty attack set cannot substantiate a recall claim.
 8. Allow at most three proposal/evaluation iterations. If validation still fails, report failure and keep baseline rules active. Never bypass the guardrail or describe an unevaluated proposal as safe.
 
 The database accepts zero attack groups and any positive evaluation iteration. Store benign-only evaluations with zero retained groups and display recall as N/A; never treat an empty denominator as 100% recall. Enforce the three-iteration limit in tuner policy rather than schema constraints.
@@ -77,6 +77,8 @@ During a tuning-only task, modify only `tuned_rules.yaml`; return YAML and a sho
 - The manifest's counts describe dataset preparation, not tuned performance. Do not claim production readiness or production recall from a curated demo.
 
 ## Development and verification
+
+- Dashboard tuning jobs expose bounded timestamped safe progress logs; `app/tuning/diagnostics.py` classifies failures without forwarding raw exceptions or secrets. Setup failures before attempt creation log to the job and backend logger even when no Audit entry exists. The API configures console logging and uses exclusive Windows socket binding to prevent duplicate listeners serving stale code. Transient job logs reset on restart; saved attempts remain durable.
 
 Keep changes focused on the requested component. Prefer small deterministic functions for parsing, scoring, grouping, budget allocation, and evaluation. Validate YAML against explicit schemas and reject unknown or unsafe rule changes before reload. Preserve the previous valid configuration if loading fails.
 
