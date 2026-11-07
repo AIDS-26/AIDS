@@ -30,6 +30,21 @@ def main() -> None:
     baseline.add_argument('--observation-seconds', type=float, required=True)
     baseline.add_argument('--attack-rules', type=Path)
     baseline.add_argument('--service-rules', type=Path)
+    tuning = commands.add_parser('tune', help='Offline tuning, deterministic replay, and guarded rule versioning')
+    tuning.add_argument('baseline_run_id', type=int)
+    tuning.add_argument('--policy', type=Path, default=Path('config/tuning_policy.json'))
+    tuning.add_argument('--proposer', choices=['model', 'deterministic'], default='model')
+    tuning.add_argument('--model', help='Explicit Responses API model; alternatively CODEX_MODEL')
+    evaluation = tuning.add_mutually_exclusive_group()
+    evaluation.add_argument('--evaluation-manifest', type=Path)
+    evaluation.add_argument('--evaluation-session-minutes', type=float,
+                            help='Explicit curated demo evaluation policy; approved demo value: 10')
+    tuning.add_argument('--label-provenance', required=True)
+    tuning.add_argument('--output-directory', type=Path, default=Path('output/tuning'))
+    tuning.add_argument('--from-version', help='Continue from a version previously accepted on this baseline')
+    replay = commands.add_parser('replay-tuned', help='Replay a validated rule version without labels or a model')
+    replay.add_argument('baseline_run_id', type=int)
+    replay.add_argument('--rule-version', required=True)
     args = parser.parse_args()
     path = args.database.resolve() if args.database else database_path()
     if args.command == "migrate":
@@ -45,6 +60,26 @@ def main() -> None:
             'attack_rules': args.attack_rules, 'service_rules': args.service_rules}.items() if value is not None}
         result = score_baseline(args.dataset_id, path,
                                 observation_seconds=args.observation_seconds, **options)
+    elif args.command == 'tune':
+        import os
+        from app.tuning.model import ResponsesProposer, DeterministicProposer
+        from app.tuning.policy import load_document
+        from app.tuning.runner import tune
+        proposer = (ResponsesProposer(args.model or os.environ.get('CODEX_MODEL'))
+                    if args.proposer == 'model' else DeterministicProposer())
+        result = tune(args.baseline_run_id, path, policy=load_document(args.policy), proposer=proposer,
+                      labels_path=args.labels_database,
+                      evaluation_manifest=load_document(args.evaluation_manifest) if args.evaluation_manifest else None,
+                      evaluation_session_minutes=args.evaluation_session_minutes,
+                      label_provenance=args.label_provenance, output_directory=args.output_directory,
+                      from_version_id=args.from_version)
+        print(json.dumps(result, indent=2))
+        if result['status'] != 'completed':
+            raise SystemExit(1)
+        return
+    elif args.command == 'replay-tuned':
+        from app.tuning.runner import replay_version
+        result = replay_version(args.baseline_run_id, args.rule_version, path)
     elif args.command == "dataset-metadata":
         values = {key: value for key, value in {
             "split": args.split, "suricata_version": args.suricata_version,

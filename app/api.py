@@ -22,6 +22,7 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
     with connect(target, read_only=True) as db:
         db.execute("SELECT dest_port FROM events LIMIT 0")
         db.execute("SELECT rule_version_id FROM runs LIMIT 0")
+        db.execute("SELECT alert_score FROM tuned_event_scores LIMIT 0")
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, format, *args):
@@ -50,15 +51,24 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                     raise ValueError("Supported query parameters: limit, after_id (once each)")
                 paging = {key: int(values[0]) for key, values in query.items()}
                 siem.page_bounds(paging.get("limit", 100), paging.get("after_id", 0))
-                if url.path == "/api/datasets":
+                if url.path in ("/api/health", "/health"):
+                    with connect(target, read_only=True) as db:
+                        db.execute("SELECT 1").fetchone()
+                    result = {"status": "ok", "database": "ok"}
+                elif url.path == "/api/datasets":
                     result = siem.datasets(target, **paging)
-                elif match := re.fullmatch(r"/api/datasets/([1-9][0-9]*)/(alerts|runs)", url.path):
-                    reader = siem.source_alerts if match[2] == "alerts" else siem.runs
+                elif match := re.fullmatch(r"/api/datasets/([1-9][0-9]*)/(alerts|runs|tuning-attempts)", url.path):
+                    reader = {'alerts': siem.source_alerts, 'runs': siem.runs,
+                              'tuning-attempts': siem.tuning_attempts}[match[2]]
                     result = reader(int(match[1]), target, **paging)
                 elif match := re.fullmatch(r"/api/runs/([1-9][0-9]*)/alerts", url.path):
                     result = siem.calculated_alerts(int(match[1]), target, **paging)
                 elif match := re.fullmatch(r"/api/runs/([1-9][0-9]*)/alerts/([1-9][0-9]*)/events", url.path):
                     result = siem.evidence(int(match[1]), int(match[2]), target, **paging)
+                elif match := re.fullmatch(r"/api/tuning-attempts/([1-9][0-9]*)", url.path):
+                    result = siem.tuning_detail(int(match[1]), target, **paging)
+                elif match := re.fullmatch(r"/api/runs/([1-9][0-9]*)/rule-history", url.path):
+                    result = siem.rule_history(int(match[1]), target, **paging)
                 else:
                     self.reply(404, {"error": "Route not found"})
                     return
