@@ -4,6 +4,17 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $source = Join-Path $repoRoot 'tuned_rules.yaml'
 $history = Join-Path $repoRoot 'tuning/history'
+function Get-CanonicalSha256([string]$filePath) {
+    # Git may check text out with CRLF on Windows. Hash LF-normalized UTF-8 text.
+    $content = [System.IO.File]::ReadAllText($filePath, [System.Text.Encoding]::UTF8)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($content.Replace("`r`n", "`n"))
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return ([System.BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $sha.Dispose()
+    }
+}
 if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
     throw 'tuned_rules.yaml was not found'
 }
@@ -19,8 +30,8 @@ $serviceHash = [regex]::Match($contents, '(?m)^  service_sha256: ([a-f0-9]{64})\
 if (-not $attackHash.Success -or -not $serviceHash.Success) {
     throw 'Source SHA-256 values are missing or invalid'
 }
-if ((Get-FileHash -LiteralPath (Join-Path $repoRoot 'config/attack_rules.json') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $attackHash.Groups[1].Value -or
-    (Get-FileHash -LiteralPath (Join-Path $repoRoot 'config/service_rules.json') -Algorithm SHA256).Hash.ToLowerInvariant() -ne $serviceHash.Groups[1].Value) {
+if ((Get-CanonicalSha256 (Join-Path $repoRoot 'config/attack_rules.json')) -ne $attackHash.Groups[1].Value -or
+    (Get-CanonicalSha256 (Join-Path $repoRoot 'config/service_rules.json')) -ne $serviceHash.Groups[1].Value) {
     throw 'YAML source hashes do not match current canonical JSON'
 }
 $versionId = $version.Groups[1].Value
@@ -39,11 +50,12 @@ if ((Test-Path -LiteralPath $snapshotPath) -or (Test-Path -LiteralPath $recordPa
     throw "Version $versionId already exists; archived snapshots are immutable"
 }
 
-$digest = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
+$digest = Get-CanonicalSha256 $source
 $record = [ordered]@{
     version_id = $versionId
     parent_id = if ($parentId -eq 'null') { $null } else { $parentId }
     sha256 = $digest
+    hash_mode = 'utf8_lf'
     archived_at_utc = [DateTime]::UtcNow.ToString('o')
     snapshot = "$versionId.yaml"
 }

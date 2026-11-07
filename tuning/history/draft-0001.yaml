@@ -8,7 +8,7 @@ source:
   attack_rules_path: config/attack_rules.json
   attack_sha256: 49dc8819a3e5d28b9f8bf370894a795e92e0e3b5596a168baf2de587784146e7
   service_rules_path: config/service_rules.json
-  service_sha256: b1408b228778730486d34a299e40b321ee48be2dd7f73d59811cf21461f9c895
+  service_sha256: 6261788152c95a87a53f6475d44a5e2d9f1c9b5fa0a4511416ff1506e36acf12
 policy:
   score_cap: 10
   default_window_minutes: 5
