@@ -8,12 +8,12 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 
 ## Current repository
 
-- `README.md` currently contains only the project name and expansion.
-- `app/`, `siem/`, `tuner/`, `scripts/`, `tests/`, `fixtures/`, `data/`, `demo/`, and `docs/` are currently empty scaffolding. Their names suggest component boundaries; they do not establish implemented APIs.
-- `demo_freeze/eve_demo_FINAL.json` is Suricata EVE JSON Lines: one JSON event per line, despite its `.json` extension.
-- `demo_freeze/manifest.json` records dataset preparation, counts, windows, seed, and a SHA-256. `demo_freeze.zip` is an existing archive.
+- `README.md` documents the current top-level layout and data format.
+- `config/attack_rules.json` contains attack-type classification and severity weights.
+- `config/service_rules.json` contains CIDR-to-service mappings and service weights.
+- `data/eve_demo_FINAL.json` is Suricata EVE JSON Lines: one JSON event per line, despite its `.json` extension.
 - No dependency manifest, runnable application, evaluator, or test command has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist. Update this section with verified setup and test commands when implementation adds them.
-- Preserve existing user files and untracked artifacts. Treat `demo_freeze/` and its archive as frozen inputs; write derived outputs elsewhere unless the user requests regeneration.
+- Preserve existing user files and untracked artifacts. Treat source datasets as immutable inputs and write derived outputs elsewhere unless the user requests regeneration.
 
 ## Architecture
 
