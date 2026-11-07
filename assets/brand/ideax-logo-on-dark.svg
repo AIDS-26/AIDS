@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 440" role="img" aria-label="IDEA-X logo for dark backgrounds">
+<title>IDEA-X logo for dark backgrounds</title>
+  <g transform="translate(205 205)">
+    <circle cx="0" cy="0" r="73" fill="#FFFFFF"/>
+    <path d="M-148 0 A148 148 0 0 1 45 -141" fill="none" stroke="#FFFFFF" stroke-width="31" stroke-linecap="round"/>
+    <path d="M80 -124 A148 148 0 0 1 133 62" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/>
+    <path d="M112 97 A148 148 0 0 1 51 139" fill="none" stroke="#FFFFFF" stroke-width="31" stroke-linecap="round"/>
+    <path d="M16 147 A148 148 0 0 1 -128 75" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/>
+    <circle cx="89" cy="-122" r="31" fill="#BD2024"/>
+  </g>
+  <g transform="translate(382 116)" fill="#FFFFFF">
+    <text x="0" y="145" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="154" font-weight="900" letter-spacing="-8">IDEA-X</text>
+    <text x="4" y="207" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="400" letter-spacing="-0.3">Intrusion Detection Escalation through Agentic reasoning</text>
+  </g>
+</svg>

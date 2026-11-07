@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 40 330 330" role="img" aria-label="IDEA-X mark">
+<title>IDEA-X mark</title>
+  <g transform="translate(205 205)">
+    <circle cx="0" cy="0" r="73" fill="#004488"/>
+    <path d="M-148 0 A148 148 0 0 1 45 -141" fill="none" stroke="#004488" stroke-width="31" stroke-linecap="round"/>
+    <path d="M80 -124 A148 148 0 0 1 133 62" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/>
+    <path d="M112 97 A148 148 0 0 1 51 139" fill="none" stroke="#004488" stroke-width="31" stroke-linecap="round"/>
+    <path d="M16 147 A148 148 0 0 1 -128 75" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/>
+    <circle cx="89" cy="-122" r="31" fill="#BD2024"/>
+  </g>
+</svg>

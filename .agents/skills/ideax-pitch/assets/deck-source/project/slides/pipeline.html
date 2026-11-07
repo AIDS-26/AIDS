@@ -1,0 +1,43 @@
+<section id="pipeline" data-transition="fade" style="background:#F2F2F2;color:#0B1420;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:space-between;gap:48px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:3px;color:#BD2024;text-transform:uppercase">How it works</p>
+<h2 style="font-family:'Oswald', 'Arial Narrow', sans-serif;font-size:72px;font-weight:500;line-height:1.1;color:#0B1420">One model step. Everything else is code.</h2>
+</div>
+<div style="display:flex;flex-direction:row;align-items:stretch;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FBFBF8;border:2px solid #CBD5E0;border-radius:8px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">1 · Original run</p>
+<h3 style="font-size:40px;font-weight:600;line-height:1.15;color:#0B1420">Every alert alone</h3>
+<ul style="font-size:28px;line-height:1.45;color:#3B4A5C">
+<li>Suricata reads the traffic</li>
+<li>Each alert scored on its own</li>
+<li>5,483 alerts, 1,535 emails</li>
+</ul>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:32px;background:#6A9DCF;align-self:center"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#004488;border:2px solid #004488;border-radius:8px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#A9C8EA">2 · Codex tunes, offline</p>
+<h3 style="font-size:40px;font-weight:600;line-height:1.15;color:#F2F2F2">Propose, test, revise</h3>
+<ul style="font-size:28px;line-height:1.45;color:#E2ECF6">
+<li>Measures flow against budget</li>
+<li>Writes tuned_rules.yaml</li>
+<li>Runs evaluate(), up to 3 tries</li>
+</ul>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#004488;background:#F2F2F2;padding:10px 16px;border-radius:4px">Guardrail: fixed checks before use</p>
+</div>
+<x-shape kind="arrow-right" style="width:56px;height:32px;background:#6A9DCF;align-self:center"></x-shape>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#FBFBF8;border:2px solid #CBD5E0;border-radius:8px;padding:36px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">3 · Tuned run</p>
+<h3 style="font-size:40px;font-weight:600;line-height:1.15;color:#0B1420">Grouped and ranked</h3>
+<ul style="font-size:28px;line-height:1.45;color:#3B4A5C">
+<li>Same alerts, same order</li>
+<li>Grouped by target and attack</li>
+<li>Repeats raise the score</li>
+</ul>
+</div>
+</div>
+<div style="position:absolute;left:128px;right:128px;bottom:64px;display:flex;flex-direction:row;justify-content:space-between">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">Audit log every run · Suricata rules unchanged · Codex edits only tuned_rules.yaml</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#5A6878">07</p>
+</div>
+<aside>1:35–1:55. Walk left to right in one breath. “Stage one is today’s world: every alert on its own. Stage two is Codex, offline: it measures the flow, writes new settings, tests them and revises. A fixed guardrail checks the result. Stage three replays the same alerts with the tuned settings.” Stress: the model never scores an alert; code does. Then: “Let me show you.”</aside>
+</section>

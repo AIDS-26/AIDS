@@ -1,0 +1,793 @@
+<meta charset="utf-8">
+<title>IDEA-X Project Brief</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: a single reading column (~68ch) for the brief; the mockup breaks out to 1200px inside its own scroll box. */
+:root{
+  --bg:#F5F7FA; --surface:#FFFFFF; --ink:#0E1620; --muted:#526273; --line:#D8E0E8;
+  --primary:#004488; --primary-ink:#FFFFFF; --secondary:#6A9DCF; --accent:#BD2024;
+  --tint:#EAF3FC; --code-bg:#EEF2F6;
+  --ok:#1F7A4D; --ok-tint:#EAF7EF; --warn:#946200; --warn-tint:#FFF4D6; --bad:#BD2024; --bad-tint:#FCECED;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --f-ui:"Inter", "Segoe UI", system-ui, sans-serif;
+  /* product mockup palette: fixed, it is a picture of the light UI */
+  --m-canvas:#FFFFFF; --m-surface:#F2F2F2; --m-ink:#020202; --m-muted:#526273; --m-border:#D8E0E8;
+  --m-primary:#004488; --m-secondary:#6A9DCF; --m-accent:#BD2024; --m-blueTint:#EAF3FC; --m-redTint:#FCECED;
+  --m-green:#1F7A4D; --m-greenTint:#EAF7EF; --m-yellow:#946200; --m-yellowTint:#FFF4D6;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141D; --surface:#131E2A; --ink:#E4EBF2; --muted:#93A3B5; --line:#24364A;
+  --primary:#8DB8E6; --primary-ink:#06121F; --secondary:#6A9DCF; --accent:#E2575B;
+  --tint:#16283B; --code-bg:#182635;
+  --ok:#5CC08C; --ok-tint:#123024; --warn:#E0B24A; --warn-tint:#33280E; --bad:#E2575B; --bad-tint:#3A1719;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0C141D; --surface:#131E2A; --ink:#E4EBF2; --muted:#93A3B5; --line:#24364A;
+  --primary:#8DB8E6; --primary-ink:#06121F; --secondary:#6A9DCF; --accent:#E2575B;
+  --tint:#16283B; --code-bg:#182635;
+  --ok:#5CC08C; --ok-tint:#123024; --warn:#E0B24A; --warn-tint:#33280E; --bad:#E2575B; --bad-tint:#3A1719;
+  color-scheme:dark }
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:760px;margin:0 auto}
+.wide{max-width:1240px;margin:0 auto}
+h1,h2,h3{text-wrap:balance;line-height:1.25;margin:0}
+h1{font-size:2rem;font-weight:600;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:600;margin-top:3.2rem;padding-top:1.2rem;border-top:1px solid var(--line)}
+h3{font-size:1.05rem;font-weight:600;margin-top:1.8rem}
+p{margin:.8rem 0}
+.lede{font-size:1.1rem;color:var(--ink)}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+code{background:var(--code-bg);padding:.1em .35em;border-radius:3px}
+a{color:var(--primary)}
+.num{font-variant-numeric:tabular-nums}
+
+header.top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:28px 8px}
+header.top .logo{display:flex;align-items:center;gap:12px}
+header.top .logo b{font-family:var(--f-ui);font-weight:600;font-size:1.5rem;letter-spacing:-.02em}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.9rem;margin:18px 0 0;padding:12px 0;border-bottom:1px solid var(--line)}
+nav.toc a{text-decoration:none;color:var(--muted)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--primary);text-decoration:underline}
+
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 18px;margin:1.2rem 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-tint)}
+.callout.bad{border-color:var(--bad);background:var(--bad-tint)}
+.callout p:first-child{margin-top:0}.callout p:last-child{margin-bottom:0}
+
+.stat-line{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:1.4rem 0}
+.stat-line div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.stat-line b{display:block;font-size:1.6rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat-line span{font-size:.85rem;color:var(--muted)}
+
+dl.gloss{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr);gap:0;margin:1rem 0;border-top:1px solid var(--line)}
+dl.gloss dt,dl.gloss dd{margin:0;padding:10px 0;border-bottom:1px solid var(--line)}
+dl.gloss dt{font-weight:600;padding-right:14px}
+dl.gloss dd{color:var(--ink)}
+dl.gloss dd small{display:block;color:var(--muted);font-size:.85rem}
+
+/* stage diagram */
+.stages{display:grid;gap:14px;margin:1.4rem 0}
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.stage .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.stage .head b{font-size:1rem}
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.box{border:1px solid var(--line);border-radius:4px;padding:6px 10px;font-size:.88rem;background:var(--bg);line-height:1.35}
+.box small{display:block;color:var(--muted);font-size:.78rem}
+.box.code{border-color:var(--primary)}
+.box.llm{border:1.5px dashed var(--primary);background:var(--tint)}
+.arrow{color:var(--muted);font-family:var(--f-mono)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:10px;border:1px solid var(--line);margin-right:6px;vertical-align:-1px;background:var(--bg)}
+.legend i.code{border-color:var(--primary)}
+.legend i.llm{border:1.5px dashed var(--primary);background:var(--tint)}
+
+.formula{font-family:var(--f-mono);font-size:1rem;background:var(--code-bg);border-radius:6px;padding:12px 16px;overflow-x:auto;white-space:nowrap}
+table.t{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
+table.t th,table.t td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.t th{font-weight:600;font-size:.8rem;color:var(--muted)}
+table.t td.r,table.t th.r{text-align:right}
+.scroll{overflow-x:auto;margin:1rem 0}
+
+/* calculator */
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;margin:1.2rem 0}
+.calc .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.calc label{font-size:.85rem;color:var(--muted);display:block}
+.calc output{font-family:var(--f-mono);font-weight:500;color:var(--ink)}
+.calc input[type=range]{width:100%;accent-color:var(--primary)}
+.calc .result{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.calc .big{font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums}
+.bars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px;margin-top:14px;align-items:end;height:120px}
+.bars div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:.75rem;color:var(--muted)}
+.bars span.b{width:100%;border-radius:3px 3px 0 0;display:flex;align-items:flex-start;justify-content:center;color:var(--primary-ink);font-weight:600;font-size:.78rem;padding-top:2px}
+.band{display:inline-block;font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:3px}
+.band.High{background:var(--bad-tint);color:var(--bad)}
+.band.Medium{background:var(--warn-tint);color:var(--warn)}
+.band.Low{background:var(--ok-tint);color:var(--ok)}
+
+/* gap bars */
+.gapcell{position:relative;width:180px;height:14px}
+.gapcell .axis{position:absolute;left:30px;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
+.gapcell .pos{position:absolute;left:30px;top:2px;height:10px;background:var(--accent);border-radius:0 2px 2px 0}
+.gapcell .neg{position:absolute;right:150px;top:2px;height:10px;background:var(--primary);border-radius:2px 0 0 2px}
+
+ol.steps{padding-left:1.3rem}
+ol.steps li{margin:.4rem 0}
+ul.tight li{margin:.25rem 0}
+
+/* proposal table */
+.prio{font-size:.72rem;font-weight:600;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.prio.must{background:var(--primary);color:var(--primary-ink)}
+.prio.should{background:var(--tint);color:var(--primary);border:1px solid var(--secondary)}
+.prio.later{background:transparent;color:var(--muted);border:1px solid var(--line)}
+
+/* ===== Mockup (fixed product palette) ===== */
+.mock-shell{margin:1.2rem 0;border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.mock-tabs-ext{display:flex;gap:4px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);font-size:.85rem;align-items:center}
+.mock-tabs-ext span{color:var(--muted);margin-right:6px}
+.mock-scroll{overflow-x:auto;background:#C9D3DD}
+.mock{width:1200px;margin:0 auto;background:var(--m-canvas);color:var(--m-ink);font-family:var(--f-ui);font-size:13px;line-height:20px;font-variant-numeric:tabular-nums}
+.mock *{box-sizing:border-box}
+.m-head{display:flex;align-items:center;gap:20px;padding:14px 28px;border-bottom:1px solid var(--m-border)}
+.m-brand{display:flex;align-items:center;gap:10px}
+.m-brand b{font-size:18px;font-weight:600;letter-spacing:-.02em}
+.m-brand small{display:block;font-size:11px;line-height:14px;color:var(--m-muted)}
+.m-nav{display:flex;gap:2px;margin-left:16px}
+.m-nav button{font:inherit;font-weight:500;background:none;border:0;padding:8px 12px;border-radius:4px;color:var(--m-muted);cursor:pointer;border-bottom:2px solid transparent;border-radius:0}
+.m-nav button[aria-selected="true"]{color:var(--m-primary);border-bottom-color:var(--m-primary)}
+.m-nav button:focus-visible,.m-btn:focus-visible,.m-seg button:focus-visible,.m-group:focus-visible,.m-att button:focus-visible{outline:2px solid var(--m-secondary);outline-offset:2px}
+.m-src{margin-left:auto;font-size:12px;color:var(--m-muted);border:1px solid var(--m-border);border-radius:4px;padding:4px 10px;background:var(--m-surface)}
+.m-body{padding:20px 28px 28px;display:grid;gap:16px}
+.m-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.m-btn{font:inherit;font-weight:500;font-size:12px;border-radius:4px;padding:6px 14px;border:1px solid var(--m-border);background:var(--m-canvas);color:var(--m-primary);cursor:pointer}
+.m-btn.primary{background:var(--m-primary);border-color:var(--m-primary);color:#fff}
+.m-seg{display:inline-flex;border:1px solid var(--m-border);border-radius:4px;overflow:hidden}
+.m-seg button{font:inherit;font-size:12px;border:0;background:var(--m-canvas);padding:5px 11px;cursor:pointer;color:var(--m-ink)}
+.m-seg button[aria-pressed="true"]{background:var(--m-ink);color:#fff}
+.m-card{border:1px solid var(--m-border);border-radius:6px;background:var(--m-canvas)}
+.m-card.pad{padding:14px 16px}
+.m-h{font-size:16px;line-height:24px;font-weight:600;margin:0}
+.m-sub{font-size:12px;color:var(--m-muted);margin:0}
+.m-label{font-size:12px;line-height:18px;font-weight:500;color:var(--m-muted)}
+.m-small{font-size:11px;line-height:16px;color:var(--m-muted)}
+.m-metric{font-size:30px;line-height:36px;font-weight:600}
+.m-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.m-lane-head{padding:14px 16px;border-bottom:1px solid var(--m-border)}
+.m-lane-head .top{display:flex;justify-content:space-between;align-items:baseline}
+.m-big{font-size:44px;line-height:48px;font-weight:600;letter-spacing:-.02em;margin-top:6px}
+.m-mini{display:flex;gap:18px;margin-top:8px}
+.m-mini div{padding-left:8px;border-left:3px solid var(--m-border)}
+.m-mini b{display:block;font-size:15px;line-height:20px}
+.m-mini .h{border-color:var(--m-accent)} .m-mini .m{border-color:var(--m-yellow)} .m-mini .l{border-color:var(--m-green)} .m-mini .e{border-color:var(--m-primary)}
+.m-feed{max-height:330px;overflow:auto}
+.m-feed .ev{display:grid;grid-template-columns:62px 1fr 120px 64px;gap:8px;padding:5px 16px;border-bottom:1px solid #EEF1F4;font-size:12px;align-items:center}
+.m-badge{display:inline-block;font-size:11px;line-height:16px;font-weight:600;padding:2px 8px;border-radius:3px;text-align:center}
+.m-badge.High{background:var(--m-redTint);color:var(--m-accent)}
+.m-badge.Medium{background:var(--m-yellowTint);color:var(--m-yellow)}
+.m-badge.Low{background:var(--m-greenTint);color:var(--m-green)}
+.m-badge.Benign{background:var(--m-surface);color:var(--m-muted)}
+.m-badge.Pass{background:var(--m-greenTint);color:var(--m-green)}
+.m-badge.Fail{background:var(--m-redTint);color:var(--m-accent)}
+.m-groups{padding:10px 12px;display:grid;gap:8px;max-height:330px;overflow:auto}
+.m-group{display:grid;grid-template-columns:4px 1fr auto;gap:12px;border:1px solid var(--m-border);border-radius:4px;padding:10px 12px 10px 0;background:var(--m-canvas);cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.m-group .stripe{border-radius:0 2px 2px 0}
+.m-group .score{font-size:20px;font-weight:600;align-self:center}
+.m-group[aria-expanded="true"]{border-color:var(--m-primary);background:var(--m-blueTint)}
+.m-detail{border:1px solid var(--m-primary);border-radius:4px;padding:10px 12px;font-size:12px;background:var(--m-canvas)}
+.m-detail table{width:100%;border-collapse:collapse}
+.m-detail td{padding:3px 6px;border-bottom:1px solid #EEF1F4}
+.m-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.m-kpi{border:1px solid var(--m-border);border-radius:6px;padding:12px 14px}
+.m-kpi.ok{background:var(--m-greenTint);border-color:#CFE8DA}
+.m-note{font-size:12px;color:var(--m-muted);border-left:3px solid var(--m-secondary);padding:4px 10px;background:var(--m-blueTint)}
+.m-table{width:100%;border-collapse:collapse;font-size:12px}
+.m-table th{font-weight:500;color:var(--m-muted);text-align:left;padding:8px 10px;background:var(--m-surface);border-bottom:1px solid var(--m-border)}
+.m-table td{padding:8px 10px;border-bottom:1px solid #EEF1F4;vertical-align:middle}
+.m-table td.r,.m-table th.r{text-align:right}
+.m-table tr.sel td{background:var(--m-blueTint)}
+.m-input{font:inherit;width:64px;border:1px solid var(--m-border);border-radius:4px;padding:4px 8px;font-weight:600}
+.m-att{display:flex;gap:6px}
+.m-att button{font:inherit;font-size:12px;border:1px solid var(--m-border);background:var(--m-canvas);border-radius:4px;padding:6px 10px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.m-att button[aria-pressed="true"]{border-color:var(--m-primary);box-shadow:inset 0 -2px 0 var(--m-primary)}
+.m-checks{list-style:none;padding:0;margin:0;display:grid;gap:4px;font-size:12px}
+.m-checks li{display:grid;grid-template-columns:18px 1fr;gap:6px}
+.m-checks .y{color:var(--m-green);font-weight:700}.m-checks .n{color:var(--m-accent);font-weight:700}
+.m-diff{font-family:var(--f-mono);font-size:11.5px;line-height:18px}
+.m-diff .rule{padding:8px 10px;border-bottom:1px solid #EEF1F4}
+.m-diff .old{color:var(--m-accent)} .m-diff .new{color:var(--m-green)}
+.m-diff .why{font-family:var(--f-ui);color:var(--m-muted);font-size:12px}
+.m-log{background:#0F1720;color:#C9D4DF;font-family:var(--f-mono);font-size:11.5px;line-height:18px;padding:10px 12px;border-radius:4px;max-height:170px;overflow:auto;white-space:pre}
+.m-log .f{color:#FF8A8D}.m-log .p{color:#7FD3A6}.m-log .c{color:#8DB8E6}
+.m-mail-list .item{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:8px 12px;border-bottom:1px solid #EEF1F4;font-size:12px}
+.m-mail-list .item.sel{background:var(--m-blueTint)}
+.m-mail{padding:16px 20px;font-size:13px}
+.m-mail .hdr{display:grid;grid-template-columns:70px 1fr;gap:2px 10px;font-size:12px;border-bottom:1px solid var(--m-border);padding-bottom:10px;margin-bottom:12px}
+.m-mail .hdr span{color:var(--m-muted)}
+.m-mail table{border-collapse:collapse;margin:10px 0;font-size:12px}
+.m-mail td{padding:4px 14px 4px 0;border-bottom:1px solid #EEF1F4}
+.m-mail td:first-child{color:var(--m-muted)}
+.m-stack{position:relative}
+.m-stack .item{background:var(--m-canvas)}
+
+@media (max-width:640px){
+  h1{font-size:1.6rem}
+  .stat-line{grid-template-columns:minmax(0,1fr)}
+  dl.gloss{grid-template-columns:minmax(0,1fr)}
+  dl.gloss dt{border-bottom:0;padding-bottom:0}
+  .calc .controls{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="logo">
+    <svg width="40" height="40" viewBox="40 40 330 330" aria-hidden="true"><g transform="translate(205 205)"><circle r="73" fill="#004488"/><path d="M-148 0 A148 148 0 0 1 45 -141" fill="none" stroke="#004488" stroke-width="31" stroke-linecap="round"/><path d="M80 -124 A148 148 0 0 1 133 62" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/><path d="M112 97 A148 148 0 0 1 51 139" fill="none" stroke="#004488" stroke-width="31" stroke-linecap="round"/><path d="M16 147 A148 148 0 0 1 -128 75" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/><circle cx="89" cy="-122" r="31" fill="#BD2024"/></g></svg>
+    <b>IDEA-X</b>
+  </div>
+  <span class="muted" style="font-size:.9rem">Intrusion Detection Escalation through Agentic reasoning</span>
+</header>
+<p class="eyebrow">Project brief · Sea × OpenAI Codex Hackathon, 7 Nov 2026 · written for the design, frontend and QA owner</p>
+<h1>What we are building, in plain words</h1>
+<nav class="toc" aria-label="Sections">
+  <a href="#story">The story</a><a href="#words">Words you will hear</a><a href="#flow">How it runs</a><a href="#score">Scoring</a><a href="#grouping">Grouping</a><a href="#codex">What Codex calculates</a><a href="#limits">Limits</a><a href="#features">Proposed features</a><a href="#mockup">Mockup</a><a href="#qa">QA checklist</a>
+</nav>
+
+<section id="story">
+<h2>The story</h2>
+<p class="lede">Picture a mall's CCTV room. Sensors raise an alarm every few seconds, and most alarms are a door swinging open. After a week the guards stop looking. Then a real break-in rings an alarm, and nobody checks it.</p>
+<p>Company security teams live in that room. Industry surveys put the average at about 3,000 security alerts a day, with most of them never read. The sensors already see the attacks. The problem is that people cannot read everything the sensors raise.</p>
+<p>IDEA-X does not build a better sensor. It changes how the alarms reach people:</p>
+<ul class="tight">
+  <li><b>Group</b> repeated alarms about the same target into one alert, so a flood of 756 identical warnings becomes one line.</li>
+  <li><b>Escalate</b> that one alert when the repeats keep coming, so a target being hit again and again rises to the top.</li>
+  <li><b>Let Codex tune the settings</b> for each kind of alarm, the way a site reliability engineer tunes on-call alarms: measure the flow, compare it with what the team can read, and adjust.</li>
+  <li><b>Check every change</b> with a fixed safety check before it is used, and keep a record of what changed and why.</li>
+</ul>
+<div class="stat-line">
+  <div><b>5,483</b><span>alerts from the original rules in the PDF's real replay</span></div>
+  <div><b>112 → 46</b><span>grouped alerts: replay page with one global setting, then Codex's per-rule settings</span></div>
+  <div><b>0</b><span>harmless groups pushed up a severity level (this must stay 0)</span></div>
+</div>
+<p class="muted" style="font-size:.9rem">Figures come from the newest PDF. We quote the per-rule result (46) once the rebuilt app reproduces it tomorrow.</p>
+<p><b>The pitch line:</b> “Codex doesn't score alerts. It writes and tests the rules that do.”</p>
+</section>
+
+<section id="words">
+<h2>Words you will hear</h2>
+<h3>From security</h3>
+<dl class="gloss">
+  <dt>SOC</dt><dd>Security Operations Center. The team, or room, that watches alerts and decides which ones matter. The CCTV room in the story.</dd>
+  <dt>Suricata</dt><dd>Free, open-source software that watches network traffic and raises an alert when traffic matches one of its rules. It is our sensor. We do not change its rules.</dd>
+  <dt>PCAP</dt><dd>A recording of network traffic. The CCTV footage.</dd>
+  <dt>eve.json</dt><dd>The file Suricata writes. One line per alert: time, which rule fired, source IP, target IP, port. <small>The PDF calls our sample <code>eve_demo_FINAL.json</code> (5,483 alerts).</small></dd>
+  <dt>CIC-IDS2017</dt><dd>A public research dataset: a week of recorded traffic from a test company network, with real attacks run at known times. We use the Thursday recording. Because the attack times are published, we know which alerts belong to real attacks. Those are the <b>labels</b>.</dd>
+  <dt>Attack vs benign</dt><dd>Attack: the alert came from one of the known attacks. Benign: harmless traffic that still tripped a rule, such as a policy warning.</dd>
+  <dt>SIEM</dt><dd>The dashboard that collects every alert and decides what to show or email. The PDF has two: <b>SIEM I</b> (original rules) and <b>SIEM II</b> (tuned rules). <small>In the product we call them <b>Original rules</b> and <b>Tuned rules</b>.</small></dd>
+  <dt>Alert fatigue</dt><dd>When people stop reading alerts because there are too many.</dd>
+  <dt>Severity band</dt><dd>Scores run from 1 to 10. <span class="band Low">Low</span> 1–4, <span class="band Medium">Medium</span> 5–7, <span class="band High">High</span> 8–10. Each High alert in the original rules sends an email.</dd>
+</dl>
+<h3>From SRE (site reliability engineering)</h3>
+<dl class="gloss">
+  <dt>SRE</dt><dd>The engineers who keep an app like Shopee running. Their habit: watch the traffic, set a limit for what people can handle, and tune the alarms so on-call staff are not woken up by noise.</dd>
+  <dt>Budget B</dt><dd>How many alerts per hour the analysts can actually read. An operator sets this number, for example 20 per hour.</dd>
+  <dt>Burn rate</dt><dd>Alerts arriving per hour divided by the budget. 373 per hour against a budget of 20 gives a burn rate of 18.6×: the team gets almost 19 times what it can read.</dd>
+  <dt>p95</dt><dd>The 95th percentile. “p95 burst size is 40” means 95% of bursts have 40 events or fewer. It describes a normal busy moment while ignoring the rare extreme ones.</dd>
+  <dt>Delta gap</dt><dd>Observed alerts per hour minus the share of the budget a rule deserves. Positive: the rule is too noisy. Negative: an important rule is too quiet.</dd>
+</dl>
+<h3>Our system</h3>
+<dl class="gloss">
+  <dt>Rule</dt><dd>In the PDF a “rule” is an attack type at a service, for example “Brute force at web server”. Each gets its own settings.</dd>
+  <dt>Window W</dt><dd>How many minutes the tuned rules wait to collect repeats into the same group. Bigger W means more grouping and fewer alerts.</dd>
+  <dt>N_sat</dt><dd>The saturation point: how many events in a group push its score all the way to 10. Smaller N_sat means quicker escalation.</dd>
+  <dt>Group key</dt><dd>What makes two alerts “the same”: same target and same attack type. Scanners are the exception: they are grouped by who is scanning (the source), because they hit many targets.</dd>
+  <dt>Codex tuner</dt><dd>Codex, run offline before the tuned replay. It reads the original results and writes new W and N_sat values per rule into <code>tuned_rules.yaml</code>, with a reason for each change. It never scores alerts itself.</dd>
+  <dt>evaluate()</dt><dd>A fixed script Codex calls to test its own proposal: how many fewer alerts, did every attack still show up, was any harmless group raised.</dd>
+  <dt>Guardrail</dt><dd>A fixed safety check that runs after Codex. It rejects a proposal that breaks a limit, for example a grouping window that is too long for a dangerous rule.</dd>
+  <dt>Recall</dt><dd>Of the real attacks in the labels, how many still appear correctly after tuning. Must be 100%. <small>Exact definition to confirm with the scorecard owner.</small></dd>
+  <dt>YAML</dt><dd>A plain-text settings format that is easy to read and to compare line by line (a “diff”).</dd>
+</dl>
+</section>
+
+<section id="flow">
+<h2>How it runs: three stages</h2>
+<p>Everything is ordinary, predictable code except one step: the Codex tuner. That is on purpose. The model proposes; code checks and executes.</p>
+<div class="stages">
+  <div class="stage">
+    <div class="head"><b>1. Original run</b><span class="muted" style="font-size:.88rem">every alert on its own</span></div>
+    <div class="chain"><span class="box">Traffic recording<small>CIC-IDS2017 PCAP</small></span><span class="arrow">→</span><span class="box code">Suricata<small>fixed rules</small></span><span class="arrow">→</span><span class="box code">App<small>scores each alert</small></span><span class="arrow">→</span><span class="box">Original rules<small>5,483 alerts</small></span><span class="arrow">→</span><span class="box">Email<small>one per High alert</small></span></div>
+  </div>
+  <div class="stage">
+    <div class="head"><b>2. Tuning, offline</b><span class="muted" style="font-size:.88rem">runs once, before the tuned replay</span></div>
+    <div class="chain"><span class="box">Inputs<small>rule settings, asset map, original results</small></span><span class="arrow">→</span><span class="box llm">Codex tuner<small>proposes, tests, revises (max 3)</small></span><span class="arrow">→</span><span class="box code">Guardrail<small>checks limits</small></span><span class="arrow">→</span><span class="box">tuned_rules.yaml<small>with a reason per change</small></span></div>
+  </div>
+  <div class="stage">
+    <div class="head"><b>3. Tuned run</b><span class="muted" style="font-size:.88rem">same alerts, grouped and ranked</span></div>
+    <div class="chain"><span class="box">Same eve.json</span><span class="arrow">→</span><span class="box code">App<small>loads tuned rules</small></span><span class="arrow">→</span><span class="box">Tuned rules<small>grouped alerts</small></span><span class="arrow">→</span><span class="box">Email<small>one per High group</small></span></div>
+  </div>
+  <div class="stage">
+    <div class="head"><b>Audit log</b><span class="muted" style="font-size:.88rem">kept for every run</span></div>
+    <p style="margin:.4rem 0 0;font-size:.92rem">Data before tuning, the rule changes, data after tuning.</p>
+  </div>
+</div>
+<div class="legend"><span><i></i>Data</span><span><i class="code"></i>Fixed code</span><span><i class="llm"></i>Codex (the only model step)</span></div>
+<p>There is no human approval step in this version. The guardrail is the gate. A failed proposal is not used.</p>
+</section>
+
+<section id="score">
+<h2>How one alert gets its score</h2>
+<div class="formula">S = min(10, A + C)</div>
+<ul class="tight">
+  <li><b>A</b> is the attack-type weight: how dangerous this kind of attack is. An exploit weighs more than a ping.</li>
+  <li><b>C</b> is the service weight: how important the target machine is, taken from the asset map. The web server matters more than a test laptop.</li>
+  <li><b>10</b> is the cap. No score goes above it.</li>
+</ul>
+<p>The original rules stop here: every alert gets its S and is shown by itself. If S is 8 or more, it sends an email. That is how 756 exploit alerts became 756 emails in the PDF.</p>
+</section>
+
+<section id="grouping">
+<h2>How grouping raises the score</h2>
+<p>The tuned rules collect alerts with the same group key inside the window W. The group's score rises with the number of events in it, n:</p>
+<div class="formula">X = round( S + (10 − S) × min(1, ln n ÷ ln N_sat) )</div>
+<p>In words: start at the base score S and close the distance to 10. The more events, the more of the distance you close. At N_sat events you reach 10. The logarithm (ln) makes the first few repeats count most: going from 1 to 10 events matters more than going from 100 to 110.</p>
+<p>Two safety facts come from the shape of the formula. With one event, ln 1 = 0, so X = S: nothing is ever scored lower than its base. And benign alerts are excluded on purpose: they always keep S.</p>
+
+<div class="calc" aria-label="Score calculator">
+  <div class="controls">
+    <div><label for="cS">Base score S: <output id="oS">5</output></label><input id="cS" type="range" min="1" max="9" value="5"></div>
+    <div><label for="cN">N_sat: <output id="oN">60</output></label><input id="cN" type="range" min="2" max="200" value="60"></div>
+    <div><label for="cn">Events in the group, n: <output id="on">8</output></label><input id="cn" type="range" min="1" max="250" value="8"></div>
+  </div>
+  <div class="result">
+    <span class="big" id="oX">8</span><span id="oBand" class="band High">High</span>
+    <span class="muted" id="oWhy" style="font-size:.9rem"></span>
+  </div>
+  <div class="bars" id="bars" aria-label="Score for different group sizes"></div>
+  <p class="muted" style="font-size:.82rem;margin:.6rem 0 0">Bars: the score this S and N_sat would give at n = 1, 2, 3, 5, 10, 20, 60, 200 events.</p>
+</div>
+<div class="callout warn">
+  <p><b>One example in the PDF needs care.</b> The PDF's one-page primer says “two minor alarms on the same server become one medium alarm.” That is only true when N_sat is small. With S = 3 and N_sat = 60, two events give 4, still Low. It takes N_sat of 25 or less. Try it above with S = 3 and n = 2. Say “repeats raise the score” in the pitch instead, or show a case that is true.</p>
+</div>
+</section>
+
+<section id="codex">
+<h2>What Codex calculates</h2>
+<p>Codex treats the alert stream like website traffic. It does five things for each rule, then proposes settings.</p>
+<ol class="steps">
+  <li><b>Measure the flow.</b> Alerts per hour from the original run, plus the biggest and typical (p95) burst inside a window.</li>
+  <li><b>Compare with the budget.</b> All rules together send 373 alerts per hour. The budget is 20. Burn rate 18.6×.</li>
+  <li><b>Give each rule a weight.</b> w = S × evidence. Evidence is 1.0 for attack traffic and 0.2 for benign traffic, so harmless noise gets a small share.</li>
+  <li><b>Split the budget by weight.</b> Allowed per hour = B × w ÷ (sum of all w).</li>
+  <li><b>Find the gap.</b> Observed per hour − allowed per hour.</li>
+</ol>
+<p>You can change the budget below and watch the shares move. The observed numbers are from the PDF. The base scores are back-calculated from the PDF's allowed column, so treat them as a reconstruction.</p>
+<div class="calc" style="padding-bottom:6px">
+  <label for="budget" style="display:inline">Budget B, alerts per hour: </label>
+  <input id="budget" type="number" min="5" max="200" value="20" style="width:70px;font:inherit;padding:2px 6px">
+  <span class="muted" style="margin-left:12px">Burn rate <b id="burn" class="num" style="color:var(--accent)">18.6×</b></span>
+  <div class="scroll">
+  <table class="t" id="gapTable">
+    <thead><tr><th>Rule (attack type at service)</th><th class="r">Base S</th><th class="r">Evidence</th><th class="r">Observed / h</th><th class="r">Allowed / h</th><th class="r">Gap</th><th>Too noisy ← → too quiet</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  </div>
+</div>
+<h3>What Codex changes</h3>
+<ul class="tight">
+  <li><b>Positive gap (too noisy):</b> pick the smallest window W that brings the rule's grouped alerts under its allowed share. Set N_sat to the rule's p95 burst size, so a normal busy burst reaches 10 and anything bigger stands out.</li>
+  <li><b>Negative gap (too quiet for its importance):</b> keep W small so the alert fires at once, and make it escalate sooner. In the sample, “Exploit at Windows Vista host” is the one rule like this.</li>
+  <li><b>Hard limit:</b> rules with S of 8 or more never get a long window, so a serious attack is never delayed by grouping.</li>
+</ul>
+<h3>How Codex checks itself</h3>
+<p>After writing <code>tuned_rules.yaml</code>, Codex runs <code>evaluate()</code> and reads three numbers: alert reduction, attack recall and benign groups raised. If recall is below 100% or any benign group was raised, it revises and runs again, at most three times. Then the guardrail checks the final proposal. Codex is only allowed to edit that one YAML file.</p>
+<p>In the product, Codex runs through the Codex CLI (<code>codex exec</code>), started by our app. The screen shows it as a job with a log, the way a build server shows a build.</p>
+</section>
+
+<section id="limits">
+<h2>Limits we say out loud</h2>
+<ul class="tight">
+  <li><b>Labels at runtime.</b> The tuned rules use the dataset's attack/benign labels to keep benign alerts at their base score and to set the 0.2 evidence weight. A real system would not have these labels. We present them as a stand-in for analyst feedback, and the screen says so.</li>
+  <li><b>The budget and the 0.2 weight are assumptions.</b> They are operator inputs, not facts.</li>
+  <li><b>One dataset, one day.</b> A clean result on Thursday's traffic is not a promise about future attacks.</li>
+  <li><b>No response actions.</b> IDEA-X reads alerts and sends emails. It does not block IPs or touch other systems.</li>
+  <li><b>Privacy.</b> Codex is a cloud model. We send it counts per rule, not raw traffic.</li>
+</ul>
+</section>
+</div>
+
+<div class="wrap" id="features">
+<h2>Proposed features</h2>
+<p>Four screens, named for what a person does on them. “Must” items are what the 6-minute demo needs. The data column is the file each screen reads, which we should agree with the backend owners tomorrow morning.</p>
+</div>
+<div class="wide"><div class="scroll">
+<table class="t" style="min-width:860px">
+  <thead><tr><th>Screen</th><th>Feature</th><th>Why it matters to judges</th><th>Priority</th><th>Reads</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="6"><b>Replay</b></td><td>Play, pause, restart; speed 60× / 120× / 360×; demo clock</td><td>The live demo itself</td><td><span class="prio must">Must</span></td><td class="mono">original_alerts.json</td></tr>
+    <tr><td>Timeline: total alerts over time, original vs tuned, with attack windows underneath</td><td>Shows floods next to the real attacks in one picture</td><td><span class="prio must">Must</span></td><td class="mono">attack_windows.json</td></tr>
+    <tr><td>Two lanes side by side: Original rules (every alert) and Tuned rules (groups)</td><td>The before/after, in real time</td><td><span class="prio must">Must</span></td><td class="mono">tuned_groups.json</td></tr>
+    <tr><td>Summary row: fewer alerts, groups moved up a band, benign groups raised, emails sent</td><td>Real-world value in four numbers</td><td><span class="prio must">Must</span></td><td class="mono">(computed)</td></tr>
+    <tr><td>Click a group to see the original alerts inside it</td><td>Trust: nothing is hidden, only grouped</td><td><span class="prio should">Should</span></td><td class="mono">tuned_groups.json</td></tr>
+    <tr><td>Notice that attack/benign tags come from dataset labels</td><td>Honesty, pre-empts the obvious question</td><td><span class="prio must">Must</span></td><td class="mono">—</td></tr>
+    <tr><td rowspan="6"><b>Tuning</b></td><td>Budget input, observed rate, burn rate</td><td>The SRE idea in one strip</td><td><span class="prio must">Must</span></td><td class="mono">flow_table.json</td></tr>
+    <tr><td>Per-rule gap table: observed, allowed, gap bar, proposed change</td><td>Shows Codex's analysis, not just its answer</td><td><span class="prio must">Must</span></td><td class="mono">flow_table.json</td></tr>
+    <tr><td>Attempts 1–3 with evaluate results and the guardrail checklist</td><td>Codex tests and revises its own work</td><td><span class="prio must">Must</span></td><td class="mono">tuning_run.json</td></tr>
+    <tr><td>Rule changes: old value, new value, gap addressed, one-line reason</td><td>Every change is reviewable</td><td><span class="prio must">Must</span></td><td class="mono">tuned_rules.yaml</td></tr>
+    <tr><td>Run tuning button with the live Codex log</td><td>Codex visibly in the loop</td><td><span class="prio should">Should</span></td><td class="mono">API route → codex exec</td></tr>
+    <tr><td>Show the last saved run if a live run is slow or fails</td><td>Demo does not depend on network luck</td><td><span class="prio must">Must</span></td><td class="mono">tuning_run.json</td></tr>
+    <tr><td rowspan="2"><b>Audit log</b></td><td>List of runs, including failed ones, with budget, attempts, result</td><td>Honest record, failures stay visible</td><td><span class="prio should">Should</span></td><td class="mono">runs/index.json</td></tr>
+    <tr><td>Per run: data before, rule changes, data after, file names</td><td>The PDF's audit log</td><td><span class="prio should">Should</span></td><td class="mono">runs/&lt;id&gt;/…</td></tr>
+    <tr><td rowspan="2"><b>Emails</b></td><td>Count of emails each version sent, with the inbox flood shown</td><td>Makes alert fatigue felt</td><td><span class="prio should">Should</span></td><td class="mono">(computed)</td></tr>
+    <tr><td>Preview of one High-group email</td><td>Shows what an analyst receives</td><td><span class="prio later">Later</span></td><td class="mono">tuned_groups.json</td></tr>
+    <tr><td><b>All</b></td><td>Loading, empty and error states</td><td>Build quality: holds up under use</td><td><span class="prio should">Should</span></td><td class="mono">—</td></tr>
+  </tbody>
+</table>
+</div></div>
+
+<div class="wrap">
+<h3>Naming</h3>
+<p>In the product: <b>Original rules</b> and <b>Tuned rules</b>, with a short line under each: “Every alert on its own” and “Related alerts grouped, repeats raise the score”. Alerts in the tuned lane are called <b>grouped alerts</b>. Tabs: Replay, Tuning, Audit log, Emails. Codex appears as a <b>tuning run</b>.</p>
+<h3>Keeping it from looking AI-made</h3>
+<ul class="tight">
+  <li>No purple, gradients, glows, sparkle or robot icons, chat bubbles or typing effects. The brand blue does the work; red only means High.</li>
+  <li>Codex is shown like a build job: a status, a log, a result. No “AI assistant” framing.</li>
+  <li>Flat white surfaces, 1-pixel borders, small corner radius, no drop shadows.</li>
+  <li>Dense tables and real units: IPs, timestamps, events per hour. Few big hero numbers.</li>
+  <li>Color is for meaning only: red High, amber Medium, green Low, grey benign.</li>
+</ul>
+</div>
+
+<div class="wide" id="mockup">
+<div class="wrap" style="max-width:760px;margin:0 auto"><h2>Mockup</h2>
+<p>A clickable sketch to agree on before we draw it in Figma. It uses your Figma styles (Inter, the brand palette, your existing badges and cards). Numbers are the PDF's mid-replay snapshot and are examples only. Try: switch tabs, click a grouped alert, change the budget on Tuning, switch between attempts.</p></div>
+<div class="mock-shell">
+  <div class="mock-tabs-ext"><span>Desktop, 1200 px wide. Scroll sideways on small screens.</span></div>
+  <div class="mock-scroll">
+  <div class="mock" id="mock">
+    <div class="m-head">
+      <div class="m-brand">
+        <svg width="30" height="30" viewBox="40 40 330 330" aria-hidden="true"><g transform="translate(205 205)"><circle r="73" fill="#004488"/><path d="M-148 0 A148 148 0 0 1 45 -141" fill="none" stroke="#004488" stroke-width="31" stroke-linecap="round"/><path d="M80 -124 A148 148 0 0 1 133 62" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/><path d="M112 97 A148 148 0 0 1 51 139" fill="none" stroke="#004488" stroke-width="31" stroke-linecap="round"/><path d="M16 147 A148 148 0 0 1 -128 75" fill="none" stroke="#6A9DCF" stroke-width="31" stroke-linecap="round"/><circle cx="89" cy="-122" r="31" fill="#BD2024"/></g></svg>
+        <div><b>IDEA-X</b><small>Intrusion Detection Escalation</small></div>
+      </div>
+      <div class="m-nav" role="tablist" aria-label="Screens">
+        <button role="tab" aria-selected="true" data-screen="replay">Replay</button>
+        <button role="tab" aria-selected="false" data-screen="tuning">Tuning</button>
+        <button role="tab" aria-selected="false" data-screen="audit">Audit log</button>
+        <button role="tab" aria-selected="false" data-screen="emails">Emails</button>
+      </div>
+      <div class="m-src">CIC-IDS2017 · Thursday · eve_demo_FINAL.json · 5,483 alerts</div>
+    </div>
+
+    <!-- REPLAY -->
+    <div class="m-body" data-panel="replay">
+      <div class="m-row" style="justify-content:space-between">
+        <div class="m-row">
+          <button class="m-btn primary" id="playBtn">Pause</button>
+          <button class="m-btn">Restart</button>
+          <div class="m-seg" role="group" aria-label="Speed"><button aria-pressed="false">60×</button><button aria-pressed="true">120×</button><button aria-pressed="false">360×</button></div>
+          <span class="m-label" style="margin-left:6px">Demo clock <b style="color:var(--m-ink)">1:55:26</b> / 2:41:00</span>
+          <span class="m-label">· Now: <b style="color:var(--m-accent)">Infiltration, exploit on Windows Vista host</b></span>
+        </div>
+        <span class="m-label">Tuned rules from run #3 · <span style="font-family:var(--f-mono)">tuned_rules.yaml</span></span>
+      </div>
+      <div class="m-card pad">
+        <div class="m-row" style="justify-content:space-between"><span class="m-label">Total alerts raised so far</span><span class="m-small"><span style="display:inline-block;width:14px;height:2px;background:#020202;vertical-align:middle"></span> Original rules &nbsp; <span style="display:inline-block;width:14px;height:2px;background:#1F7A4D;vertical-align:middle"></span> Tuned rules &nbsp; <span style="display:inline-block;width:10px;height:8px;background:#E8A3A5;vertical-align:middle"></span> Attack in progress (from labels)</span></div>
+        <svg id="timeline" viewBox="0 0 1112 150" width="100%" height="150" role="img" aria-label="Cumulative alerts over the demo clock"></svg>
+      </div>
+      <div class="m-two">
+        <div class="m-card">
+          <div class="m-lane-head">
+            <div class="top"><div><p class="m-h">Original rules</p><p class="m-sub">Every alert on its own, scored from the base rules</p></div></div>
+            <div class="m-big">4,427</div><div class="m-small">alerts raised</div>
+            <div class="m-mini"><div class="h"><b>756</b><span class="m-small">High</span></div><div class="m"><b>2,374</b><span class="m-small">Medium</span></div><div class="l"><b>1,297</b><span class="m-small">Low</span></div><div class="e"><b>756</b><span class="m-small">emails sent</span></div></div>
+          </div>
+          <div class="m-feed" id="feed"></div>
+        </div>
+        <div class="m-card">
+          <div class="m-lane-head">
+            <div class="top"><div><p class="m-h">Tuned rules</p><p class="m-sub">Related alerts grouped by target and attack type. Repeats raise the score.</p></div></div>
+            <div class="m-big" style="color:var(--m-green)">61</div><div class="m-small">grouped alerts</div>
+            <div class="m-mini"><div class="h"><b>3</b><span class="m-small">High</span></div><div class="m"><b>1</b><span class="m-small">Medium</span></div><div class="l"><b>57</b><span class="m-small">Low</span></div><div class="e"><b>3</b><span class="m-small">emails sent</span></div></div>
+          </div>
+          <div class="m-groups" id="groups"></div>
+        </div>
+      </div>
+      <div class="m-kpis">
+        <div class="m-kpi"><div class="m-metric">99%</div><div class="m-label">fewer alerts to read</div></div>
+        <div class="m-kpi"><div class="m-metric">3</div><div class="m-label">groups moved up a severity band</div></div>
+        <div class="m-kpi ok"><div class="m-metric" style="color:var(--m-green)">0</div><div class="m-label">benign groups raised (must stay 0)</div></div>
+        <div class="m-kpi"><div class="m-metric">756 → 3</div><div class="m-label">emails, original → tuned</div></div>
+      </div>
+      <div class="m-note">Attack and benign tags come from the CIC-IDS2017 labels. In a live deployment they would come from analyst feedback.</div>
+    </div>
+
+    <!-- TUNING -->
+    <div class="m-body" data-panel="tuning" hidden>
+      <div class="m-row" style="justify-content:space-between">
+        <div><p class="m-h" style="font-size:20px">Tuning run #3</p><p class="m-sub">6 Nov 2026, 21:40 · Codex CLI · 2 attempts · 3 min 12 s</p></div>
+        <div class="m-row"><span class="m-badge Pass">Passed guardrail</span><button class="m-btn">View tuned_rules.yaml</button><button class="m-btn primary">Run tuning again</button></div>
+      </div>
+      <div class="m-row" style="gap:12px">
+        <div class="m-kpi" style="flex:1"><div class="m-label">Analyst budget</div><div class="m-row" style="gap:6px;margin-top:4px"><input class="m-input" id="mBudget" type="number" value="20" min="5" max="200" aria-label="Budget, alerts per hour"><span class="m-small">alerts / hour</span></div></div>
+        <div class="m-kpi" style="flex:1"><div class="m-label">Observed, original rules</div><div class="m-metric" style="font-size:24px">373 <span class="m-small">/ hour</span></div></div>
+        <div class="m-kpi" style="flex:1;background:var(--m-redTint);border-color:#F2C9CA"><div class="m-label">Burn rate</div><div class="m-metric" style="font-size:24px;color:var(--m-accent)" id="mBurn">18.6×</div></div>
+        <div class="m-kpi" style="flex:1"><div class="m-label">After tuning (evaluate)</div><div class="m-metric" style="font-size:24px">46 <span class="m-small">grouped alerts, −99.2%</span></div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start">
+        <div class="m-card">
+          <div class="m-lane-head"><p class="m-h">Where the load comes from</p><p class="m-sub">Per rule, from the original run. Allowed = budget × weight ÷ total weight.</p></div>
+          <table class="m-table" id="mGap"><thead><tr><th>Rule</th><th class="r">S</th><th class="r">Observed/h</th><th class="r">Allowed/h</th><th>Gap</th><th>Change</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div style="display:grid;gap:12px">
+          <div class="m-card pad">
+            <div class="m-row" style="justify-content:space-between"><p class="m-h">Attempts</p>
+              <div class="m-att" role="group" aria-label="Attempt">
+                <button aria-pressed="false" data-att="1"><span class="m-badge Fail">Fail</span>Attempt 1</button>
+                <button aria-pressed="true" data-att="2"><span class="m-badge Pass">Pass</span>Attempt 2</button>
+              </div>
+            </div>
+            <div id="attBody" style="margin-top:10px"></div>
+          </div>
+          <div class="m-card">
+            <div class="m-lane-head" style="padding:10px 16px"><p class="m-h" style="font-size:14px">Rule changes in this attempt</p></div>
+            <div class="m-diff" id="diff"></div>
+          </div>
+          <div>
+            <div class="m-label" style="margin-bottom:4px">Codex log</div>
+            <div class="m-log" id="log"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="m-body" data-panel="audit" hidden>
+      <div><p class="m-h" style="font-size:20px">Audit log</p><p class="m-sub">Every tuning run is kept, including failed ones. Original alerts are never deleted.</p></div>
+      <div class="m-card">
+        <table class="m-table">
+          <thead><tr><th>Run</th><th>Started</th><th class="r">Budget</th><th class="r">Attempts</th><th>Result</th><th class="r">Alerts before → after</th><th class="r">Rules changed</th><th>Attack recall</th></tr></thead>
+          <tbody>
+            <tr class="sel"><td><b>#3</b></td><td>6 Nov, 21:40</td><td class="r">20/h</td><td class="r">2</td><td><span class="m-badge Pass">Passed</span></td><td class="r">5,483 → 46</td><td class="r">8</td><td>7 of 7</td></tr>
+            <tr><td><b>#2</b></td><td>6 Nov, 20:55</td><td class="r">10/h</td><td class="r">3</td><td><span class="m-badge Fail">Failed, not used</span></td><td class="r">5,483 → 31</td><td class="r">8</td><td style="color:var(--m-accent)">6 of 7</td></tr>
+            <tr><td><b>#1</b></td><td>6 Nov, 20:10</td><td class="r">20/h</td><td class="r">1</td><td><span class="m-badge Pass">Passed</span></td><td class="r">5,483 → 58</td><td class="r">6</td><td>7 of 7</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div class="m-card pad"><div class="m-label">Before tuning</div><p class="m-h" style="margin-top:4px">373 alerts / hour</p>
+          <ul class="m-checks" style="margin-top:8px"><li><span>·</span><span>Burn rate 18.6× against 20/h</span></li><li><span>·</span><span>Biggest gap: Brute force at web server, +191/h</span></li><li><span>·</span><span>Under-alerting: Exploit at Windows Vista host, −1.9/h</span></li></ul>
+          <p class="m-small" style="margin-top:10px;font-family:var(--f-mono)">original_alerts.json · flow_table.json</p></div>
+        <div class="m-card pad"><div class="m-label">Rule changes</div><p class="m-h" style="margin-top:4px">8 rules, 14 values</p>
+          <ul class="m-checks" style="margin-top:8px"><li><span>·</span><span>Window W changed on 8 rules</span></li><li><span>·</span><span>N_sat changed on 6 rules</span></li><li><span>·</span><span>No score below its base S</span></li></ul>
+          <p class="m-small" style="margin-top:10px;font-family:var(--f-mono)">tuned_rules.yaml · codex_log.txt</p></div>
+        <div class="m-card pad"><div class="m-label">After tuning</div><p class="m-h" style="margin-top:4px">46 grouped alerts</p>
+          <ul class="m-checks" style="margin-top:8px"><li><span class="y">✓</span><span>Attack recall 7 of 7</span></li><li><span class="y">✓</span><span>0 benign groups raised</span></li><li><span>·</span><span>7 High groups, 7 emails</span></li></ul>
+          <p class="m-small" style="margin-top:10px;font-family:var(--f-mono)">tuned_groups.json · evaluate.json</p></div>
+      </div>
+    </div>
+
+    <!-- EMAILS -->
+    <div class="m-body" data-panel="emails" hidden>
+      <div><p class="m-h" style="font-size:20px">Emails to the on-call analyst</p><p class="m-sub">Same moment in the replay (1:55:26). Original rules email every High alert. Tuned rules email once per High group.</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:16px;align-items:start">
+        <div class="m-card">
+          <div class="m-lane-head"><p class="m-label">Original rules</p><p class="m-h">756 emails</p></div>
+          <div class="m-mail-list m-stack" id="flood"></div>
+        </div>
+        <div class="m-card">
+          <div class="m-lane-head"><p class="m-label">Tuned rules</p><p class="m-h" style="color:var(--m-green)">3 emails</p></div>
+          <div class="m-mail-list">
+            <div class="item sel"><b>[High] Exploit on Windows Vista host</b><span class="m-small">1:41</span><span class="m-small">192.168.10.8 · 756 events in group</span></div>
+            <div class="item"><b>[High] Web probe on web server</b><span class="m-small">0:58</span><span class="m-small">192.168.10.50 · raised from Low</span></div>
+            <div class="item"><b>[High] Brute force on web server</b><span class="m-small">0:09</span><span class="m-small">192.168.10.50 · raised from Medium</span></div>
+          </div>
+        </div>
+        <div class="m-card m-mail">
+          <div class="hdr"><span>From</span><b>IDEA-X alerts</b><span>To</span><span style="color:var(--m-ink)">SOC on-call</span><span>Subject</span><b>[High] Exploit on Windows Vista host (192.168.10.8), 756 events</b></div>
+          <p style="margin:0 0 6px">A group of related alerts reached High.</p>
+          <table>
+            <tr><td>Target</td><td>192.168.10.8, Windows Vista host</td></tr>
+            <tr><td>Attack type</td><td>Exploit</td></tr>
+            <tr><td>Score</td><td><b>10</b> (base 9, raised by volume)</td></tr>
+            <tr><td>Events</td><td>756, first at 1:41:10</td></tr>
+            <tr><td>Source</td><td>205.174.165.73</td></tr>
+            <tr><td>Rule settings</td><td>W 2 min, N_sat 3 (run #3)</td></tr>
+            <tr><td>Label</td><td>Attack (CIC-IDS2017)</td></tr>
+          </table>
+          <p class="m-small" style="margin:8px 0 0">One email per group. New events update the group on the dashboard instead of sending more email.</p>
+          <div class="m-row" style="margin-top:12px"><button class="m-btn primary">Open group in IDEA-X</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+</div>
+
+<div class="wrap" id="qa">
+<h2>QA checklist for the tuned output</h2>
+<p>Your QA covers the tuned rules and the grouped alerts. These are checks that catch the usual mistakes.</p>
+<ul class="tight">
+  <li><b>Nothing lost.</b> Every original alert belongs to exactly one group. The sum of group event counts equals the original count.</li>
+  <li><b>Never below base.</b> No group scores lower than the base S of its events.</li>
+  <li><b>Benign stays put.</b> Every benign group keeps its base S. “Benign groups raised” is 0.</li>
+  <li><b>Group keys.</b> Scanners (port scan, ping sweep) are grouped by source. Everything else by target and attack type.</li>
+  <li><b>N_sat is 2 or more.</b> With N_sat = 1, ln N_sat is 0 and the formula divides by zero.</li>
+  <li><b>Same rounding everywhere.</b> Python's <code>round(4.5)</code> gives 4. JavaScript's <code>Math.round(4.5)</code> gives 5. If the backend scores in Python and the screen recomputes in JavaScript, a band can flip. Pick one rule and have only one side compute.</li>
+  <li><b>What the window means.</b> Agree whether a group stays open while events keep arriving within W minutes of the last one, or closes W minutes after the first. The PDF's replay kept 756 exploit events in one group, which only happens with the first meaning. Also agree what happens to an event exactly W minutes later.</li>
+  <li><b>Long windows on serious rules.</b> Rules with S of 8 or more stay within the maximum window.</li>
+  <li><b>Numbers match.</b> The figures on screen equal the <code>evaluate</code> output for the same run.</li>
+</ul>
+<p class="muted" style="font-size:.85rem;margin-top:2rem">Sources: the newest PDF (“Codex tuning as SRE: the delta gap calculation”), the team handoff notes, and the hackathon slides. Alert-volume statistics are vendor survey figures cited in the PDF.</p>
+</div>
+
+<script>
+(function(){
+  // ---------- Score calculator ----------
+  const $ = id => document.getElementById(id);
+  const band = x => x >= 8 ? "High" : x >= 5 ? "Medium" : "Low";
+  // Python-style round-half-to-even is what the backend uses; numbers here never land on .5 for the shown inputs.
+  const score = (S, n, N) => Math.round(S + (10 - S) * Math.min(1, Math.log(n) / Math.log(N)));
+  const sizes = [1,2,3,5,10,20,60,200];
+  function calc(){
+    const S = +$("cS").value, N = +$("cN").value, n = +$("cn").value;
+    $("oS").textContent = S; $("oN").textContent = N; $("on").textContent = n;
+    const X = score(S, n, N);
+    $("oX").textContent = X;
+    const b = band(X); $("oBand").textContent = b; $("oBand").className = "band " + b;
+    const share = Math.min(1, Math.log(n)/Math.log(N));
+    $("oWhy").textContent = n === 1 ? "One event: the score stays at its base S." :
+      share >= 1 ? `n reached N_sat, so the score is capped at 10.` :
+      `Closes ${Math.round(share*100)}% of the distance from ${S} to 10.`;
+    const cols = { High: "var(--bad)", Medium: "var(--warn)", Low: "var(--ok)" };
+    $("bars").innerHTML = sizes.map(k => { const x = score(S,k,N); return `<div><span class="b" style="height:${x*10}%;background:${cols[band(x)]}">${x}</span><span>n=${k}</span></div>`; }).join("");
+  }
+  ["cS","cN","cn"].forEach(id => $(id).addEventListener("input", calc)); calc();
+
+  // ---------- Gap table (brief + mockup) ----------
+  const rules = [
+    { name:"Brute force at web server", S:5, ev:1, obs:194 },
+    { name:"Benign policy at internal hosts", S:2, ev:0.2, obs:83 },
+    { name:"Web probe at web server", S:4, ev:1, obs:51 },
+    { name:"Benign policy at web server", S:3, ev:0.2, obs:25 },
+    { name:"SQL injection at web server", S:7, ev:1, obs:9.1 },
+    { name:"Port scan, internal", S:3, ev:1, obs:4.3 },
+    { name:"Exploit at Windows Vista host", S:9, ev:1, obs:3.9 },
+    { name:"Ping sweep, internal", S:2, ev:1, obs:2.2 }
+  ];
+  const changes = {
+    1: ["W 5→30, N_sat 60→120","W 5→60","W 5→30, N_sat 60→40","W 5→60","W 5→10, N_sat 60→9","W 5→15, N_sat 60→6","W 5→15, N_sat 60→3","W 5→10, N_sat 60→4"],
+    2: ["W 5→30, N_sat 60→120","W 5→60","W 5→30, N_sat 60→40","W 5→60","W 5→10, N_sat 60→9","W 5→15, N_sat 60→6","W 5→2, N_sat 60→3","W 5→10, N_sat 60→4"]
+  };
+  const totalObs = 373;
+  const fmt = v => Math.abs(v) >= 10 ? v.toFixed(0) : v.toFixed(1);
+  function shares(B){ const tw = rules.reduce((s,r)=>s+r.S*r.ev,0); return rules.map(r => { const a = B*r.S*r.ev/tw; return { ...r, allowed:a, gap:r.obs - a }; }); }
+  function gapBar(g, scaleMax){
+    const w = Math.min(150, Math.abs(g)/scaleMax*150);
+    return g >= 0 ? `<div class="gapcell"><span class="axis"></span><span class="pos" style="width:${w}px"></span></div>`
+                  : `<div class="gapcell"><span class="axis"></span><span class="neg" style="width:${Math.max(3,Math.min(30,w*6))}px"></span></div>`;
+  }
+  function renderBrief(){
+    const B = Math.max(1, +$("budget").value || 20);
+    $("burn").textContent = (totalObs/B).toFixed(1) + "×";
+    const rows = shares(B), max = Math.max(...rows.map(r=>Math.abs(r.gap)));
+    document.querySelector("#gapTable tbody").innerHTML = rows.map(r => `<tr><td>${r.name}</td><td class="r">${r.S}</td><td class="r">${r.ev}</td><td class="r">${r.obs}</td><td class="r">${fmt(r.allowed)}</td><td class="r" style="color:${r.gap<0?'var(--primary)':'var(--accent)'}">${r.gap>0?'+':''}${fmt(r.gap)}</td><td>${gapBar(r.gap,max)}</td></tr>`).join("");
+  }
+  $("budget").addEventListener("input", renderBrief); renderBrief();
+
+  let att = 2;
+  function renderMock(){
+    const B = Math.max(1, +$("mBudget").value || 20);
+    $("mBurn").textContent = (totalObs/B).toFixed(1) + "×";
+    const rows = shares(B), max = Math.max(...rows.map(r=>Math.abs(r.gap)));
+    document.querySelector("#mGap tbody").innerHTML = rows.map((r,i) => {
+      const bad = att===1 && i===6;
+      return `<tr><td>${r.name}</td><td class="r">${r.S}</td><td class="r">${r.obs}</td><td class="r">${fmt(r.allowed)}</td><td style="color:${r.gap<0?'#004488':'#BD2024'};white-space:nowrap">${r.gap>0?'+':''}${fmt(r.gap)}</td><td style="font-family:var(--f-mono);font-size:11px;${bad?'color:#BD2024;font-weight:600':''}">${changes[att][i]}</td></tr>`;
+    }).join("");
+  }
+  $("mBudget").addEventListener("input", renderMock);
+
+  const attempts = {
+    1: { checks:[["y","Alert reduction 99.3% (5,483 → 38)"],["y","Attack recall 7 of 7"],["y","0 benign groups raised"],["y","No score below its base S"],["n","Rules with S ≥ 8 keep W ≤ 5 min: Exploit at Windows Vista host has W = 15"],["y","Only tuned_rules.yaml changed"]],
+         note:"Guardrail rejected this attempt. Codex revised the exploit rule.",
+         diff:[["exploit@win_vista_host","window_min","5","15","Gap −1.9/h, but grouped to cut repeat emails."],["brute_force@web_server","window_min","5","30","Gap +191/h. 30-minute groups fit the 3.2/h share."],["brute_force@web_server","n_sat","60","120","p95 burst size is 118 events."]] },
+    2: { checks:[["y","Alert reduction 99.2% (5,483 → 46)"],["y","Attack recall 7 of 7"],["y","0 benign groups raised"],["y","No score below its base S"],["y","Rules with S ≥ 8 keep W ≤ 5 min"],["y","Only tuned_rules.yaml changed"]],
+         note:"All checks passed. These settings are used for the tuned replay.",
+         diff:[["exploit@win_vista_host","window_min","5","2","Gap −1.9/h: under-alerting for its priority. Alert at once, never merge for long."],["exploit@win_vista_host","n_sat","60","3","Escalate to 10 after 3 events."],["brute_force@web_server","window_min","5","30","Gap +191/h. 30-minute groups fit the 3.2/h share."],["brute_force@web_server","n_sat","60","120","p95 burst size is 118 events."],["benign_policy@internal","window_min","5","60","Gap +83/h. Benign: grouped, never raised."]] }
+  };
+  const logs = {
+    1:`<span class="c">$ codex exec --cd tuning "$(cat tuning_task.md)"</span>
+read base_rules.yaml (8 rules), asset_map.yaml
+read original_alerts.json: 5,483 alerts
+flow: 373 alerts/h, budget 20/h, burn rate 18.6x
+wrote tuned_rules.yaml (attempt 1, 14 values)
+evaluate: reduction 99.3%, recall 7/7, benign raised 0
+<span class="f">guardrail FAIL: exploit@win_vista_host window_min 15 &gt; max 5 for S &gt;= 8</span>`,
+    2:`<span class="c">$ codex exec --cd tuning "$(cat tuning_task.md)"</span>
+read base_rules.yaml (8 rules), asset_map.yaml
+read original_alerts.json: 5,483 alerts
+flow: 373 alerts/h, budget 20/h, burn rate 18.6x
+wrote tuned_rules.yaml (attempt 1, 14 values)
+evaluate: reduction 99.3%, recall 7/7, benign raised 0
+<span class="f">guardrail FAIL: exploit@win_vista_host window_min 15 &gt; max 5 for S &gt;= 8</span>
+revise: exploit@win_vista_host window_min 15 -&gt; 2, n_sat 60 -&gt; 3
+wrote tuned_rules.yaml (attempt 2, 14 values)
+evaluate: reduction 99.2%, recall 7/7, benign raised 0
+<span class="p">guardrail PASS (6/6 checks)</span>
+done in 3m 12s`
+  };
+  function renderAtt(){
+    const a = attempts[att];
+    $("attBody").innerHTML = `<ul class="m-checks">${a.checks.map(([k,t])=>`<li><span class="${k}">${k==='y'?'✓':'✕'}</span><span>${t}</span></li>`).join("")}</ul><p class="m-small" style="margin:8px 0 0">${a.note}</p>`;
+    $("diff").innerHTML = a.diff.map(([r,k,o,n,w]) => `<div class="rule"><div>${r}.${k}: <span class="old">${o}</span> → <span class="new">${n}</span></div><div class="why">${w}</div></div>`).join("");
+    $("log").innerHTML = logs[att];
+    document.querySelectorAll(".m-att button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.att === att)));
+    renderMock();
+  }
+  document.querySelectorAll(".m-att button").forEach(b => b.addEventListener("click", () => { att = +b.dataset.att; renderAtt(); }));
+  renderAtt();
+
+  // ---------- Tabs ----------
+  document.querySelectorAll(".m-nav button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".m-nav button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
+    document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== b.dataset.screen);
+  }));
+  document.querySelectorAll(".m-seg button").forEach(b => b.addEventListener("click", () => document.querySelectorAll(".m-seg button").forEach(x => x.setAttribute("aria-pressed", String(x===b)))));
+  $("playBtn").addEventListener("click", e => { e.target.textContent = e.target.textContent === "Pause" ? "Play" : "Pause"; });
+
+  // ---------- Original feed ----------
+  const feed = [];
+  for (let i = 0; i < 16; i++) { const s = 26 - i; feed.push(`<div class="ev"><span class="m-small">1:55:${String(s).padStart(2,"0")}</span><span>Exploit on Windows Vista host</span><span class="m-small">192.168.10.8</span><span class="m-badge High">High</span></div>`); }
+  $("feed").innerHTML = feed.join("");
+
+  // ---------- Tuned groups ----------
+  const groups = [
+    { t:"Exploit on Windows Vista host (192.168.10.8)", m:"756 events · High · email sent", s:10, b:"High", ev:[["1:55:26","205.174.165.73 → 192.168.10.8:445","High"],["1:55:25","205.174.165.73 → 192.168.10.8:445","High"],["1:41:10","first event, base S 9","High"]], why:"Base 9, W 2 min, N_sat 3. Reached 10 at the 3rd event." },
+    { t:"Web probe on web server (192.168.10.50)", m:"991 events · raised from Low to High · email sent", s:10, b:"High", ev:[["0:58:12","172.16.0.1 → 192.168.10.50:80","Low"],["0:31:40","first event, base S 4","Low"]], why:"Base 4, W 30 min, N_sat 40. Each event alone is Low. The group reached 10 at 40 events." },
+    { t:"Brute force on web server (192.168.10.50)", m:"2,374 events · raised from Medium to High · email sent", s:10, b:"High", ev:[["0:44:58","172.16.0.1 → 192.168.10.50:80","Medium"],["0:05:03","first event, base S 5","Medium"]], why:"Base 5, W 30 min, N_sat 120. Reached High at 11 events, 10 at 120." },
+    { t:"Port scan from 172.16.0.1", m:"2 events in this group · raised from Low to Medium", s:6, b:"Medium", ev:[["1:54:10","172.16.0.1 → 192.168.10.8 (many ports)","Low"]], why:"Grouped by source because scanners hit many targets. Base 3, N_sat 6: two events give 6." },
+    { t:"Benign policy at internal hosts", m:"9 events in this group · Low · benign, not raised", s:2, b:"Benign", ev:[["1:53:02","192.168.10.8 → 8.8.8.8:53","Low"]], why:"Benign groups always keep their base score." }
+  ];
+  const stripe = { High:"#BD2024", Medium:"#946200", Low:"#1F7A4D", Benign:"#D8E0E8" };
+  let open = -1;
+  function renderGroups(){
+    $("groups").innerHTML = groups.map((g,i) => `<button class="m-group" aria-expanded="${open===i}" data-g="${i}"><span class="stripe" style="background:${stripe[g.b]}"></span><span><b>${g.t}</b><br><span class="m-small">${g.m}</span></span><span class="score" style="padding-right:4px">${g.s}</span></button>` +
+      (open===i ? `<div class="m-detail"><div class="m-label" style="margin-bottom:4px">${g.why}</div><table>${g.ev.map(e=>`<tr><td class="m-small">${e[0]}</td><td>${e[1]}</td><td><span class="m-badge ${e[2]}">${e[2]}</span></td></tr>`).join("")}</table><div class="m-small" style="margin-top:4px">Original alerts in this group are kept and listed in full.</div></div>` : "")).join("");
+    document.querySelectorAll(".m-group").forEach(b => b.addEventListener("click", () => { const i = +b.dataset.g; open = open === i ? -1 : i; renderGroups(); }));
+  }
+  renderGroups();
+
+  // ---------- Email flood ----------
+  const flood = [];
+  for (let i = 0; i < 9; i++) flood.push(`<div class="item"><b>[High] Exploit on Windows Vista host</b><span class="m-small">1:55:${String(26-i).padStart(2,"0")}</span><span class="m-small">192.168.10.8 · 1 event</span></div>`);
+  flood.push(`<div class="item" style="justify-content:center;grid-template-columns:1fr"><span class="m-small" style="text-align:center">+ 747 more, mostly identical</span></div>`);
+  $("flood").innerHTML = flood.join("");
+
+  // ---------- Timeline ----------
+  const W = 1112, H = 150, top = 8, chartH = 100, end = 9660, now = 6926; // seconds of demo clock
+  const x = t => 40 + (t/end)*(W-50);
+  const windows = [[300,2700,"Brute force"],[3300,4500,"XSS"],[4800,4920,"SQL inj."],[6000,7500,"Infiltration"],[7800,9000,"Port scan"]];
+  function rate(t){ let r = 0.08; for (const [a,b] of windows) if (t>=a && t<=b) r += (a===300?0.95:a===6000?(t>6700?1.6:0.2):0.35); return r; }
+  let c1 = 0, c2 = 0, p1 = [], p2 = [];
+  for (let t = 0; t <= now; t += 60) { c1 += rate(t)*60; c2 += (rate(t) > 0.5 ? 0.012 : 0.006)*60; p1.push([t,c1]); p2.push([t,c2]); }
+  const k1 = 4427/c1, k2 = 61/c2, ymax = 5483;
+  const y = v => top + chartH - (v/ymax)*chartH;
+  const path = (pts,k) => pts.map(([t,v],i)=>`${i?"L":"M"}${x(t).toFixed(1)},${y(v*k).toFixed(1)}`).join("");
+  let svg = "";
+  [0,2000,4000].forEach(v => { svg += `<line x1="40" x2="${W-10}" y1="${y(v)}" y2="${y(v)}" stroke="#EEF1F4"/><text x="34" y="${y(v)+4}" text-anchor="end" font-size="10" fill="#526273">${v.toLocaleString()}</text>`; });
+  windows.forEach(([a,b,l]) => { svg += `<rect x="${x(a)}" y="${top+chartH+8}" width="${Math.max(3,x(b)-x(a))}" height="14" fill="#E8A3A5"/><text x="${x(a)}" y="${top+chartH+36}" font-size="10" fill="#526273">${l}</text>`; });
+  svg += `<path d="${path(p1,k1)}" fill="none" stroke="#020202" stroke-width="1.6"/>`;
+  svg += `<path d="${path(p2,k2)}" fill="none" stroke="#1F7A4D" stroke-width="2"/>`;
+  svg += `<line x1="${x(now)}" x2="${x(now)}" y1="${top}" y2="${top+chartH+22}" stroke="#004488" stroke-dasharray="3 3"/>`;
+  svg += `<circle cx="${x(now)}" cy="${y(4427)}" r="3.5" fill="#020202"/><text x="${x(now)-6}" y="${y(4427)-6}" text-anchor="end" font-size="11" font-weight="600" fill="#020202">4,427</text>`;
+  svg += `<circle cx="${x(now)}" cy="${y(61)}" r="3.5" fill="#1F7A4D"/><text x="${x(now)+6}" y="${y(61)-4}" font-size="11" font-weight="600" fill="#1F7A4D">61</text>`;
+  ["0:00","0:40","1:20","2:00","2:41"].forEach((l,i) => { svg += `<text x="${x(i*end/4)}" y="${H-2}" font-size="10" fill="#526273" text-anchor="${i===0?'start':i===4?'end':'middle'}">${l}</text>`; });
+  $("timeline").innerHTML = svg;
+})();
+</script>
