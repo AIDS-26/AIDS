@@ -78,6 +78,8 @@ During a tuning-only task, modify only `tuned_rules.yaml`; return YAML and a sho
 
 ## Development and verification
 
+- Ask IDEA-X uses same-origin Next.js `POST /api/chat`, proxying to Python `POST /api/chat` and `app/chat.py`. Python loads existing backend CODEX credentials and calls the Responses API with no action tools. Chat reads canonical attack/service mappings and a bounded causal saved Replay projection; dataset/run membership, exact baseline pairing and selected alert/group/time are validated. No labels, raw event JSON or runtime writes. Sample Email records are unavailable to chat; general mapping explanations remain available. See `fe/CHATBOT.md`. Restart the API to load this route.
+
 - Dashboard tuning jobs expose bounded timestamped safe progress logs; `app/tuning/diagnostics.py` classifies failures without forwarding raw exceptions or secrets. Setup failures before attempt creation log to the job and backend logger even when no Audit entry exists. The API configures console logging and uses exclusive Windows socket binding to prevent duplicate listeners serving stale code. Transient job logs reset on restart; saved attempts remain durable.
 
 Keep changes focused on the requested component. Prefer small deterministic functions for parsing, scoring, grouping, budget allocation, and evaluation. Validate YAML against explicit schemas and reject unknown or unsafe rule changes before reload. Preserve the previous valid configuration if loading fails.

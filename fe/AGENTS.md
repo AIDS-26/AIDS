@@ -1,5 +1,11 @@
 # fe/AGENTS.md: IDEA-X dashboard (frontend)
 
+## Connected Ask IDEA-X (7 Nov 2026)
+
+- This supersedes the earlier frontend-only chat handoff. `app/api/chat/route.ts` proxies through `lib/chat-backend.ts` to Python `POST /api/chat`, using server-only `IDEAX_BACKEND_URL`. Existing backend CODEX credentials stay in Python. See `CHATBOT.md`.
+- Saved Replay sends the exact `baseline_run_id` with displayed run, dataset, frozen time and optional alert/group selection. Backend retrieval supplies canonical and saved mappings plus bounded visible evidence; future members are excluded. Sample Email context supports general explanations only, with its unavailable sample evidence disclosed.
+- The assistant has no rule writes, tuning controls or action tools. Existing Pick, history, cancellation and retry remain.
+
 Loaded on top of the root `AGENTS.md` when Codex starts in `fe/`. Owner: Tina.
 `fe/` is the client-facing SIEM frontend (it replaces the old `siem/` placeholder).
 Full spec: skill `ideax-frontend` (tokens, Figma → React component map, screen-by-screen spec).
@@ -172,3 +178,8 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - Audit automatically opens the latest attempt and shows every saved iteration in order, with grouped-alert counts, evaluation, guardrail status, old/new rule parameters, flow/delta gaps, and per-candidate rule history. Failed iterations remain visible. Refresh log refreshes both the list and the open detail. There are no dataset or iteration selectors.
 - `/emails` stays explicitly sample-only and is titled Email. It lists tuned group previews with notification-time values and a separate full-group snapshot/table of every clustered source log. Later members are marked Joined later. Sample scores and memberships come from saved fixtures through `lib/data.ts`; labels are excluded from the presentation data. No emails are sent.
 - Verification: production build (including TypeScript), lint, and all 38 existing frontend tests passed. Local production HTTP checks passed for the three remaining screens, absence of saved selectors, all 11 legacy redirects, and preserved Replay query IDs. Direct loader checks verified all three tuned emails retain exact complete group membership without labels, with notification values separate from later group updates. The configured dataset API returned HTTP 200. Interactive browser/responsive checks were unavailable in this session; no tuning job or email was started.
+
+## Replay control update (7 Nov 2026)
+
+- Play starts tuning directly when no accepted comparison exists, without a modal. With accepted results it plays the saved comparison. Retune replaces Restart and always creates a fresh tuning attempt from the original baseline rules, not a continuation of the accepted version. Successful tuning reloads and autoplays both lanes.
+- Removed Retry/Refresh comparison, which only fetched saved results. Job progress polling and automatic result loading remain. Startup errors stay visible with saved results; rapid clicks are guarded and uncertain startup retries reuse the request ID to avoid duplicate jobs.

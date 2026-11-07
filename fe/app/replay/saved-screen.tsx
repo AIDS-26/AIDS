@@ -7,7 +7,7 @@ import RuleHistory from "@/app/components/rule-history";
 import { initialPlayback, playbackReducer, selectFrame, type Speed } from "@/lib/replay";
 import type { BaselineRun, Dataset } from "@/lib/backend-client";
 import type { SavedReplay, OriginalAlert, Summary, SavedGroup, GroupPoint } from "@/lib/saved-replay";
-import { parseJob, type TuningJob, type TuningSettings } from "@/lib/tuning-jobs";
+import { parseJob, type TuningJob } from "@/lib/tuning-jobs";
 
 function useRead<T>(url: string | null, revision: number) {
   const [state, setState] = useState<{ url: string | null; revision: number; data?: T; error?: string }>({ url: null, revision: -1 });
@@ -95,39 +95,6 @@ function GroupCard({ group, alerts, t, pause }: { group: SavedGroup & GroupPoint
     </div>}</details>;
 }
 
-function TuningPrompt({ baseline, onCancel, onStarted, onOriginal }: {
-  baseline: number; onCancel: () => void; onStarted: (job: TuningJob) => void; onOriginal: () => void;
-}) {
-  const dialog = useRef<HTMLDialogElement>(null), requestId = useRef<string | null>(null);
-  const settings = useRead<TuningSettings>("/api/tuning-jobs", 0);
-  const [starting, setStarting] = useState(false), [error, setError] = useState<string | null>(null);
-  useEffect(() => { const element = dialog.current; element?.showModal(); return () => element?.close(); }, []);
-  async function start() {
-    if (starting) return;
-    setStarting(true); setError(null);
-    requestId.current ??= crypto.randomUUID().replaceAll("-", "");
-    try {
-      const response = await fetch("/api/tuning-jobs", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseline_run_id: baseline, request_id: requestId.current }) });
-      const body = await response.json();
-      if (!response.ok) throw new Error(body.error || "Unable to start tuning.");
-      const job = parseJob(body);
-      if (job.baseline_run_id !== baseline) throw new Error("Tuning job belongs to another baseline.");
-      onStarted(job);
-    } catch (error) { setError(error instanceof Error ? error.message : "Unable to start tuning."); setStarting(false); }
-  }
-  return <dialog ref={dialog} className="tuning-prompt" aria-labelledby="tuning-prompt-title" onCancel={event => { event.preventDefault(); if (!starting) onCancel(); }}>
-    <h2 id="tuning-prompt-title">Tune and play these alerts?</h2>
-    <p>Use Original run #{baseline} to generate tuned rules and evaluate them. Both lanes wait, then replay together on the same clock. Repeated alerts remain visible inside each group.</p>
-    {settings.loading && <p role="status">Checking tuning settings…</p>}
-    {settings.data && <p>Model: <b>{settings.data.model}</b>. This starts a paid API run with up to three proposals. The guardrail checks every proposal before activation.</p>}
-    {settings.data && !settings.data.ready && <p role="alert">Set CODEX_API_KEY in the backend environment or root .env before starting.</p>}
-    {(settings.error || error) && <p role="alert">{error || settings.error}</p>}
-    <div className="tuning-prompt-actions"><button className="primary-button" disabled={starting || !settings.data?.ready} onClick={start}>{starting ? "Starting…" : "Start tuning and play"}</button>
-      <button disabled={starting} onClick={onOriginal}>Play original alerts</button><button disabled={starting} onClick={onCancel}>Cancel</button></div>
-  </dialog>;
-}
-
 function Player({ data, requestTuning, autoPlayToken, busy }: {
   data: SavedReplay; requestTuning: () => void; autoPlayToken: string; busy: boolean;
 }) {
@@ -167,7 +134,7 @@ function Player({ data, requestTuning, autoPlayToken, busy }: {
     {data.notice && <p className="notice saved-replay-notice" role="status">{data.notice}</p>}
     <div className="controls"><div className="playback" role="group" aria-label="Replay playback">
       <button className="primary-button" disabled={busy} onClick={play}>{playback.playing ? "Pause" : "Play"}</button>
-      <button disabled={busy} onClick={() => dispatch({ type: "restart", now: performance.now() })}>Restart</button>
+      <button disabled={busy} onClick={requestTuning}>Retune</button>
       <button disabled={busy || ended} onClick={() => dispatch({ type: "finish", now: performance.now() })}>Show final</button>
       <div className="speed" role="group" aria-label="Playback speed">{([60, 120, 360] as Speed[]).map(speed => <button key={speed} className={speed === playback.speed ? "selected" : ""} aria-pressed={speed === playback.speed} onClick={() => dispatch({ type: "speed", speed, now: performance.now() })}>{speed}×</button>)}</div>
     </div><span className="mono">{clock(playback.t)} / {clock(data.duration_s)}</span><span role="status">{ended ? "Saved final results" : playback.playing ? "Playing saved events" : "Paused"}</span>
@@ -200,7 +167,7 @@ function Player({ data, requestTuning, autoPlayToken, busy }: {
     {data.evaluation && <p className="baseline-note">Saved evaluation #{data.evaluation.id} on tuned run #{data.evaluation.tuned_run_id}: attack-group evidence retention {data.evaluation.attack_groups_total === 0 ? "N/A (no attack groups)" : `${data.evaluation.attack_groups_retained} / ${data.evaluation.attack_groups_total}`}. {data.evaluation.recall_scope || "Curated demo evidence retention; not independently validated detection recall."}</p>}
     <aside className="notice">Attack/benign labels from CIC-IDS2017 are used only to grade results and to weight the offline tuning. At runtime, benign comes from the rule definition.</aside>
     <p className="baseline-note">Scores and playback summaries come from saved backend results. Email delivery counts and attack-window overlays are unavailable in this read model. No emails are sent.</p>
-    <ChatAssistant context={{ source: data.tuned_run_id === null ? "baseline" : "replay", sample: false, dataset_id: data.dataset.id, run_id: data.tuned_run_id ?? data.baseline_run_id, replay_time_s: playback.t }}
+    <ChatAssistant context={{ source: data.tuned_run_id === null ? "baseline" : "replay", sample: false, dataset_id: data.dataset.id, baseline_run_id: data.baseline_run_id, run_id: data.tuned_run_id ?? data.baseline_run_id, replay_time_s: playback.t }}
       targets={[...alerts.slice(-50).map(a => ({ id: `alert-${a.id}`, label: `${a.signature || a.rule_name} · ${a.dest_ip}` })), ...groups.slice(0, 50).map(g => ({ id: `group-${g.group_id}`, label: g.title }))]}/>
   </>;
 }
@@ -209,7 +176,10 @@ export default function SavedReplayScreen({ initialSelection }: { initialSelecti
   const [revision, refresh] = useState(0);
   const chosenDataset = initialSelection?.dataset ?? "", chosenRun = initialSelection?.run ?? "";
   const linkError = initialSelection?.error;
-  const [prompt, setPrompt] = useState(false), [job, setJob] = useState<TuningJob | null>(null);
+  const [job, setJob] = useState<TuningJob | null>(null);
+  const [starting, setStarting] = useState(false), [startError, setStartError] = useState<string | null>(null);
+  const startPending = useRef(false);
+  const requestId = useRef<string | null>(null);
   const [jobError, setJobError] = useState<string | null>(null), [pollRevision, retryPoll] = useState(0);
   const [originalPlayToken, setOriginalPlayToken] = useState("");
   const datasets = useRead<{ items: Dataset[] }>("/api/baseline?resource=datasets", revision);
@@ -218,7 +188,7 @@ export default function SavedReplayScreen({ initialSelection }: { initialSelecti
   const run = chosenRun || String(runs.data?.items.findLast(r => r.mode === "baseline" && r.status === "completed")?.id ?? "");
   const replay = useRead<SavedReplay>(dataset && run ? `/api/replay?dataset_id=${dataset}&run_id=${run}` : null, revision);
   const error = datasets.error || runs.error || replay.error;
-  const busy = job?.status === "running";
+  const busy = starting || job?.status === "running";
   const jobId = job?.id, jobStatus = job?.status, jobBaseline = job?.baseline_run_id;
   useEffect(() => {
     if (!jobId || jobStatus !== "running" || jobBaseline === undefined) return;
@@ -243,16 +213,40 @@ export default function SavedReplayScreen({ initialSelection }: { initialSelecti
     void poll();
     return () => { controller.abort(); clearTimeout(timer); };
   }, [jobId, jobStatus, jobBaseline, pollRevision]);
+  async function startTuning() {
+    if (startPending.current || busy || !replay.data) return;
+    startPending.current = true;
+    setStarting(true); setStartError(null);
+    requestId.current ??= crypto.randomUUID().replaceAll("-", "");
+    const baseline = replay.data.baseline_run_id;
+    try {
+      const response = await fetch("/api/tuning-jobs", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseline_run_id: baseline, request_id: requestId.current }) });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Unable to start tuning.");
+      const next = parseJob(body);
+      if (next.baseline_run_id !== baseline) throw new Error("Tuning job belongs to another baseline.");
+      requestId.current = null;
+      setOriginalPlayToken(""); setJobError(null); setJob(next);
+      if (next.status !== "running") refresh(n => n + 1);
+    } catch (error) {
+      setStartError(error instanceof Error ? error.message : "Unable to start tuning.");
+    } finally {
+      startPending.current = false; setStarting(false);
+    }
+  }
   const autoPlayToken = originalPlayToken || (job?.status === "completed" && replay.data?.tuned_run_id === job.tuned_run_id ? job.id : "");
   return <><a href="#saved-replay" className="skip-link">Skip to replay</a>
     <AppHeader active="replay" sample={false} source={replay.data ? `${replay.data.dataset.name} · ${replay.data.total_alerts.toLocaleString()} alerts` : "Saved runs · read-only"}/>
     <main id="saved-replay">
       {linkError && <p className="baseline-message" role="alert">{linkError}</p>}
-      <div className="baseline-heading"><div><h1>Original rules vs Tuned rules</h1><p>Compare grouped alerts on the same events; all original evidence stays visible</p></div><div className="baseline-tuning"><button disabled={busy || datasets.loading || runs.loading || replay.loading} onClick={() => refresh(n => n + 1)}>{error ? "Retry comparison" : "Refresh comparison"}</button></div></div>
+      <div className="baseline-heading"><div><h1>Original rules vs Tuned rules</h1><p>Compare grouped alerts on the same events; all original evidence stays visible</p></div></div>
         {(datasets.loading || runs.loading || replay.loading) && <p role="status">Loading saved results and every alert. Previously loaded results remain visible where available.</p>}
         {error && <p className="baseline-message" role="alert">{error} {replay.data ? "Showing the previously loaded run." : "No sample data substituted."}</p>}
         {datasets.data?.items.length === 0 && <p>No imported datasets. Import and score a dataset in the backend first.</p>}
         {dataset && runs.data && !run && <p>No completed Original rules run exists for this dataset. Failed and unfinished runs cannot play.</p>}
+      {starting && <p role="status">Starting a fresh tuning run from Original rules...</p>}
+      {startError && <p className="baseline-message" role="alert">{startError} Saved results remain available. Press Retune to retry.</p>}
       {job && <section className="panel baseline-panel" aria-label="Tuning progress"><h2>Tuning run{job.attempt_id ? ` · attempt #${job.attempt_id}` : ""}</h2>
         <p role="status">{job.model} · {busy ? `Running · proposal ${job.iteration || 1} of 3 · ${job.iteration_status}` : job.status === "completed" ? `Passed · tuned run #${job.tuned_run_id}` : "Failed · saved original alerts remain available"}</p>
         {(jobError || job.error) && <p role="alert">{jobError || job.error}</p>}
@@ -266,10 +260,8 @@ export default function SavedReplayScreen({ initialSelection }: { initialSelecti
         {job.status === "failed" && <button onClick={() => setOriginalPlayToken(crypto.randomUUID())}>Play original alerts</button>}
         <a href="/audit">View saved audit history</a>
       </section>}
-      {replay.data && !busy && !(job?.status === "completed" && replay.data.tuned_run_id !== job.tuned_run_id) && <Player key={`${replay.data.baseline_run_id}:${replay.data.tuned_run_id}`} data={replay.data} busy={busy} autoPlayToken={autoPlayToken} requestTuning={() => setPrompt(true)}/>}
+      {replay.data && !busy && !(job?.status === "completed" && replay.data.tuned_run_id !== job.tuned_run_id) && <Player key={`${replay.data.baseline_run_id}:${replay.data.tuned_run_id}`} data={replay.data} busy={busy} autoPlayToken={autoPlayToken} requestTuning={() => { void startTuning(); }}/>}
       {job?.status === "completed" && replay.data?.tuned_run_id !== job.tuned_run_id && <p role="status">Loading the accepted comparison. Both lanes will start together once the saved results are available.</p>}
-      {prompt && replay.data && <TuningPrompt baseline={replay.data.baseline_run_id} onCancel={() => setPrompt(false)}
-        onOriginal={() => { setPrompt(false); setOriginalPlayToken(crypto.randomUUID()); }}
-        onStarted={next => { setPrompt(false); setOriginalPlayToken(""); setJobError(null); setJob(next); }}/>}
+
     </main></>;
 }

@@ -14,13 +14,13 @@ Start the Python API from the repository root with python -m app.api. Prepare th
 
 The server-only IDEAX_BACKEND_URL defaults to http://127.0.0.1:8000. Configure another origin in .env.local using .env.example and restart Next.js. Keep credentials out of frontend environment files. The browser uses same-origin /api/baseline, /api/replay, /api/saved-tuning, and /api/rule-history adapters. These validate ownership, pagination and allowed response fields.
 
-Replay starts at the saved final snapshot. Play/Pause, Restart, Show final, and 60x/120x/360x use the same saved frames. Opening grouped evidence pauses playback. Lists initially render 50 entries, with Show more controls; totals include all records. Validated links such as /replay?dataset_id=1&run_id=2 still open a particular baseline.
+Replay starts paused at zero. Play/Pause, Show final, and 60x/120x/360x use saved frames. Retune starts a fresh tuning attempt from the original baseline rules. Opening grouped evidence pauses playback. Lists initially render 50 entries, with Show more controls; totals include all records. Validated links such as /replay?dataset_id=1&run_id=2 still open a particular baseline.
 
 Only completed, accepted tuned runs on the same baseline with complete same-event evidence populate the tuned lane. Without one, tuned results remain unavailable. No synthetic fallback or frontend scoring occurs. Failed reloads retain the previous snapshot with an error. Empty attack-group denominators show N/A; positive benign escalation counts are red. Labels grade offline results only and never determine runtime benign status.
 
 ## Local tuning jobs
 
-Run tuning, or Play without an accepted tuned result, opens the existing Tune and play prompt. Start tuning and play explicitly starts a paid backend job with up to three proposals; Play original alerts starts baseline playback. The deterministic guardrail controls activation. A passing job reloads the accepted results and plays; a failure preserves original alerts and links to Audit log.
+Play without an accepted tuned result directly starts a backend tuning job with up to three proposals. Retune always starts a fresh attempt from the original baseline, without continuing a previously accepted version. Both actions hold playback while tuning; there is no interstitial. Retry/Refresh comparison was removed; it only reloaded saved results. The deterministic guardrail controls activation. A passing job reloads the accepted results and plays; a failure preserves original alerts and links to Audit log.
 
 The /api/tuning-jobs control forwards only validated baseline/request IDs to the loopback Python API. Python alone reads CODEX_API_KEY and CODEX_MODEL from its environment or root .env. The dashboard default model is gpt-6.1-sol. Remote read APIs are supported, but tuning control requires a local backend. Jobs are transient across API restarts; saved audit history remains in SQLite. Loading any page never starts a model call.
 

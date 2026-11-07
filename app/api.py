@@ -17,6 +17,7 @@ from app.db import connect, database_path
 from app import siem
 from app.replay_view import replay_view
 from app.tuning.jobs import JobError, TuningJobs
+from app.chat import ChatError, ChatService
 
 
 class LocalAPIServer(ThreadingHTTPServer):
@@ -35,6 +36,7 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
     """Read routes plus a local-only tuning control; scoring runs in a worker."""
     target = Path(path).resolve() if path is not None else database_path()
     jobs = TuningJobs(target)
+    chat = ChatService(target)
     # Fail before listening if setup has not completed; never create an empty DB.
     with connect(target, read_only=True) as db:
         db.execute("SELECT dest_port FROM events LIMIT 0")
@@ -112,6 +114,9 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                 self.reply(503, {"error": "Database unavailable"})
 
         def do_POST(self):
+            if self.path == '/api/chat':
+                self.chat_reply()
+                return
             if self.path != '/api/tuning-jobs':
                 self.reply(404, {'error': 'Route not found'})
                 return
@@ -140,6 +145,26 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                 self.reply(400, {'error': str(error) if not isinstance(error, json.JSONDecodeError) else 'Invalid JSON'})
             except sqlite3.Error:
                 self.reply(503, {'error': 'Database unavailable'})
+
+        def chat_reply(self):
+            if (self.client_address[0] not in ('127.0.0.1', '::1')
+                    or self.headers.get('X-IDEAX-Chat') != 'dashboard'
+                    or self.headers.get('Origin')):
+                self.reply(403, {'error': 'Chat requires the dashboard proxy'})
+                return
+            try:
+                size = int(self.headers.get('Content-Length', '0'))
+                if not 0 < size <= 100_000 or self.headers.get('Content-Type') != 'application/json':
+                    raise ValueError('Expected a bounded JSON chat request')
+                self.reply(200, chat.answer(json.loads(self.rfile.read(size))))
+            except ChatError as error:
+                self.reply(error.status, {'error': str(error)})
+            except (ValueError, UnicodeError, OverflowError):
+                self.reply(400, {'error': 'Invalid chat context or conversation'})
+            except LookupError:
+                self.reply(400, {'error': 'Selected saved result is unavailable'})
+            except (sqlite3.Error, OSError):
+                self.reply(503, {'error': 'Chat context is unavailable'})
 
     return LocalAPIServer((host, port), Handler)
 
