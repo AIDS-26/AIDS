@@ -33,6 +33,14 @@ function useBackend<K extends keyof Result>(kind: K, query: string | null, revis
 
 const clock = (seconds: number) => `${Math.floor(seconds / 3600)}:${String(Math.floor(seconds / 60) % 60).padStart(2, "0")}:${String(Math.floor(seconds) % 60).padStart(2, "0")}`;
 
+function TunedLane() {
+  return <section className="panel backend-comparison-lane" aria-label="Tuned rules awaiting connection"><header className="lane-summary"><h2>Tuned rules</h2><p>Grouped alerts from the paired, accepted tuned run.</p></header><div className="comparison-waiting"><span className="static-label">Not connected</span><h3>Tuned results will appear here</h3><p>This lane is reserved for the same dataset and observation period as Original rules. Loading a baseline does not supply tuned results.</p><p>The paired-run adapter still needs to be connected. No sample groups or comparison metrics are used here.</p></div></section>;
+}
+
+function EmptyComparison({ loading = false }: { loading?: boolean }) {
+  return <div className="lanes backend-comparison"><section className="panel backend-comparison-lane"><header className="lane-summary"><h2>Original rules</h2><p>Scored alerts from the selected backend run.</p></header><div className="comparison-waiting"><h3>{loading ? "Waiting for saved results" : "Select an Original rules run"}</h3><p>{loading ? "The Original rules lane will populate when the complete run has loaded." : "Choose a dataset and completed run above to replay its alerts here."}</p></div></section><TunedLane/></div>;
+}
+
 function EvidencePanel({ dataset, run, alert }: { dataset: number; run: number; alert: number }) {
   const [revision, refresh] = useState(0);
   const result = useBackend("evidence", `&dataset_id=${dataset}&run_id=${run}&alert_id=${alert}`, revision);
@@ -60,7 +68,8 @@ function Player({ run, items }: Result["alerts"]) {
       <button onClick={() => { select(null); dispatch({ type: "restart", now: performance.now() }); }}>Restart</button>
       <div className="speed" role="group" aria-label="Playback speed">{([60, 120, 360] as Speed[]).map(speed => <button key={speed} className={speed === playback.speed ? "selected" : ""} aria-pressed={speed === playback.speed} onClick={() => dispatch({ type: "speed", speed, now: performance.now() })}>{speed}×</button>)}</div>
     </div><span className="mono">{clock(playback.t)} / {clock(run.observation_seconds)}</span><span role="status">{ended ? "Complete · restart to replay" : playback.playing ? "Playing" : "Paused"}</span></div>
-    <section className="panel baseline-panel"><h2>Original rules · run #{run.id}</h2>
+    <div className="lanes backend-comparison">
+    <section className="panel baseline-panel backend-comparison-lane"><h2>Original rules · run #{run.id}</h2>
       <p className="baseline-subtitle">Dataset #{run.dataset_id} · Saved scores and severity · No live tuning</p>
       <details className="baseline-metadata"><summary>Run provenance and clock details</summary><dl><dt>Rule version</dt><dd className="mono">{run.rule_version_id ?? "Not supplied"}</dd><dt>Completed</dt><dd>{run.completed_at ?? "Not supplied"}</dd><dt>Clock starts at</dt><dd>{items[0]?.timestamp ?? "No alerts"}</dd><dt>Observation duration</dt><dd>{run.observation_seconds} seconds (saved by the backend)</dd></dl><p>Records appear at their event timestamps. Scores and severity come unchanged from the backend.</p></details>
       <progress aria-label="Replay elapsed time" max={run.observation_seconds} value={playback.t}/>
@@ -68,8 +77,9 @@ function Player({ run, items }: Result["alerts"]) {
       {items.length === 0 ? <div className="baseline-message"><strong>No calculated alerts</strong><p>This completed run has no saved alert records. Choose another run or refresh after the backend has saved its results.</p></div> : <div className="table-scroll" tabIndex={0} role="region" aria-label="Original alerts; scroll horizontally on smaller screens"><table className="baseline-table"><caption className="sr-only">Latest elapsed Original rules alerts. Opening evidence pauses playback.</caption><thead><tr><th scope="col">Elapsed</th><th scope="col">Signature / rule</th><th scope="col">Target</th><th scope="col">Score</th><th scope="col">Severity</th><th scope="col">Evidence</th></tr></thead><tbody>{visible.slice(-50).reverse().map(alert => <tr key={alert.id} data-chat-id={String(alert.id)} className={selected === alert.id ? "baseline-selected" : undefined}><td className="mono">{clock((alert.first_timestamp_us-origin)/1e6)}</td><td><strong>{alert.signature ?? alert.attack_type}</strong><details className="baseline-rule"><summary>Rule ID</summary><span className="mono">{alert.rule_id}</span></details></td><td className="mono">{alert.dest_ip ?? "Not supplied"}</td><td>{alert.score}</td><td><span className={`badge ${alert.severity.toLowerCase()}`}>{alert.severity}</span></td><td><button aria-expanded={selected === alert.id} aria-controls={selected === alert.id ? `evidence-${alert.id}` : undefined} onClick={() => { if (selected !== alert.id) dispatch({ type: "pause", now: performance.now() }); select(selected === alert.id ? null : alert.id); }}>Alert #{alert.id}</button></td></tr>)}</tbody></table></div>}
       {selected !== null && visible.some(alert => alert.id === selected) && <EvidencePanel key={selected} dataset={run.dataset_id} run={run.id} alert={selected}/>}
     </section>
+    <TunedLane/>
+    </div>
     <RuleHistory datasetId={run.dataset_id} runId={run.id}/>
-    <section className="panel baseline-panel"><h2>Tuned rules · unavailable</h2><p>No tuned run is connected. Reduction, recall, benign groups raised, comparison chart, and email metrics are unavailable in baseline-only mode.</p></section>
     <ChatAssistant context={{ source: "baseline", sample: false, dataset_id: run.dataset_id, run_id: run.id, replay_time_s: playback.t }} targets={visible.slice(-50).map(alert => ({ id: String(alert.id), label: `${alert.signature ?? alert.attack_type} · ${alert.dest_ip ?? "Unknown target"}` }))}/>
   </>;
 }
@@ -77,7 +87,7 @@ function Player({ run, items }: Result["alerts"]) {
 function RunLoader({ dataset, run }: { dataset: number; run: number }) {
   const [revision, refresh] = useState(0);
   const result = useBackend("alerts", `&dataset_id=${dataset}&run_id=${run}`, revision);
-  return <><div className="baseline-loadbar"><span>Selected run <strong>#{run}</strong></span><button disabled={result.loading} onClick={() => refresh(revision + 1)}>{result.loading ? "Loading run…" : result.error ? "Retry loading run" : "Reload saved run"}</button></div>{result.loading && <p className="baseline-message" role="status">Loading all saved alerts before playback. {result.data ? "The previously loaded run remains available below." : "Larger datasets may take a few seconds."}</p>}{result.error && <p className="baseline-message" role="alert">{result.error} {result.data ? "Showing the previously loaded run." : "No sample data substituted."}</p>}{result.data && <Player key={run} {...result.data}/>}</>;
+  return <><div className="baseline-loadbar"><span>Selected run <strong>#{run}</strong></span><button disabled={result.loading} onClick={() => refresh(revision + 1)}>{result.loading ? "Loading run…" : result.error ? "Retry loading run" : "Reload saved run"}</button></div>{result.loading && <p className="baseline-message" role="status">Loading all saved alerts before playback. {result.data ? "The previously loaded run remains available below." : "Larger datasets may take a few seconds."}</p>}{result.error && <p className="baseline-message" role="alert">{result.error} {result.data ? "Showing the previously loaded run." : "No sample data substituted."}</p>}{result.data ? <Player key={run} {...result.data}/> : <EmptyComparison loading/>}</>;
 }
 
 export default function BaselineScreen({ initialSelection = { dataset: "", run: "", error: null } }: { initialSelection?: { dataset: string; run: string; error: string | null } }) {
@@ -89,17 +99,21 @@ export default function BaselineScreen({ initialSelection = { dataset: "", run: 
   return <><a className="skip-link" href="#baseline">Skip to replay</a><AppHeader active="replay" sample={false} source="Original rules · read-only"/>
     <main id="baseline"><ReplayModes active="baseline"/>
       {initialSelection.error && <p role="alert" className="baseline-message">{initialSelection.error}</p>}
-      <div className="baseline-heading"><div><h1>Original rules replay</h1><p>Saved backend results · baseline only</p></div><div className="baseline-tuning"><button disabled aria-describedby="tuning-unavailable">Run tuning</button><small id="tuning-unavailable">Live tuning is not connected</small></div></div>
+      <div className="baseline-heading"><div><h1>Original vs Tuned rules</h1><p>Backend comparison · Original rules available, tuned integration pending</p></div><div className="baseline-tuning"><button disabled aria-describedby="tuning-unavailable">Run tuning</button><small id="tuning-unavailable">Live tuning is not connected</small></div></div>
       <section className="panel baseline-panel"><h2>Select a saved baseline</h2><div className="baseline-selectors">
         <label>Dataset<select disabled={datasets.loading || !datasets.data?.items.length} value={dataset} onChange={event => { setDataset(event.target.value); setRun(""); }}><option value="">{datasets.loading ? "Loading datasets…" : "Choose a dataset"}</option>{datasets.data?.items.map(item => <option key={item.id} value={item.id}>#{item.id} · {item.name} · {item.event_count} events</option>)}</select></label>
-        <label>Run<select disabled={!dataset || runs.loading} value={run} onChange={event => setRun(event.target.value)}><option value="">Choose a completed baseline</option>{runs.data?.items.map(item => <option key={item.id} value={item.id} disabled={item.mode !== "baseline" || item.status !== "completed"}>#{item.id} · {item.mode === "baseline" ? "Original rules" : item.mode} · {item.status}</option>)}</select></label>
+        <label>Original rules run<select disabled={!dataset || runs.loading} value={run} onChange={event => setRun(event.target.value)}><option value="">Choose a completed baseline</option>{runs.data?.items.map(item => <option key={item.id} value={item.id} disabled={item.mode !== "baseline" || item.status !== "completed"}>#{item.id} · {item.mode === "baseline" ? "Original rules" : item.mode} · {item.status}</option>)}</select></label>
+        <label>Tuned rules run<select disabled aria-describedby="paired-run-pending"><option>Not connected yet</option></select></label>
         <button disabled={datasets.loading || runs.loading} onClick={() => refresh(revision + 1)}>Refresh lists</button></div>
         {(datasets.loading || runs.loading) && <p role="status">Loading saved datasets and runs…</p>}{(datasets.error || runs.error) && <div className="baseline-message" role="alert"><strong>Could not refresh saved results</strong><p>{datasets.error || runs.error}</p><p>Check that the backend read API is running, then use Refresh lists. Sample demo remains available separately.</p></div>}
         {!dataset && !datasets.loading && !datasets.error && Boolean(datasets.data?.items.length) && <p className="baseline-subtitle">Choose a dataset, then a completed Original rules run to begin.</p>}
         {datasets.data?.items.length === 0 && <p>No datasets available. Import and score a dataset in the backend first.</p>}
         {dataset && runs.data && !runs.data.items.some(item => item.mode === "baseline" && item.status === "completed") && <p>No completed Original rules run. Failed and unfinished runs cannot be replayed.</p>}
       </section>
-      {dataset && run && <RunLoader key={`${dataset}:${run}`} dataset={Number(dataset)} run={Number(run)}/>}
+      <p id="paired-run-pending" className="baseline-note">Comparison layout preview: real Original rules can replay now. The tuned lane and comparison metrics remain unavailable until the paired-run integration is complete.</p>
+      <section className="stats" aria-label="Comparison metrics unavailable">{["alert reduction", "attack-group recall", "benign groups raised", "email comparison"].map(label => <div className="stat" key={label}><strong aria-label="Unavailable">—</strong><span>{label}<small className="comparison-unavailable">Awaiting paired results</small></span></div>)}</section>
+      <section className="panel comparison-chart-placeholder" aria-label="Comparison chart unavailable"><h2>Original vs Tuned alert timeline</h2><p>The comparison chart will appear here when both runs are connected. Original rules playback is available below after selecting a run.</p></section>
+      {dataset && run ? <RunLoader key={`${dataset}:${run}`} dataset={Number(dataset)} run={Number(run)}/> : <EmptyComparison/>}
       <p className="baseline-note">Evaluation labels are not used by this replay. At runtime, benign comes from the rule definition. Curated labels may be used only for evaluation and offline tuning evidence. Sample screens remain separately labelled; Emails is sample-only.</p>
     </main></>;
 }

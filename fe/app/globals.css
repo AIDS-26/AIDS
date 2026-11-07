@@ -342,6 +342,14 @@ button:not(:disabled):hover { filter: brightness(.94); }
 .comparison-provenance dt { color: var(--color-muted); font-size: 11px; }
 .comparison-provenance dd { overflow-wrap: anywhere; }
 .comparison-failed { color: var(--color-accent); }
+.backend-comparison { align-items: stretch; margin: 16px 0; }
+.backend-comparison-lane { min-width: 0; margin: 0; }
+.comparison-waiting { padding: 24px 20px; min-height: 260px; }
+.comparison-waiting h3 { font-size: 16px; font-weight: 600; margin: 12px 0; }
+.comparison-waiting p { margin: 12px 0; color: var(--color-muted); }
+.comparison-unavailable { display: block; color: var(--color-muted); }
+.comparison-chart-placeholder { padding: 16px; margin: 16px 0; background: var(--color-surface); }
+.comparison-chart-placeholder p { margin-top: 8px; color: var(--color-muted); }
 .saved-version { overflow-wrap: anywhere; max-width: 420px; white-space: normal; }
 .history-version { border-top: 1px solid var(--color-border); padding: 12px 0; }
 .history-version summary { cursor: pointer; overflow-wrap: anywhere; }
