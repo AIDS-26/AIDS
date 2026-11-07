@@ -8,11 +8,15 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 
 ## Current repository
 
-- `README.md` currently contains only the project name and expansion.
-- `app/`, `siem/`, `tuner/`, `scripts/`, `tests/`, `fixtures/`, `data/`, `demo/`, and `docs/` are currently empty scaffolding. Their names suggest component boundaries; they do not establish implemented APIs.
+- `app/db.py` provides shared SQLite connections and transactional migrations; `app/import_events.py` imports EVE JSON Lines. `app/labels.py` writes the separate label store; only `app/evaluate.py` attaches it read-only. This is an evaluation access layer, not a complete scoring/recall evaluator. Client-facing functions belong in `siem/`; the processing app needs no frontend.
+- `migrations/` contains ordered SQL schema changes. Never edit an applied migration; add a new numbered file. Both components use `app.db.connect()` and the same `DATABASE_PATH` (process environment, then root `.env`, then `data/aids.sqlite3`). Relative paths resolve from the repository root. Live databases must reside on one host and outside synchronized/network storage.
+- `README.md` documents setup, schema, and shared access. Run from the root: `python -m scripts.manage_db migrate`, `python -m scripts.manage_db import-eve demo_freeze/eve_demo_FINAL.json --split tune`, and `python -m scripts.manage_db status`. Verify with `python -m unittest discover -s tests -v`. Run migrations with workers stopped.
+- Requires Python 3.10+ and SQLite 3.31+ with JSON functions; no third-party dependencies. Connections enable WAL, foreign keys, and a 10-second busy timeout. Keep writes short and create a new run for each replay. Preserve event-to-alert evidence links.
 - `demo_freeze/eve_demo_FINAL.json` is Suricata EVE JSON Lines: one JSON event per line, despite its `.json` extension.
 - `demo_freeze/manifest.json` records dataset preparation, counts, windows, seed, and a SHA-256. `demo_freeze.zip` is an existing archive.
-- No dependency manifest, runnable application, evaluator, or test command has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist. Update this section with verified setup and test commands when implementation adds them.
+- The scoring application, SIEM service, tuner, and evaluator remain unimplemented. Database tables are infrastructure, not evidence those components exist. Update commands and component descriptions as implementation progresses.
+- Rule versions, lineage/diffs, rule flow statistics, score trajectories, run errors, and tuning iteration reports have schema support. New runs need `rule_version_id` matching their snapshot; new alerts need an application `rule_id`. Membership triggers maintain `event_count`; new memberships require rolling count and per-event score. Do not invent missing historical trajectory or version lineage.
+- Approval/activation workflows are intentionally not implemented, per the user. Lifecycle fields are storage metadata only. The frozen dataset is for tuning, versions are unknown until supplied, and live-demo/heldout data is undecided.
 - Preserve existing user files and untracked artifacts. Treat `demo_freeze/` and its archive as frozen inputs; write derived outputs elsewhere unless the user requests regeneration.
 
 ## Architecture
@@ -48,12 +52,15 @@ Expected logical inputs are `base_rules.yaml`, `asset_map.yaml`, `siem1_results.
 7. Run the deterministic evaluator and report every iteration: alert reduction, attack-group recall, and benign groups raised. Accept only 100% attack-group recall and zero benign groups raised. Define and report the attack-group denominator and what counts as a raised benign group; an empty attack set cannot substantiate a recall claim.
 8. Allow at most three proposal/evaluation iterations. If validation still fails, report failure and keep baseline rules active. Never bypass the guardrail or describe an unevaluated proposal as safe.
 
+The database accepts zero attack groups and any positive evaluation iteration. Store benign-only evaluations with zero retained groups and display recall as N/A; never treat an empty denominator as 100% recall. Enforce the three-iteration limit in tuner policy rather than schema constraints.
+
 During a tuning-only task, modify only `tuned_rules.yaml`; return YAML and a short evaluation report. This restriction does not prevent application, evaluator, documentation, or test development explicitly requested by the user. Evaluation artifacts should follow the task's agreed output contract.
 
 ## Data and evaluation integrity
 
 - Compare baseline and tuned runs on identical events, observation duration, and label definitions. Preserve event identity and provenance through grouping; grouping must not silently delete attack evidence.
-- The frozen data includes `demo.label`, `demo.phase`, and `demo.original_timestamp`. Preserve original timestamps and replay using a clearly specified event-time field. Distinguish curated demo labels from independent ground truth; signature-derived labels do not prove detection accuracy.
+- The frozen source includes `demo.label`, `demo.phase`, and `demo.original_timestamp`. Preserve the entire demo metadata block only in the separate label database and original source; sanitize it out of runtime `events.raw_json`. Source hash plus line number links labels to events. `LABEL_DATABASE_PATH` selects the label file; default is `<main stem>.labels.sqlite3`. Ordinary runtime connections must not attach it. Restrict access to both labels and original sources for tool isolation; file separation alone is not a security sandbox.
+- Ingestion commits/verifies labels before runtime events; interrupted cross-file writes are repaired by reimport. Migration 0004 exports old labels before dropping them, scrubs old JSON and compacts the runtime database. Do not bypass its preflight or edit applied migrations.
 - Keep evaluation labels out of runtime scoring. Use labels only in evaluation and in the explicitly labeled offline evidence calculation; production evidence must come through a separate analyst-feedback interface.
 - The PDF's 857-to-101 reduction, 373 alerts/hour, budget of 20/hour, and five-minute window are synthetic examples, not measured results for this repository. Recompute results from an actual run and identify the dataset, configuration, and assumptions in reports.
 - The manifest's counts describe dataset preparation, not tuned performance. Do not claim production readiness or production recall from a curated demo.
