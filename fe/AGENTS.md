@@ -74,7 +74,7 @@ Before the final response, run one reporting pass. If candidates remain, from th
 ## Implemented sample Replay (7 Nov 2026)
 
 - Existing scaffold retained in `fe/app/`.
-- `/` redirects to `/replay`. The Replay page loads clearly labeled synthetic JSON through `fe/lib/data.ts`; the agreed backend API can replace this source module.
+- `/` redirects to `/replay` through `next.config.ts` before rendering, avoiding instant-navigation validation of a redirect-only page. The Replay page loads clearly labeled synthetic JSON through `fe/lib/data.ts`; the agreed backend API can replace this source module.
 - `npm run dev`, `npm run build`, `npm run lint`, and `npx tsc --noEmit` are the available commands. `npm test` runs playback timing, frame selection, and fixture integrity tests.
 - Playback supports Play/Pause, Restart (pause at zero, retain speed), and 60×/120×/360×. Scores, bands, and metrics come from saved sample frames. Future navigation is disabled; real pipeline integration remains deferred.
 - Dev/build scripts use Webpack and Tailwind PostCSS after a reproducible Turbopack CSS worker startup failure on Windows. Production build, lint, TypeScript, and fixture integrity checks passed for the static Replay implementation.
@@ -139,3 +139,11 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - Nested iteration pagination, ownership/selection checks, allowlisted flow/evaluation/guardrail/change fields, failure retention, and explicit empty states. No backend paths or raw provider diagnostics forwarded.
 - Run tuning is disabled. Accepted-in-attempt history is distinct from current activation. Zero-denominator recall is N/A; benign raised > 0 is red.
 - Build, lint, TypeScript, 27 tests, and browser checks passed. The public API currently returns no attempts; populated-state UI checks used test-only browser responses, not shipped fixtures.
+
+## Default saved dashboard (7 Nov 2026)
+
+- `/replay`, `/tuning`, and `/audit` now default to backend data; earlier sample-default notes above are historical. Samples remain at `/replay/sample`, `/tuning/sample`, `/audit/sample`; Emails and `/replay/comparison` remain explicitly labeled samples. Existing backend-specific URLs still work.
+- `GET /api/replay?dataset_id=ID&run_id=BASELINE_ID` uses `getSavedReplayData()` and `lib/saved-replay.ts`, forwarding only an allowlisted, validated complete backend `/api/runs/{baseline_run_id}/replay` projection. Use the existing server-only `IDEAX_BACKEND_URL`; restart the Python API after changing routes.
+- Replay selects the canonical dataset and latest completed baseline, opens at the saved final snapshot, and offers Play replay, Restart, Show final, and all three speeds. All counts, reductions, scores, bands and score histories come from the backend. The first 50 rows/groups render initially with Show more; totals cover every event. Opening grouped evidence pauses playback. Existing chat controls remain.
+- Only accepted versions on the exact baseline with complete same-event evidence may populate Tuned rules. No accepted run means unavailable, never sample results or a fabricated zero. Full-run evaluation metrics include their evaluation/run IDs; empty denominators show N/A. Email delivery counts and attack-window overlays remain unavailable.
+- The configured live database has baseline run #1 with 5,483 alerts and no tuning attempts. Chrome verified counts, playback, failed refresh retention/retry, saved empty history, separate samples, and 1440/1280/400px layouts without uncaught exceptions. Backend tests cover populated accepted-run histories in temporary databases; no live tuning or database writes were performed by this integration.

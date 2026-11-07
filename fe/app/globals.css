@@ -118,6 +118,10 @@ button:disabled { cursor: not-allowed; }
 .group-detail > small { display: block; color: var(--color-muted); padding-top: 6px; }
 .notice { margin-top: 16px; padding: 7px 12px; background: var(--color-blue-tint); border-left: 3px solid var(--color-secondary); color: var(--color-muted); font-size: 12px; }
 .sample-note { margin-top: 8px; color: var(--color-muted); font-size: 11px; }
+.saved-replay-notice { margin-bottom: 16px; }
+.saved-list-footer { padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--color-muted); font-size: 11px; }
+.saved-replay .alert-row > span:nth-child(2) { overflow-wrap: anywhere; }
+.saved-replay .alert-row .badge { font-size: 10px; padding: 3px 2px; white-space: nowrap; }
 @media (max-width: 1279px) {
   .app-header { flex-wrap: wrap; gap: 16px; }
   .source-chip { white-space: normal; }

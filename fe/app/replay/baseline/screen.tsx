@@ -97,6 +97,6 @@ export default function BaselineScreen() {
         {dataset && runs.data && !runs.data.items.some(item => item.mode === "baseline" && item.status === "completed") && <p>No completed Original rules run. Failed and unfinished runs cannot be replayed.</p>}
       </section>
       {dataset && run && <RunLoader key={`${dataset}:${run}`} dataset={Number(dataset)} run={Number(run)}/>}
-      <p className="baseline-note">Evaluation labels are not used by this replay. At runtime, benign comes from the rule definition. Curated labels may be used only for evaluation and offline tuning evidence. Tuning, Audit log, and Emails remain separately labelled sample screens.</p>
+      <p className="baseline-note">Evaluation labels are not used by this replay. At runtime, benign comes from the rule definition. Curated labels may be used only for evaluation and offline tuning evidence. Tuning and Audit log show saved backend history; Emails remains a labeled sample.</p>
     </main></>;
 }

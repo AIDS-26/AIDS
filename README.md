@@ -186,6 +186,7 @@ const alerts = await fetch(`http://127.0.0.1:8000/api/runs/${run.id}/alerts?limi
 | `/api/datasets/{id}/runs` | Calculation run IDs, status, mode and rule-version IDs |
 | `/api/runs/{id}/alerts` | Application scores/groups from a completed baseline or tuned run |
 | `/api/runs/{id}/alerts/{alert_id}/events` | Evidence membership and stored score trajectory |
+| `/api/runs/{baseline_run_id}/replay` | Complete saved Original/Tuned playback snapshot, counts, evidence membership and persisted effective score histories |
 
 All list routes accept `limit` (1–500, default 100) and `after_id` (default 0).
 Responses contain `items` and `next_after_id`; pass that cursor to get the next
@@ -199,6 +200,25 @@ use the completed-run route for calculated scores even after a replay exists.
 `suricata_severity` is Suricata's original 1–3 value, **not** the application's
 Low/Medium/High score. `flow_id` is a string to preserve large integers in JavaScript.
 No raw JSON, demo labels, label paths or original source paths are exposed.
+
+The replay snapshot is intentionally complete and rejects pagination parameters.
+It requires a completed, one-alert-per-event baseline. Tuned results are selected
+only from a completed run using a previously accepted version on that exact
+baseline, with the same observation duration and complete, unique event evidence.
+Missing tuned results remain `null`; missing historical scores are never invented.
+Frames use `(timestamp_us, source_line, event_id)` ordering, include events at the
+clock boundary, and aggregate persisted scores/severities without running scoring,
+tuning, or evaluation. Reduction is a presentation count ratio rounded half up to
+one decimal. Saved evaluation metrics describe the full evaluated run, including
+the original evaluation run ID when viewing a fresh replay of its accepted version.
+No labels or email delivery records are loaded by this view.
+
+The dashboard now opens saved backend results at `/replay`, `/tuning`, and `/audit`.
+Set the server-only `IDEAX_BACKEND_URL` in `fe/.env.local` if the API is hosted
+elsewhere; the default is loopback port 8000. Restart the Python read API after
+updating route code. Replay initially shows the final saved counts; Play replay
+starts at zero. Synthetic screens remain under each route's `/sample` subpath.
+Emails remains a labeled sample and live tuning still runs through the backend CLI.
 
 ### Calculation integration
 

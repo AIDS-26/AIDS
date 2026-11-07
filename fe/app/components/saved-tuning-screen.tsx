@@ -68,10 +68,11 @@ function Detail({ dataset, attemptId, screen }: { dataset: string; attemptId: nu
 }
 
 export default function SavedTuningScreen({ screen }: { screen: "tuning" | "audit" }) {
-  const [dataset, setDataset] = useState("");
+  const [chosenDataset, setDataset] = useState("");
   const [selected, select] = useState<number | null>(null);
   const [revision, refresh] = useState(0);
   const datasets = useSaved<{ items: Dataset[] }>("/api/baseline?resource=datasets", revision);
+  const dataset = chosenDataset || String(datasets.data?.items.find(item => item.name === "eve_demo_FINAL.json")?.id ?? datasets.data?.items.at(-1)?.id ?? "");
   const attempts = useSaved<{ items: SavedAttempt[] }>(dataset ? `/api/saved-tuning?dataset_id=${dataset}` : null, revision);
   return <><a href="#saved-results" className="skip-link">Skip to saved results</a><AppHeader active={screen} sample={false} source="Saved tuning results · read-only"/>
     <main id="saved-results"><SavedSourceTabs screen={screen} backend/><div className="baseline-heading"><div><h1>{screen === "tuning" ? "Saved tuning" : "Audit log"}</h1><p>Backend results · passed and failed attempts</p></div><div className="baseline-tuning"><button disabled aria-describedby="saved-tune-disabled">Run tuning</button><small id="saved-tune-disabled">Read-only connection · tuning starts in the backend</small></div></div>

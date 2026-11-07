@@ -7,7 +7,7 @@ const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] }
 
 export const metadata: Metadata = {
   title: "Replay · IDEA-X",
-  description: "IDEA-X alert replay — clearly labeled static sample.",
+  description: "IDEA-X saved alert replay, tuning results, and audit history.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

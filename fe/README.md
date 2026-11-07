@@ -2,6 +2,48 @@
 
 Next.js App Router + TypeScript + Tailwind. `/` redirects to `/replay`.
 
+## Default dashboard: saved backend results
+
+`/replay`, `/tuning`, and `/audit` now open real saved backend results. The earlier
+sample implementation notes below describe the preserved sample screens at
+`/replay/sample`, `/tuning/sample`, and `/audit/sample`. Emails remains a labeled
+sample. `/replay/baseline` and the `/tuning/backend` / `/audit/backend` URLs remain
+available; `/replay/comparison` remains an explicitly labeled sample preview.
+
+Start the updated Python read API from the repository root: `python -m app.api`.
+Restart an already running API after updating its route definitions. The existing
+server-only `IDEAX_BACKEND_URL` setting applies to every saved-results screen,
+defaulting to `http://127.0.0.1:8000`; no CORS changes are required.
+
+Replay selects the canonical imported demo dataset and latest completed baseline
+by default, and initially shows the saved final counts. Choose another dataset or
+baseline with the selectors. Play replay starts from the beginning; Restart pauses
+at zero; Show final returns to the complete result. All three speeds use the same
+saved score histories and count frames. The list initially renders 50 rows to keep
+playback responsive; Show 50 more reveals additional rows without changing totals.
+
+The server adapter in `lib/saved-replay.ts` validates dataset/run ownership and
+the complete Python `/api/runs/{baseline_run_id}/replay` snapshot. Every baseline
+alert is loaded; tuned memberships must cover all originals exactly once. The
+backend selects only a completed, accepted tuned version on the exact baseline,
+including later deterministic replays of accepted versions. Without one, the
+right lane and comparison metrics say unavailable. Failed reloads retain the
+previously loaded snapshot. There is no sample fallback or frontend score,
+severity, reduction, or evaluation calculation.
+
+Group expansion uses elapsed membership and persisted effective score histories,
+pauses playback, and preserves the existing Ask IDEA-X interface. Full-run saved
+evaluation results are labeled with their evaluated run ID. Empty attack sets
+display N/A. Email delivery counts and attack-window overlays are unavailable in
+this read model; no emails or model calls are made by loading the dashboard.
+
+Live verification: dataset/run #1 contains 5,483 alerts over 9,600 seconds and no
+accepted tuned run. Chrome checks passed for initial totals, playback, loading
+additional rows, retained results on failed reload, retry, saved empty Tuning/Audit
+history, separate samples, and 1440/1280/400px widths with no page overflow or
+uncaught exceptions. Backend tests exercise accepted pairing and causal tuned
+trajectories using temporary databases; the live database was not tuned or changed.
+
 ## Commands
 
 - `npm install`: install dependencies.

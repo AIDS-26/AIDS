@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from app.db import connect, database_path
 from app import siem
+from app.replay_view import replay_view
 
 
 def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
@@ -61,6 +62,10 @@ def make_server(path: str | Path | None = None, *, host: str = "127.0.0.1",
                     reader = {'alerts': siem.source_alerts, 'runs': siem.runs,
                               'tuning-attempts': siem.tuning_attempts}[match[2]]
                     result = reader(int(match[1]), target, **paging)
+                elif match := re.fullmatch(r"/api/runs/([1-9][0-9]*)/replay", url.path):
+                    if paging:
+                        raise ValueError('Replay returns a complete snapshot; pagination parameters are not supported')
+                    result = replay_view(int(match[1]), target)
                 elif match := re.fullmatch(r"/api/runs/([1-9][0-9]*)/alerts", url.path):
                     result = siem.calculated_alerts(int(match[1]), target, **paging)
                 elif match := re.fullmatch(r"/api/runs/([1-9][0-9]*)/alerts/([1-9][0-9]*)/events", url.path):

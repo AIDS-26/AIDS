@@ -1,6 +1,5 @@
-import { getReplayData } from "@/lib/data";
-import Replay from "./replay-screen";
+import SavedReplayScreen from "./saved-screen";
 
 export default function ReplayPage() {
-  return <Replay data={getReplayData()}/>;
+  return <SavedReplayScreen/>;
 }
