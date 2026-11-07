@@ -12,7 +12,8 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 - `config/attack_rules.json` contains attack-type classification and severity weights.
 - `config/service_rules.json` contains CIDR-to-service mappings and service weights.
 - `data/eve_demo_FINAL.json` is Suricata EVE JSON Lines: one JSON event per line, despite its `.json` extension.
-- No dependency manifest, runnable application, evaluator, or test command has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist. Update this section with verified setup and test commands when implementation adds them.
+- `siem/scoring.py` implements deterministic per-group runtime scoring. Its focused tests are in `tests/test_scoring.py` and run with `python -m unittest discover -s tests -v`.
+- No dependency manifest, runnable application, or evaluator has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist. Update this section with verified setup and test commands when implementation adds them.
 - Preserve existing user files and untracked artifacts. Treat source datasets as immutable inputs and write derived outputs elsewhere unless the user requests regeneration.
 
 ## Architecture
