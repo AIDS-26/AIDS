@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AppHeader from "@/app/components/app-header";
+import ChatAssistant from "@/app/components/chat-assistant";
 import type { AuditData } from "@/lib/data";
 import { recallLabel } from "@/lib/tuning";
 
@@ -21,6 +22,7 @@ export default function Audit({ data }: { data: AuditData }) {
   return <>
     <a href="#audit" className="skip-link">Skip to audit log</a>
     <AppHeader active="audit" source="Design examples · 5,483 alerts"/>
+    <ChatAssistant context={{ source: "audit", sample: true, run_id: selected }}/>
     <main id="audit">
       <header className="audit-title"><h1>Audit log</h1><p>Every tuning run is kept, including failed ones. Original alerts are never deleted.</p></header>
       <section className="panel" aria-label="Sample tuning runs">
