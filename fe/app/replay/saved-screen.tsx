@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useReducer, useState } from "react";
 import AppHeader from "@/app/components/app-header";
 import ChatAssistant from "@/app/components/chat-assistant";
+import RuleHistory from "@/app/components/rule-history";
 import ReplayModes from "./replay-modes";
 import { initialPlayback, playbackReducer, selectFrame, type Speed } from "@/lib/replay";
 import type { BaselineRun, Dataset } from "@/lib/backend-client";
@@ -150,6 +151,8 @@ function Player({ data }: { data: SavedReplay }) {
       </section>
     </div>
     <details className="baseline-metadata"><summary>Saved run provenance</summary><dl><dt>Dataset SHA-256</dt><dd className="mono">{data.dataset.sha256}</dd><dt>Rule version</dt><dd className="mono">{data.rule_version_id}</dd><dt>Observation duration</dt><dd>{data.duration_s} seconds</dd></dl></details>
+    <RuleHistory datasetId={data.dataset.id} runId={data.baseline_run_id}/>
+    {data.tuned_run_id !== null && <RuleHistory datasetId={data.dataset.id} runId={data.tuned_run_id}/>}
     {data.evaluation && <p className="baseline-note">Saved evaluation #{data.evaluation.id} on tuned run #{data.evaluation.tuned_run_id}: attack-group evidence retention {data.evaluation.attack_groups_total === 0 ? "N/A (no attack groups)" : `${data.evaluation.attack_groups_retained} / ${data.evaluation.attack_groups_total}`}. {data.evaluation.recall_scope || "Curated demo evidence retention; not independently validated detection recall."}</p>}
     <aside className="notice">Attack/benign labels from CIC-IDS2017 are used only to grade results and to weight the offline tuning. At runtime, benign comes from the rule definition.</aside>
     <p className="baseline-note">Scores and playback summaries come from saved backend results. Email delivery counts and attack-window overlays are unavailable in this read model. No emails are sent.</p>
@@ -158,8 +161,9 @@ function Player({ data }: { data: SavedReplay }) {
   </>;
 }
 
-export default function SavedReplayScreen() {
-  const [revision, refresh] = useState(0), [chosenDataset, setDataset] = useState(""), [chosenRun, setRun] = useState("");
+export default function SavedReplayScreen({ initialSelection }: { initialSelection?: { dataset: string; run: string; error: string | null } }) {
+  const [revision, refresh] = useState(0), [chosenDataset, setDataset] = useState(initialSelection?.dataset ?? ""), [chosenRun, setRun] = useState(initialSelection?.run ?? "");
+  const [linkError, clearLinkError] = useState(initialSelection?.error ?? null);
   const datasets = useRead<{ items: Dataset[] }>("/api/baseline?resource=datasets", revision);
   const dataset = chosenDataset || String(datasets.data?.items.find(d => d.name === "eve_demo_FINAL.json")?.id ?? datasets.data?.items.at(-1)?.id ?? "");
   const runs = useRead<{ items: BaselineRun[] }>(dataset ? `/api/baseline?resource=runs&dataset_id=${dataset}` : null, revision);
@@ -169,10 +173,11 @@ export default function SavedReplayScreen() {
   return <><a href="#saved-replay" className="skip-link">Skip to replay</a>
     <AppHeader active="replay" sample={false} source={replay.data ? `${replay.data.dataset.name} · ${replay.data.total_alerts.toLocaleString()} alerts` : "Saved runs · read-only"}/>
     <main id="saved-replay"><ReplayModes active="saved"/>
+      {linkError && <p className="baseline-message" role="alert">{linkError}</p>}
       <div className="baseline-heading"><div><h1>Original vs Tuned rules</h1><p>Saved backend results · opens at the final snapshot</p></div><div className="baseline-tuning"><button disabled aria-describedby="saved-tuning-disabled">Run tuning</button><small id="saved-tuning-disabled">Tuning runs offline in the backend</small></div></div>
       <section className="panel baseline-panel"><h2>Select saved results</h2><div className="baseline-selectors">
-        <label>Dataset<select disabled={datasets.loading || !datasets.data?.items.length} value={dataset} onChange={event => { setDataset(event.target.value); setRun(""); }}><option value="" disabled>Choose a dataset</option>{datasets.data?.items.map(d => <option key={d.id} value={d.id}>#{d.id} · {d.name} · {d.event_count.toLocaleString()} events</option>)}</select></label>
-        <label>Original run<select disabled={!dataset || runs.loading} value={run} onChange={event => setRun(event.target.value)}><option value="" disabled>Choose a completed baseline</option>{runs.data?.items.map(r => <option key={r.id} value={r.id} disabled={r.mode !== "baseline" || r.status !== "completed"}>#{r.id} · {r.mode === "baseline" ? "Original rules" : "Tuned rules"} · {r.status}</option>)}</select></label>
+        <label>Dataset<select disabled={datasets.loading || !datasets.data?.items.length} value={dataset} onChange={event => { setDataset(event.target.value); setRun(""); clearLinkError(null); }}><option value="" disabled>Choose a dataset</option>{datasets.data?.items.map(d => <option key={d.id} value={d.id}>#{d.id} · {d.name} · {d.event_count.toLocaleString()} events</option>)}</select></label>
+        <label>Original run<select disabled={!dataset || runs.loading} value={run} onChange={event => { setRun(event.target.value); clearLinkError(null); }}><option value="" disabled>Choose a completed baseline</option>{runs.data?.items.map(r => <option key={r.id} value={r.id} disabled={r.mode !== "baseline" || r.status !== "completed"}>#{r.id} · {r.mode === "baseline" ? "Original rules" : "Tuned rules"} · {r.status}</option>)}</select></label>
         <button disabled={datasets.loading || runs.loading || replay.loading} onClick={() => refresh(n => n + 1)}>{error ? "Retry saved results" : "Reload saved results"}</button>
       </div>
         {(datasets.loading || runs.loading || replay.loading) && <p role="status">Loading saved results and every alert. Previously loaded results remain visible where available.</p>}

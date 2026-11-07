@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppHeader from "./app-header";
 import SavedSourceTabs from "./saved-source-tabs";
+import RuleHistory from "./rule-history";
 import type { Dataset } from "@/lib/backend-client";
+import { baselineHref } from "@/lib/navigation";
 import { iterationAccepted, savedRecall, type SavedAttempt, type SavedDetail, type SavedIteration } from "@/lib/saved-tuning";
 
 function useSaved<T>(url: string | null, revision: number) {
@@ -59,10 +61,11 @@ function Detail({ dataset, attemptId, screen }: { dataset: string; attemptId: nu
       <p className="saved-version">Accepted version in this attempt: {detail.attempt.selected_version_id ?? "None"}. This is saved history, not a claim about the currently active version.</p>
       {detail.attempt.status === "failed" && <p className="baseline-message">This attempt did not activate a proposal. Previously active rules remain unchanged.</p>}
       {detail.attempt.has_error && <p role="alert">The backend recorded an attempt error. Review the saved iterations below or the backend logs.</p>}
-      <Link href={`/replay/baseline`}>View Original rules replay</Link>
+      <Link href={baselineHref(dataset, detail.attempt.baseline_run_id)}>View Original rules replay</Link>
     </section>
     {screen === "tuning" && <section className="panel baseline-panel"><h2>Saved flow and delta gaps</h2>{detail.flow ? <><p>Budget: {number(detail.flow.budget_per_hour)} alerts/hour · Observed: {number(detail.flow.observed_per_hour)} alerts/hour · Burn rate: {number(detail.flow.burn_rate)}</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Saved rule flow"><table className="baseline-table"><thead><tr><th scope="col">Rule</th><th scope="col">Observed/hour</th><th scope="col">Allowed/hour</th><th scope="col">Delta gap</th><th scope="col">Peak / p95</th></tr></thead><tbody>{detail.flow.rules.map(item => <tr key={item.rule_id}><td className="saved-version">{item.rule_id}</td><td>{number(item.observed_per_hour)}</td><td>{number(item.allowed_per_hour)}</td><td>{number(item.delta_gap)}</td><td>{number(item.peak_n)} / {number(item.p95_n)}</td></tr>)}</tbody></table></div></> : <p>No flow calculation was saved for this attempt.</p>}</section>}
     {detail.iterations.length ? <><label className="saved-iteration-select">Saved iteration<select value={iteration?.id ?? ""} onChange={event => setIteration(Number(event.target.value))}>{detail.iterations.map(item => <option key={item.id} value={item.id}>Iteration {item.iteration} · {item.status} · {iterationAccepted(detail.attempt, item) ? "accepted" : "not accepted"}</option>)}</select></label>{iteration && <Iteration attempt={detail.attempt} item={iteration}/>}</> : <p className="baseline-message">No iterations have been saved yet. Refresh details after the backend updates this attempt.</p>}
+    <RuleHistory key={iteration?.tuned_run_id ?? detail.attempt.baseline_run_id} datasetId={Number(dataset)} runId={iteration?.tuned_run_id ?? detail.attempt.baseline_run_id}/>
     </>}
   </section>;
 }
@@ -80,7 +83,7 @@ export default function SavedTuningScreen({ screen }: { screen: "tuning" | "audi
       {(datasets.loading || attempts.loading) && <p role="status">Loading saved results…</p>}{(datasets.error || attempts.error) && <p className="baseline-message" role="alert">{datasets.error || attempts.error} Previously loaded results remain visible where available. No sample fallback is used.</p>}
       {datasets.data?.items.length === 0 && <p>No datasets returned by the backend.</p>}
     </section>
-    {dataset && attempts.data?.items.length === 0 && <section className="panel baseline-panel"><h2>No saved tuning attempts yet</h2><p>The backend is reachable, but this dataset has no tuning history. Once the backend saves an attempt, use Refresh lists. Failed attempts will appear here too.</p><Link href="/replay/baseline">Open Original rules replay</Link></section>}
+    {dataset && attempts.data?.items.length === 0 && <section className="panel baseline-panel"><h2>No saved tuning attempts yet</h2><p>The backend is reachable, but this dataset has no tuning history. Once the backend saves an attempt, use Refresh lists. Failed attempts will appear here too.</p><Link href={baselineHref(dataset)}>Open Original rules replay</Link></section>}
     {Boolean(attempts.data?.items.length) && <section className="panel baseline-panel"><h2>Saved attempts</h2><div className="table-scroll" tabIndex={0} role="region" aria-label="Saved tuning attempts"><table className="baseline-table"><thead><tr><th scope="col">Attempt</th><th scope="col">Original run</th><th scope="col">Created</th><th scope="col">Status</th><th scope="col">Details</th></tr></thead><tbody>{attempts.data!.items.map(item => <tr key={item.id} className={selected === item.id ? "baseline-selected" : undefined}><td>#{item.id}</td><td>#{item.baseline_run_id}</td><td>{item.created_at}</td><td className={item.status === "failed" ? "comparison-failed" : ""}>{item.status}</td><td><button aria-pressed={selected === item.id} onClick={() => select(item.id)}>View attempt #{item.id}</button></td></tr>)}</tbody></table></div></section>}
     {dataset && selected !== null && <Detail key={`${dataset}:${selected}`} dataset={dataset} attemptId={selected} screen={screen}/>}
     <aside className="notice">Values are saved backend outputs. Recall describes the backend’s stated evaluation scope; it is not a production detection-accuracy claim.</aside>

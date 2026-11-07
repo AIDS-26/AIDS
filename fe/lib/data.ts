@@ -62,3 +62,8 @@ export async function getSavedReplayData(query: { dataset_id: number; run_id: nu
   const { readSavedReplay } = await import("./saved-replay");
   return readSavedReplay(query, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
 }
+
+export async function getRuleHistoryData(datasetId: number, runId: number) {
+  const { readRuleHistory } = await import("./rule-history");
+  return readRuleHistory(datasetId, runId, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
+}
