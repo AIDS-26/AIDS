@@ -4,9 +4,9 @@ Intrusion Detection Escalation through Agentic reasoning with Codex, eXtended
 `app/` is the backend: processing, database access, and the future HTTP API.
 `siem/` is the frontend: the client-facing SIEM interface. It will request data
 through the backend API; SQLite access stays in backend Python code.
-This setup supplies database infrastructure and a standalone scoring function,
-not a UI, HTTP server, or integrated tuner yet. The evaluation module provides
-trusted label access, not recall calculations. It requires Python 3.10+,
+This setup supplies database infrastructure and Adel's baseline/SIEM II
+calculation modules, but no HTTP server or complete tuning loop yet. The
+database evaluation module provides trusted label access. It requires Python 3.10+,
 SQLite 3.31+ with JSON functions, and PyYAML for rule snapshots.
 
 ## Project structure
@@ -31,10 +31,11 @@ a runtime mapping loader is not implemented yet. Use
 `demo_freeze/eve_demo_FINAL.json` as the single canonical extracted demo dataset.
 The existing `demo_freeze.zip` archive is retained.
 
-`app/scoring.py` calculates the deterministic score from weights and the count
-already gathered within the configured window. `tuner/rules.py` builds complete
+`app/calculation_base/` contains the baseline scoring and SIEM II grouping.
+`tuner/rules.py` builds complete
 YAML rule snapshots from the canonical mapping JSON, validates candidate
-parameters and audit entries, and binds them to JSON source hashes. See
+parameters and audit entries, binds them to JSON source hashes, and translates
+them for Adel's grouping function. See
 [`docs/yaml-rules.md`](docs/yaml-rules.md). Install PyYAML with
 `python -m pip install -r requirements.txt` before using the tuner module.
 

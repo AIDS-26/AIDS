@@ -23,6 +23,13 @@ and `N_sat`. A tuned snapshot retains the full baseline definitions; each
 changed override has an audit entry with `old`, `new`, `gap`, and `rationale`.
 See `tuner.rules.validate(candidate, attack_json, service_json, base)`.
 
+`tuner.rules.to_siem2_settings` converts validated overrides to Adel's
+`attack_type|service` lookup and returns the YAML defaults. Call
+`app.calculation_base.siem2_calculation_base.group_events_with_yaml` for tuned
+groups or `app.calculation_base.evaluate.evaluate_with_yaml` for its preliminary
+evaluation report. The current evaluator reports event coverage, not the PDF's
+attack-group recall; it cannot yet certify a tuned proposal for activation.
+
 The application's `rule_versions`, `tuning_attempts`, `tuning_iterations`, and
 `evaluations` tables in `migrations/` own version history and iteration reports.
 Store the parsed, validated YAML mapping serialized as JSON in the existing

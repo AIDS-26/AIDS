@@ -52,6 +52,7 @@ def score_events(events, attack_mapping, service_mapping):
             'attack_type': attack['attack_type'], 'service': service['service'],
             'attack_weight': attack['weight'], 'service_weight': service['weight'],
             'base_score': score, 'severity': band(score), 'label': label,
+            'benign_rule': attack.get('severity_override') == 'S',
             'evidence': 1.0 if label == 'attack' else 0.2,
         })
     return result

@@ -66,6 +66,23 @@ def dump(snapshot):
     return yaml.safe_dump(snapshot, sort_keys=False, allow_unicode=True)
 
 
+def to_siem2_settings(snapshot, attack_path, service_path):
+    """Return Adel's rule lookup and defaults from a validated full snapshot.
+
+    SIEM II currently indexes rules by ``attack_type|service`` rather than CIDR.
+    Reject ambiguous service names instead of silently selecting an override.
+    """
+    validate(snapshot, attack_path, service_path)
+    services = {rule["cidr"]: rule["service"] for rule in snapshot["service_rules"]}
+    if len(set(services.values())) != len(services):
+        raise RuleError("service names must be unique for SIEM II rule lookup")
+    lookup = {}
+    for rule in snapshot["overrides"]:
+        key = rule["attack_type"] + "|" + services[rule["service_cidr"]]
+        lookup[key] = {"window_minutes": rule["window_min"], "n_sat": rule["n_sat"]}
+    return lookup, snapshot["policy"]["window_min"], snapshot["policy"]["n_sat"]
+
+
 def validate(snapshot, attack_path, service_path, base=None):
     """Reject unknown fields, invalid bounds, and changes to canonical weights."""
     required = {"schema_version", "kind", "source", "policy", "attack_rules",
