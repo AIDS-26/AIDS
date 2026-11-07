@@ -47,6 +47,7 @@ def build_base(attack_path, service_path, *, window_min, n_sat,
         "attack_rules": attacks["rules"],
         "attack_fallback": attacks["fallback"],
         "service_rules": services["rules"],
+        "service_default": services["default"],
         "overrides": [],
         "changes": [],
     }
@@ -86,7 +87,7 @@ def to_siem2_settings(snapshot, attack_path, service_path):
 def validate(snapshot, attack_path, service_path, base=None):
     """Reject unknown fields, invalid bounds, and changes to canonical weights."""
     required = {"schema_version", "kind", "source", "policy", "attack_rules",
-                "attack_fallback", "service_rules", "overrides", "changes"}
+                "attack_fallback", "service_rules", "service_default", "overrides", "changes"}
     if not isinstance(snapshot, dict) or set(snapshot) != required:
         raise RuleError("snapshot fields do not match schema v1")
     if snapshot["schema_version"] != 1 or snapshot["kind"] not in ("base", "tuned"):
@@ -99,16 +100,18 @@ def validate(snapshot, attack_path, service_path, base=None):
     for attack in attacks["rules"] + [attacks["fallback"]]:
         if type(attack["weight"]) is not int or not 0 <= attack["weight"] <= 10:
             raise RuleError("attack weight must be an integer from 0 to 10")
-    for service in services["rules"]:
+    for service in services["rules"] + [services["default"]]:
         if type(service["weight"]) is not int or not 0 <= service["weight"] <= 10:
             raise RuleError("service weight must be an integer from 0 to 10")
-        try:
-            ipaddress.ip_network(service["cidr"], strict=True)
-        except ValueError as exc:
-            raise RuleError("invalid service CIDR") from exc
+        if "cidr" in service:
+            try:
+                ipaddress.ip_network(service["cidr"], strict=True)
+            except ValueError as exc:
+                raise RuleError("invalid service CIDR") from exc
     if (snapshot["attack_rules"] != attacks["rules"] or
             snapshot["attack_fallback"] != attacks["fallback"] or
-            snapshot["service_rules"] != services["rules"]):
+            snapshot["service_rules"] != services["rules"] or
+            snapshot["service_default"] != services["default"]):
         raise RuleError("canonical attack or service definitions changed")
     policy = snapshot["policy"]
     if not isinstance(policy, dict) or set(policy) != {"cap", "window_min", "n_sat",

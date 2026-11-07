@@ -17,7 +17,9 @@ python -m tuner --window-min <W> --n-sat <N> --max-high-window-min <MAX> --candi
 ```
 
 The complete snapshot has `schema_version`, `kind`, `source`, `policy`,
-`attack_rules`, `attack_fallback`, `service_rules`, `overrides`, and `changes`.
+`attack_rules`, `attack_fallback`, `service_rules`, `service_default`,
+`overrides`, and `changes`. The default service entry retains its explicit
+zero weight for unmapped endpoints.
 `overrides` select an attack type and a service CIDR and supply per-rule `W`
 and `N_sat`. A tuned snapshot retains the full baseline definitions; each
 changed override has an audit entry with `old`, `new`, `gap`, and `rationale`.
@@ -27,7 +29,8 @@ See `tuner.rules.validate(candidate, attack_json, service_json, base)`.
 `attack_type|service` lookup and returns the YAML defaults. Call
 `app.calculation_base.siem2_calculation_base.group_events_with_yaml` for tuned
 groups or `app.calculation_base.evaluate.evaluate_with_yaml` for its preliminary
-evaluation report. The current evaluator reports event coverage, not the PDF's
+evaluation report, supplying labels separately as an event-ID mapping. The
+current evaluator reports event coverage, not the PDF's
 attack-group recall; it cannot yet certify a tuned proposal for activation.
 
 The application's `rule_versions`, `tuning_attempts`, `tuning_iterations`, and

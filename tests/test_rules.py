@@ -25,6 +25,7 @@ class RuleSnapshotTests(unittest.TestCase):
     def test_full_baseline_preserves_canonical_rules(self):
         self.assertEqual(len(self.base["attack_rules"]), 8)
         self.assertEqual(len(self.base["service_rules"]), 7)
+        self.assertEqual(self.base["service_default"]["weight"], 0)
         self.assertIn("attack_sha256", self.base["source"])
         self.assertIn("attack_rules:", dump(self.base))
 
@@ -96,9 +97,13 @@ class RuleSnapshotTests(unittest.TestCase):
         by_attack = {group["attack_type"]: group for group in groups}
         self.assertEqual(by_attack["suspicious_external_communication"]["score"], 10)
         self.assertEqual(by_attack["informational_or_benign"]["score"], 4)
-        report = evaluate_with_yaml(baseline, tuned, ATTACK, SERVICE)
+        report = evaluate_with_yaml(
+            baseline, tuned, ATTACK, SERVICE,
+            labels={i: e["demo"]["label"] for i, e in enumerate(events)},
+        )
         self.assertEqual(report["grouped_alerts"], 2)
         self.assertEqual(report["benign_groups_raised"], 1)
+        self.assertIsNone(report["attack_group_recall"])
 
     def test_existing_score_uses_half_up_and_rejects_invalid_saturation(self):
         self.assertEqual(adjusted_score(3, 2, 4), 7)
