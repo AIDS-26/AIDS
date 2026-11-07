@@ -2,15 +2,9 @@
 
 ## Project and scope
 
-<<<<<<< HEAD
 IDEA-X means Intrusion Detection Escalation through Agentic reasoning with Codex, eXtended (renamed from AIDS at the organizers' request; don't use the old name in code, UI or docs). Build an SRE-style SIEM tuning demo that reduces analyst alert load while preserving attack visibility.
 
 Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: the delta gap calculation," supplied by the user (copy in the repo: `docs/reference/codex-sre-delta-gap.pdf`). Treat its example Codex prompt as the specification for an offline tuning run, not as an instruction to execute tuning during unrelated development. Follow the user's current request when defining task scope.
-=======
-AIDS means Agentic Intrusion Detection System. Build an SRE-style SIEM tuning demo that reduces analyst alert load while preserving attack visibility.
-
-Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: the delta gap calculation," supplied by the user. Treat its example Codex prompt as the specification for an offline tuning run, not as an instruction to execute tuning during unrelated development. Follow the user's current request when defining task scope.
->>>>>>> 88e0024c00072f1431fc8f15c8253f3085b87a92
 
 ## Current repository
 
@@ -20,10 +14,7 @@ Design reference: `codex-sre-delta-gap (1).pdf`, titled "Codex tuning as SRE: th
 - `demo_freeze/manifest.json` records dataset preparation, counts, windows, seed, and a SHA-256. `demo_freeze.zip` is an existing archive.
 - No dependency manifest, runnable application, evaluator, or test command has been established. Inspect the repository before choosing tools; do not claim proposed commands or files already exist. Update this section with verified setup and test commands when implementation adds them.
 - Preserve existing user files and untracked artifacts. Treat `demo_freeze/` and its archive as frozen inputs; write derived outputs elsewhere unless the user requests regeneration.
-<<<<<<< HEAD
 - The dashboard frontend lives in `fe/` (Next.js + Tailwind); its rules are in `fe/AGENTS.md`.
-=======
->>>>>>> 88e0024c00072f1431fc8f15c8253f3085b87a92
 
 ## Architecture
 
@@ -42,10 +33,7 @@ Codex writes and tests the rules. It does not assign per-event scores at runtime
 - Attack score: `X = round(S + (cap - S) * min(1, ln(n) / ln(N_sat)))`.
 - Benign alerts retain `S`. Never reduce a score below `S` or exceed the cap.
 - Severity bands: Low 1-4, Medium 5-7, High 8-10.
-<<<<<<< HEAD
 - At runtime, "benign" comes from the rule definition (rules marked benign in `base_rules.yaml`), never from evaluation labels.
-=======
->>>>>>> 88e0024c00072f1431fc8f15c8253f3085b87a92
 - Runtime grouping key: target plus attack type; scanners use source plus attack type. Per-rule tuning aggregates attack type plus service. Keep these two concepts distinct.
 - Document timestamp ordering, window boundaries, percentile calculation, and rounding so replay is reproducible. Handle `n = 1` explicitly; reject or explicitly resolve `N_sat <= 1`, which makes the logarithmic formula undefined. Validate weights, windows, and asset mappings rather than silently inventing values.
 
@@ -79,7 +67,6 @@ Keep changes focused on the requested component. Prefer small deterministic func
 For scoring or tuning changes, add or run focused tests covering score floors/caps, benign non-escalation, grouping keys and time boundaries, singleton groups, invalid saturation values, budget arithmetic, high-severity window limits, immediate exploit alerts, and guardrail failure. Use the same-event replay to verify recall and alert reduction when the evaluator exists. Do not change labels or weaken checks to make a proposal pass.
 
 Report what changed, the checks actually run, their outcomes, and any remaining limitations. When a command or evaluator is unavailable, state that clearly instead of inventing successful validation. Keep this file current as real entry points, schemas, and commands are added.
-<<<<<<< HEAD
 
 ## Hackathon context (added from Tina's handoff)
 
@@ -105,5 +92,3 @@ Files that cross these boundaries follow skill `ideax-data-contracts` (a proposa
 - `docs/HANDOFF.md`: decisions, open questions, plan for the day. `docs/design/`: Figma page "IDEA-X", component list, Scripter scripts. `assets/brand/`: logos.
 - `.agents/skills/`: `ideax-domain` (formulas, glossary, Codex task prompt), `ideax-data-contracts` (JSON/YAML shapes), `ideax-frontend` (UI spec), `ideax-qa` (checks), `ideax-submission` (README, writeup, declarations), `ideax-pitch` (deck).
 - Links: GitHub https://github.com/AIDS-26/AIDS · Data (Drive) https://drive.google.com/drive/folders/1scvfMqdjjL7q0mBEkJpO17ZVkm8XyRP7 · Event https://seaxopenai-hackathon-id.sea.com/
-=======
->>>>>>> 88e0024c00072f1431fc8f15c8253f3085b87a92
