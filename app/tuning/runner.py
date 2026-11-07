@@ -151,7 +151,7 @@ def replay_version(baseline_run_id, version_id, path=None):
 
 def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
          evaluation_manifest=None, evaluation_session_minutes=None, label_provenance=None,
-         output_directory=None, from_version_id=None):
+         output_directory=None, from_version_id=None, on_attempt_created=None, on_progress=None):
     """Try at most three proposals. Only a passing child version becomes active.
 
     Each model request and replay happens outside write transactions. Failed
@@ -160,6 +160,9 @@ def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
     previously active version is never changed on failure.
     """
     validate_policy(policy)
+    def progress(stage, iteration, message):
+        if on_progress is not None:
+            on_progress(stage, iteration, message)
     run, _, baseline_snapshot, events, base = load_baseline(baseline_run_id, path)
     current = initial_rules(base, policy)
     if from_version_id:
@@ -179,6 +182,9 @@ def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
                'artifact_directory': str(directory) if directory else None}
     parent = from_version_id or run['rule_version_id']
     try:
+        if on_attempt_created is not None:
+            on_attempt_created(attempt_id)
+        progress('evaluation_setup', 0, 'Loading evaluation labels and calculating aggregate flow statistics.')
         scorecard = load_scorecard(events, run['dataset_id'], path, labels_path=labels_path,
                                    manifest=evaluation_manifest, session_minutes=evaluation_session_minutes,
                                    provenance=label_provenance)
@@ -203,7 +209,9 @@ def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
                 # individual labels, endpoints, timestamps, or attack-group members.
                 context = {'iteration': iteration, 'policy': policy, 'flow': flow,
                            'current_rules': current, 'suggested_rules': suggested, 'feedback': feedback}
+                progress('proposing', iteration, 'Requesting a model proposal using aggregate statistics.')
                 proposal = proposer(json.loads(encoded(context)))
+                progress('validating', iteration, 'Model proposal received. Validating rule parameters.')
                 proposal_json = encoded(proposal)
                 version = 'tuned/' + uuid4().hex
                 snapshot = {**baseline_snapshot, 'engine': 'tuned-session-v1',
@@ -241,10 +249,17 @@ def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
                         (run['dataset_id'], version, version, snapshot_json,
                          policy['budget_per_hour'], run['observation_seconds'])).lastrowid
                     db.execute('UPDATE tuning_iterations SET tuned_run_id=? WHERE id=?', (tuned_run_id, iteration_id))
+                progress('replaying', iteration, 'Replaying every original event with the proposed grouping settings.')
                 groups = replay(events, candidate, base, policy)
                 evaluation = scorecard.evaluate(events, groups, observation_seconds=run['observation_seconds'],
-                                                budget=policy['budget_per_hour'])
+                                                budget=policy['budget_per_hour'],
+                                                benign_evaluation=policy['benign_evaluation'])
                 guardrail = check(events, groups, candidate, base, policy, evaluation)
+                progress('checked', iteration,
+                         f"Guardrail {'passed' if guardrail['passed'] else 'rejected'}: "
+                         f"{len(events)} events, {len(groups)} groups; "
+                         f"attack groups retained {evaluation['attack_groups_retained']}/{evaluation['attack_groups_total']}; "
+                         f"benign groups raised {evaluation['benign_groups_raised']}.")
                 stats = window_statistics(events, candidate, base, policy)
                 shares = {r['rule_id']: r['allowed_per_hour'] for r in flow['rules']}
                 joint = {key: {**values, 'grouped_per_hour': values['grouped_count'] * 3600 / run['observation_seconds'],
@@ -296,6 +311,8 @@ def tune(baseline_run_id, path=None, *, policy, proposer, labels_path=None,
                                    (version, encoded(accepted), attempt_id))
                     return accepted
             except Exception as error:
+                from app.tuning.diagnostics import failure_reason
+                progress('iteration_failed', iteration, failure_reason(error))
                 message = str(error)
                 with connect(path) as db:
                     if tuned_run_id is not None:

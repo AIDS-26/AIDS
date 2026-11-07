@@ -5,7 +5,15 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   redirects() {
-    return [{ source: "/", destination: "/replay", permanent: false }];
+    return [
+      { source: "/", destination: "/replay", permanent: false },
+      ...["baseline", "backend", "sample", "comparison"].map(mode => ({
+        source: `/replay/${mode}`, destination: "/replay", permanent: false,
+      })),
+      { source: "/tuning/:path*", destination: "/audit", permanent: false },
+      { source: "/audit/:path+", destination: "/audit", permanent: false },
+      { source: "/emails/sample", destination: "/emails", permanent: false },
+    ];
   },
 };
 

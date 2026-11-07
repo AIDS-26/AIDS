@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppHeader from "./app-header";
-import SavedSourceTabs from "./saved-source-tabs";
 import RuleHistory from "./rule-history";
 import type { Dataset } from "@/lib/backend-client";
 import { baselineHref } from "@/lib/navigation";
@@ -44,16 +43,15 @@ function Iteration({ attempt, item }: { attempt: SavedAttempt; item: SavedIterat
       <div className="stat"><strong>{result.reduction_pct == null ? "Unavailable" : `${number(result.reduction_pct)}%`}</strong><span>saved alert reduction</span></div>
       <div className={`stat ${result.benign_groups_raised != null && result.benign_groups_raised > 0 ? "fail" : ""}`}><strong>{number(result.benign_groups_raised)}</strong><span>benign groups raised</span></div>
     </div><p><b>Attack-group retention:</b> {savedRecall(result)} · {result.acceptance_status ?? "Not certified"}</p><p>{result.recall_scope ?? "Evaluation scope was not supplied."}</p><p>Remaining budget gap: {number(result.remaining_budget_gap)} alerts/hour</p></> : <p>No saved evaluation for this iteration. Recall and reduction are unavailable.</p>}
-    <h4>Guardrail</h4>{item.guardrail ? <><p className={item.guardrail.passed ? "text-green" : "comparison-failed"}>{item.guardrail.passed ? "Passed" : "Failed"}{item.guardrail.budget_met === false ? " · Budget not met" : item.guardrail.budget_met ? " · Budget met" : ""}</p><ul>{item.guardrail.errors.map((error, index) => <li key={index}>{error}</li>)}</ul></> : <p>Guardrail result unavailable.</p>}
+    <h4>Guardrail</h4>{item.guardrail ? <><p className={item.guardrail.passed ? "text-green" : "comparison-failed"}>{item.guardrail.passed ? "Passed" : "Failed"}{item.guardrail.budget_met === false ? " · Budget not met" : item.guardrail.budget_met ? " · Budget met" : ""}</p><ul>{item.guardrail.errors.map((error, index) => <li key={index}>{error}</li>)}</ul>{item.guardrail.warnings.map((warning, index) => <p className="notice" key={index}>Warning: {warning}</p>)}</> : <p>Guardrail result unavailable.</p>}
     <h4>Recorded rule changes</h4>{item.changes.length ? <div className="table-scroll" role="region" aria-label="Recorded rule changes" tabIndex={0}><table className="baseline-table"><thead><tr><th scope="col">Rule / parameter</th><th scope="col">Old → proposed</th><th scope="col">Delta gap</th><th scope="col">Rationale</th></tr></thead><tbody>{item.changes.map((change, index) => <tr key={index}><td className="saved-version">{change.rule_id}<small>{change.parameter}</small></td><td>{number(change.old_value)} → {number(change.new_value)}</td><td>{number(change.delta_gap)}</td><td>{change.rationale}</td></tr>)}</tbody></table></div> : <p>No parameter changes recorded.</p>}
   </section>;
 }
 
-function Detail({ dataset, attemptId, screen }: { dataset: string; attemptId: number; screen: "tuning" | "audit" }) {
+function Detail({ dataset, attemptId, listRevision }: { dataset: string; attemptId: number; listRevision: number }) {
   const [revision, refresh] = useState(0);
-  const [selectedIteration, setIteration] = useState<number | null>(null);
-  const result = useSaved<SavedDetail>(`/api/saved-tuning?dataset_id=${dataset}&attempt_id=${attemptId}`, revision);
-  const detail = result.data, iteration = detail?.iterations.find(item => item.id === selectedIteration) ?? detail?.iterations.at(-1);
+  const result = useSaved<SavedDetail>(`/api/saved-tuning?dataset_id=${dataset}&attempt_id=${attemptId}`, revision + listRevision);
+  const detail = result.data;
   return <section aria-label="Saved attempt details"><div className="baseline-loadbar"><h2>Attempt #{attemptId}</h2><button disabled={result.loading} onClick={() => refresh(revision + 1)}>Refresh details</button></div>
     {result.loading && <p role="status">Loading all saved iterations…</p>}{result.error && <p className="baseline-message" role="alert">{result.error} {detail ? "Showing previously loaded details." : "No sample fallback is used."}</p>}
     {detail && <><section className="panel baseline-panel"><h2>{detail.attempt.status === "completed" ? "Completed tuning attempt" : detail.attempt.status === "failed" ? "Failed tuning attempt" : "Tuning attempt in progress"}</h2>
@@ -63,29 +61,30 @@ function Detail({ dataset, attemptId, screen }: { dataset: string; attemptId: nu
       {detail.attempt.has_error && <p role="alert">The backend recorded an attempt error. Review the saved iterations below or the backend logs.</p>}
       <Link href={baselineHref(dataset, detail.attempt.baseline_run_id)}>View Original rules replay</Link>
     </section>
-    {screen === "tuning" && <section className="panel baseline-panel"><h2>Saved flow and delta gaps</h2>{detail.flow ? <><p>Budget: {number(detail.flow.budget_per_hour)} alerts/hour · Observed: {number(detail.flow.observed_per_hour)} alerts/hour · Burn rate: {number(detail.flow.burn_rate)}</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Saved rule flow"><table className="baseline-table"><thead><tr><th scope="col">Rule</th><th scope="col">Observed/hour</th><th scope="col">Allowed/hour</th><th scope="col">Delta gap</th><th scope="col">Peak / p95</th></tr></thead><tbody>{detail.flow.rules.map(item => <tr key={item.rule_id}><td className="saved-version">{item.rule_id}</td><td>{number(item.observed_per_hour)}</td><td>{number(item.allowed_per_hour)}</td><td>{number(item.delta_gap)}</td><td>{number(item.peak_n)} / {number(item.p95_n)}</td></tr>)}</tbody></table></div></> : <p>No flow calculation was saved for this attempt.</p>}</section>}
-    {detail.iterations.length ? <><label className="saved-iteration-select">Saved iteration<select value={iteration?.id ?? ""} onChange={event => setIteration(Number(event.target.value))}>{detail.iterations.map(item => <option key={item.id} value={item.id}>Iteration {item.iteration} · {item.status} · {iterationAccepted(detail.attempt, item) ? "accepted" : "not accepted"}</option>)}</select></label>{iteration && <Iteration attempt={detail.attempt} item={iteration}/>}</> : <p className="baseline-message">No iterations have been saved yet. Refresh details after the backend updates this attempt.</p>}
-    <RuleHistory key={iteration?.tuned_run_id ?? detail.attempt.baseline_run_id} datasetId={Number(dataset)} runId={iteration?.tuned_run_id ?? detail.attempt.baseline_run_id}/>
+    <section className="panel baseline-panel"><h2>Saved flow and delta gaps</h2>{detail.flow ? <><p>Budget: {number(detail.flow.budget_per_hour)} alerts/hour · Observed: {number(detail.flow.observed_per_hour)} alerts/hour · Burn rate: {number(detail.flow.burn_rate)}</p><div className="table-scroll" tabIndex={0} role="region" aria-label="Saved rule flow"><table className="baseline-table"><thead><tr><th scope="col">Rule</th><th scope="col">Observed/hour</th><th scope="col">Allowed/hour</th><th scope="col">Delta gap</th><th scope="col">Peak / p95</th></tr></thead><tbody>{detail.flow.rules.map(item => <tr key={item.rule_id}><td className="saved-version">{item.rule_id}</td><td>{number(item.observed_per_hour)}</td><td>{number(item.allowed_per_hour)}</td><td>{number(item.delta_gap)}</td><td>{number(item.peak_n)} / {number(item.p95_n)}</td></tr>)}</tbody></table></div></> : <p>No flow calculation was saved for this attempt.</p>}</section>
+    <h2 className="audit-iterations-heading">Tuning and grouping log</h2>
+    {detail.iterations.length ? detail.iterations.slice().sort((a, b) => a.iteration - b.iteration).map(item => <div key={item.id}>
+      <Iteration attempt={detail.attempt} item={item}/>
+      {item.tuned_run_id !== null && <RuleHistory datasetId={Number(dataset)} runId={item.tuned_run_id}/>}
+    </div>) : <p className="baseline-message">No iterations have been saved yet. Refresh details after the backend updates this attempt.</p>}
     </>}
   </section>;
 }
 
-export default function SavedTuningScreen({ screen }: { screen: "tuning" | "audit" }) {
-  const [chosenDataset, setDataset] = useState("");
+export default function SavedTuningScreen() {
   const [selected, select] = useState<number | null>(null);
   const [revision, refresh] = useState(0);
   const datasets = useSaved<{ items: Dataset[] }>("/api/baseline?resource=datasets", revision);
-  const dataset = chosenDataset || String(datasets.data?.items.find(item => item.name === "eve_demo_FINAL.json")?.id ?? datasets.data?.items.at(-1)?.id ?? "");
+  const dataset = String(datasets.data?.items.find(item => item.name === "eve_demo_FINAL.json")?.id ?? datasets.data?.items.at(-1)?.id ?? "");
   const attempts = useSaved<{ items: SavedAttempt[] }>(dataset ? `/api/saved-tuning?dataset_id=${dataset}` : null, revision);
-  return <><a href="#saved-results" className="skip-link">Skip to saved results</a><AppHeader active={screen} sample={false} source="Saved tuning results · read-only"/>
-    <main id="saved-results"><SavedSourceTabs screen={screen} backend/><div className="baseline-heading"><div><h1>{screen === "tuning" ? "Saved tuning" : "Audit log"}</h1><p>Backend results · passed and failed attempts</p></div><div className="baseline-tuning"><button disabled aria-describedby="saved-tune-disabled">Run tuning</button><small id="saved-tune-disabled">Read-only connection · tuning starts in the backend</small></div></div>
-    <section className="panel baseline-panel"><h2>Select a dataset</h2><div className="baseline-selectors"><label>Dataset<select disabled={datasets.loading || !datasets.data?.items.length} value={dataset} onChange={event => { setDataset(event.target.value); select(null); }}><option value="">Choose a dataset</option>{datasets.data?.items.map(item => <option key={item.id} value={item.id}>#{item.id} · {item.name}</option>)}</select></label><button disabled={datasets.loading || attempts.loading} onClick={() => refresh(revision + 1)}>Refresh lists</button></div>
+  const selectedId = selected ?? attempts.data?.items.at(-1)?.id ?? null;
+  return <><a href="#saved-results" className="skip-link">Skip to audit log</a><AppHeader active="audit" sample={false} source="Tuning iterations and grouping history"/>
+    <main id="saved-results"><div className="baseline-heading"><div><h1>Audit log</h1><p>Every tuning iteration, rule update, grouping result, and guardrail outcome</p></div><button disabled={datasets.loading || attempts.loading} onClick={() => refresh(revision + 1)}>Refresh log</button></div>
       {(datasets.loading || attempts.loading) && <p role="status">Loading saved results…</p>}{(datasets.error || attempts.error) && <p className="baseline-message" role="alert">{datasets.error || attempts.error} Previously loaded results remain visible where available. No sample fallback is used.</p>}
       {datasets.data?.items.length === 0 && <p>No datasets returned by the backend.</p>}
-    </section>
-    {dataset && attempts.data?.items.length === 0 && <section className="panel baseline-panel"><h2>No saved tuning attempts yet</h2><p>The backend is reachable, but this dataset has no tuning history. Once the backend saves an attempt, use Refresh lists. Failed attempts will appear here too.</p><Link href={baselineHref(dataset)}>Open Original rules replay</Link></section>}
-    {Boolean(attempts.data?.items.length) && <section className="panel baseline-panel"><h2>Saved attempts</h2><div className="table-scroll" tabIndex={0} role="region" aria-label="Saved tuning attempts"><table className="baseline-table"><thead><tr><th scope="col">Attempt</th><th scope="col">Original run</th><th scope="col">Created</th><th scope="col">Status</th><th scope="col">Details</th></tr></thead><tbody>{attempts.data!.items.map(item => <tr key={item.id} className={selected === item.id ? "baseline-selected" : undefined}><td>#{item.id}</td><td>#{item.baseline_run_id}</td><td>{item.created_at}</td><td className={item.status === "failed" ? "comparison-failed" : ""}>{item.status}</td><td><button aria-pressed={selected === item.id} onClick={() => select(item.id)}>View attempt #{item.id}</button></td></tr>)}</tbody></table></div></section>}
-    {dataset && selected !== null && <Detail key={`${dataset}:${selected}`} dataset={dataset} attemptId={selected} screen={screen}/>}
+    {dataset && attempts.data?.items.length === 0 && <section className="panel baseline-panel"><h2>No saved tuning attempts yet</h2><p>The backend is reachable, but this dataset has no tuning history. Once the backend saves an attempt, use Refresh log. Failed attempts will appear here too.</p><Link href={baselineHref(dataset)}>Open Original rules replay</Link></section>}
+    {Boolean(attempts.data?.items.length) && <section className="panel baseline-panel"><h2>Saved attempts</h2><div className="table-scroll" tabIndex={0} role="region" aria-label="Saved tuning attempts"><table className="baseline-table"><thead><tr><th scope="col">Attempt</th><th scope="col">Original run</th><th scope="col">Created</th><th scope="col">Status</th><th scope="col">Details</th></tr></thead><tbody>{attempts.data!.items.map(item => <tr key={item.id} className={selectedId === item.id ? "baseline-selected" : undefined}><td>#{item.id}</td><td>#{item.baseline_run_id}</td><td>{item.created_at}</td><td className={item.status === "failed" ? "comparison-failed" : ""}>{item.status}</td><td><button aria-pressed={selectedId === item.id} onClick={() => select(item.id)}>View attempt #{item.id}</button></td></tr>)}</tbody></table></div></section>}
+    {dataset && selectedId !== null && <Detail key={`${dataset}:${selectedId}`} dataset={dataset} attemptId={selectedId} listRevision={revision}/>}
     <aside className="notice">Values are saved backend outputs. Recall describes the backend’s stated evaluation scope; it is not a production detection-accuracy claim.</aside>
     </main></>;
 }

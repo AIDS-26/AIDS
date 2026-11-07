@@ -7,7 +7,7 @@ Full spec: skill `ideax-frontend` (tokens, Figma → React component map, screen
 ## Stack
 
 - Next.js (App Router) + TypeScript + Tailwind, self-contained in `fe/` (scaffolded with create-next-app).
-- Screens: `/replay` (default, the demo centrepiece), `/tuning`, `/audit`, `/emails` (lowest priority, static is fine).
+- Screens: `/replay` (default comparison), `/audit` (tuning and grouping iterations), `/emails` (sample grouped email detail). Tuning has no separate page.
 - Commands (run in `fe/`): `npm install`, `npm run dev` (http://localhost:3000), `npm run build`, `npm run lint`.
 
 ## Rules
@@ -26,8 +26,7 @@ Full spec: skill `ideax-frontend` (tokens, Figma → React component map, screen
 4. **Honesty in the UI.** Keep the notice on Replay: attack/benign labels from CIC-IDS2017 are used only to
    grade results and weight the offline tuning; at runtime, benign comes from the rule definition. Show failed
    attempts and failed runs. "Benign groups raised" must turn red if it is ever above 0.
-5. **Names.** "Original rules" / "Tuned rules", "grouped alerts", tabs Replay · Tuning · Audit log · Emails.
-   Never "SIEM I/II" or "AIDS" in the UI.
+5. **Names.** "SIEM 1 · Original rules" / "SIEM 2 · Tuned rules", "grouped alerts", tabs Replay · Audit log · Email, as requested by the operator.
 6. **Look.** Match the Figma page "IDEA-X" (PNG exports in `docs/design/screens/`). Brand tokens only, Inter
    + JetBrains Mono, 1px borders, radius 4/6, no shadows. No purple, gradients, glow, sparkle/robot icons or
    chat bubbles. Colour is meaning: red High/Fail, amber Medium, green Low/Pass/tuned, grey benign.
@@ -154,3 +153,22 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - Saved attempt links open `/replay?dataset_id=ID&run_id=ID`. Both Replay routes validate query values and backend ownership/completion before showing data.
 - Rule history uses the read-only `/api/rule-history` frontend adapter, with backend depth-cursor pagination and lineage checks; Replay and saved attempt details show statuses, ancestors, and recorded changes. No full raw snapshots or rule writes.
 - Reconciled with the full saved Original/Tuned dashboard: both read adapters are retained, default Replay supports validated deep links, and baseline/tuned rule history appears on the full replay. Build, lint, TypeScript, all 35 frontend tests, and live browser deep-link/history/navigation/responsive checks passed; real run #1 still loads all 5,483 alerts.
+
+## Play and local tuning jobs (7 Nov 2026)
+
+- Tuning progress renders the backend's timestamped stage log, including setup failures before an audit attempt is created, provider HTTP failures, evaluation totals and terminal state. Older backends without logs show a restart hint. Raw exceptions and credentials are excluded.
+
+- Current operator update: the separate Replay header Run tuning button is removed. Play still offers Start tuning and play. Replay initially pauses at zero; both lanes are held during tuning and until the accepted saved comparison loads, then autoplay together. Group details expose every original member, including repeats suppressed from the top-level grouped list; no alert is deleted. Audit displays saved benign-escalation warnings under the current warning policy; evidence retention and runtime benign non-escalation remain mandatory.
+
+- Replay's primary label is Play/Pause. Without accepted tuned results, Play opens a modal offering Start tuning and play, Play original alerts, and Cancel. The Replay header's Run tuning button uses the same modal. A passing job reloads saved results and autoplays; failure preserves original alerts and links to Audit. Existing sample screens and history-only tuning controls remain separate.
+- `/api/tuning-jobs` is the same-origin Next.js control proxy. It forwards only validated baseline and idempotency IDs to the loopback Python API, validates job status, polls progress, and never handles credentials. Cross-origin writes and remote backend control are rejected. Models, policy, evaluation definitions and credentials cannot be supplied by a browser request.
+- Python alone loads CODEX_API_KEY/CODEX_MODEL from its process environment or root .env; the dashboard default is gpt-6.1-sol. Do not copy the key into fe/.env.local. A database-adjacent OS lock serializes dashboard workers. Status jobs are transient across API restarts; SQLite attempts/runs remain the durable audit.
+- Verification: 70 backend tests, 38 frontend tests, lint, TypeScript and production build pass. The live model attempted three proposals on baseline #2, all rejected because 33 benign-labeled groups were raised. Baseline remains available. Accepted-run automatic playback was browser-verified using a temporary test database response, never a live test activation.
+
+## Simplified dashboard (7 Nov 2026)
+
+- This section supersedes earlier route/navigation descriptions. Only Replay, Audit log, and Email remain. Replay is the saved same-event SIEM 1/SIEM 2 comparison, with no Backend/Sample tabs or saved dataset/run selectors. The canonical dataset and latest completed baseline load automatically; validated audit deep links still work. Refresh/retry, playback, grouped evidence, and local tuning jobs remain available.
+- Removed separate Replay baseline/sample/comparison pages, Tuning pages, and sample/backend Audit pages. Old Replay URLs redirect to `/replay`; old Tuning/Audit variants redirect to `/audit`.
+- Audit automatically opens the latest attempt and shows every saved iteration in order, with grouped-alert counts, evaluation, guardrail status, old/new rule parameters, flow/delta gaps, and per-candidate rule history. Failed iterations remain visible. Refresh log refreshes both the list and the open detail. There are no dataset or iteration selectors.
+- `/emails` stays explicitly sample-only and is titled Email. It lists tuned group previews with notification-time values and a separate full-group snapshot/table of every clustered source log. Later members are marked Joined later. Sample scores and memberships come from saved fixtures through `lib/data.ts`; labels are excluded from the presentation data. No emails are sent.
+- Verification: production build (including TypeScript), lint, and all 38 existing frontend tests passed. Local production HTTP checks passed for the three remaining screens, absence of saved selectors, all 11 legacy redirects, and preserved Replay query IDs. Direct loader checks verified all three tuned emails retain exact complete group membership without labels, with notification values separate from later group updates. The configured dataset API returned HTTP 200. Interactive browser/responsive checks were unavailable in this session; no tuning job or email was started.

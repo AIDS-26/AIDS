@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { screenHref, baselineHref, replaySelection } from '../lib/navigation.ts';
 import { readRuleHistory } from '../lib/rule-history.ts';
 
-test('backend navigation stays backend; sample navigation and email are explicit', () => {
+test('navigation uses one comparison and audit page for all data sources', () => {
   assert.equal(screenHref('replay',false),'/replay');
-  assert.equal(screenHref('tuning',false),'/tuning');
+  assert.equal(screenHref('tuning',false),'/audit');
   assert.equal(screenHref('audit',false),'/audit');
-  assert.equal(screenHref('replay',true),'/replay/comparison');
+  assert.equal(screenHref('replay',true),'/replay');
   assert.equal(screenHref('emails',false),'/emails');
-  assert.equal(screenHref('tuning',true),'/tuning/sample');
-  assert.equal(screenHref('audit',true),'/audit/sample');
+  assert.equal(screenHref('tuning',true),'/audit');
+  assert.equal(screenHref('audit',true),'/audit');
 });
 test('Replay links carry dataset/run IDs and reject malformed or duplicate selections', () => {
   assert.equal(baselineHref(2,7),'/replay?dataset_id=2&run_id=7');

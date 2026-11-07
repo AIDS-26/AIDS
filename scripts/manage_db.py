@@ -61,11 +61,12 @@ def main() -> None:
         result = score_baseline(args.dataset_id, path,
                                 observation_seconds=args.observation_seconds, **options)
     elif args.command == 'tune':
-        import os
         from app.tuning.model import ResponsesProposer, DeterministicProposer
+        from app.tuning.settings import tuning_settings
         from app.tuning.policy import load_document
         from app.tuning.runner import tune
-        proposer = (ResponsesProposer(args.model or os.environ.get('CODEX_MODEL'))
+        settings = tuning_settings()
+        proposer = (ResponsesProposer(args.model or settings['model'], api_key=settings['api_key'])
                     if args.proposer == 'model' else DeterministicProposer())
         result = tune(args.baseline_run_id, path, policy=load_document(args.policy), proposer=proposer,
                       labels_path=args.labels_database,

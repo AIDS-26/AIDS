@@ -11,3 +11,5 @@ Microsoft/
 __pycache__/
 *.py[cod]
 .venv/
+*.tuning.lock
+output/tuning/

@@ -42,7 +42,16 @@ export function getAuditData() {
 export type AuditData = ReturnType<typeof getAuditData>;
 
 export function getEmailsData() {
-  return emails;
+  const replay = getReplayData();
+  return {
+    ...emails,
+    tuned: emails.tuned.map(email => {
+      const group = replay.groups.find(group => group.group_id === email.group_id) ?? null;
+      return { ...email, group, clustered_logs: replay.alerts
+        .filter(alert => group?.alert_ids.includes(alert.id))
+        .sort((a, b) => a.t - b.t || a.id.localeCompare(b.id)) };
+    }),
+  };
 }
 
 export type EmailsData = ReturnType<typeof getEmailsData>;
@@ -66,4 +75,9 @@ export async function getSavedReplayData(query: { dataset_id: number; run_id: nu
 export async function getRuleHistoryData(datasetId: number, runId: number) {
   const { readRuleHistory } = await import("./rule-history");
   return readRuleHistory(datasetId, runId, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
+}
+
+export async function getTuningJobData(jobId?: string, body?: unknown) {
+  const { tuningRequest } = await import("./tuning-jobs");
+  return tuningRequest(process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000", jobId, body);
 }

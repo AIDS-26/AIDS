@@ -218,7 +218,18 @@ Set the server-only `IDEAX_BACKEND_URL` in `fe/.env.local` if the API is hosted
 elsewhere; the default is loopback port 8000. Restart the Python read API after
 updating route code. Replay initially shows the final saved counts; Play replay
 starts at zero. Synthetic screens remain under each route's `/sample` subpath.
-Emails remains a labeled sample and live tuning still runs through the backend CLI.
+Emails remains a labeled sample. On Replay, Play prompts to run background tuning
+when no accepted tuned run exists; the CLI remains available too. The Python
+backend alone loads `CODEX_API_KEY` and `CODEX_MODEL` from its process environment
+or root `.env`. See [tuning instructions](docs/tuning.md#play-and-local-background-tuning).
+
+The separate local control routes are `GET /api/tuning-jobs` (safe model/readiness),
+`POST /api/tuning-jobs` (start a background job), and `GET /api/tuning-jobs/{id}`
+(poll progress). The dashboard calls them through its same-origin proxy; data GET
+routes remain read-only. Dashboard control requires the loopback API and is not
+forwarded through remote public origins. Requests cannot alter policy or supply
+credentials. The guardrail automatically gates activation, and rejected attempts
+remain available in Audit.
 
 ### Calculation integration
 

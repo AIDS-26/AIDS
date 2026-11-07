@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import AppHeader from "@/app/components/app-header";
 import ChatAssistant from "@/app/components/chat-assistant";
 import RuleHistory from "@/app/components/rule-history";
-import ReplayModes from "./replay-modes";
 import { initialPlayback, playbackReducer, selectFrame, type Speed } from "@/lib/replay";
 import type { BaselineRun, Dataset } from "@/lib/backend-client";
 import type { SavedReplay, OriginalAlert, Summary, SavedGroup, GroupPoint } from "@/lib/saved-replay";
+import { parseJob, type TuningJob, type TuningSettings } from "@/lib/tuning-jobs";
 
 function useRead<T>(url: string | null, revision: number) {
   const [state, setState] = useState<{ url: string | null; revision: number; data?: T; error?: string }>({ url: null, revision: -1 });
@@ -88,34 +88,77 @@ function GroupCard({ group, alerts, t, pause }: { group: SavedGroup & GroupPoint
       <span><strong>{group.title}</strong><small>{group.key_type}: {group.host} · {group.n.toLocaleString()} events · {group.raised_from ? `first event ${group.raised_from}, now ${group.band}` : group.band}</small></span>
       <span className="score">{group.score}<span className="chevron" aria-hidden="true">⌄</span></span>
     </summary>
-    {open && <div className="group-detail"><p>Saved evidence for group #{group.group_id}. Scores come from the saved run.</p>
+    {open && <div className="group-detail"><p>All original alerts in group #{group.group_id}, including repeats suppressed from the top-level list. Nothing is deleted. Scores come from the saved run.</p>
       <ol>{members.slice(0, limit).map(alert => <AlertRow key={alert.id} alert={alert}/>)}</ol>
       {members.length > limit && <button onClick={() => setLimit(value => value + 50)}>Show more evidence</button>}
       <small>Showing {Math.min(limit, members.length)} of {members.length.toLocaleString()} elapsed events. All evidence is retained.</small>
     </div>}</details>;
 }
 
-function Player({ data }: { data: SavedReplay }) {
+function TuningPrompt({ baseline, onCancel, onStarted, onOriginal }: {
+  baseline: number; onCancel: () => void; onStarted: (job: TuningJob) => void; onOriginal: () => void;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null), requestId = useRef<string | null>(null);
+  const settings = useRead<TuningSettings>("/api/tuning-jobs", 0);
+  const [starting, setStarting] = useState(false), [error, setError] = useState<string | null>(null);
+  useEffect(() => { const element = dialog.current; element?.showModal(); return () => element?.close(); }, []);
+  async function start() {
+    if (starting) return;
+    setStarting(true); setError(null);
+    requestId.current ??= crypto.randomUUID().replaceAll("-", "");
+    try {
+      const response = await fetch("/api/tuning-jobs", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseline_run_id: baseline, request_id: requestId.current }) });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || "Unable to start tuning.");
+      const job = parseJob(body);
+      if (job.baseline_run_id !== baseline) throw new Error("Tuning job belongs to another baseline.");
+      onStarted(job);
+    } catch (error) { setError(error instanceof Error ? error.message : "Unable to start tuning."); setStarting(false); }
+  }
+  return <dialog ref={dialog} className="tuning-prompt" aria-labelledby="tuning-prompt-title" onCancel={event => { event.preventDefault(); if (!starting) onCancel(); }}>
+    <h2 id="tuning-prompt-title">Tune and play these alerts?</h2>
+    <p>Use Original run #{baseline} to generate tuned rules and evaluate them. Both lanes wait, then replay together on the same clock. Repeated alerts remain visible inside each group.</p>
+    {settings.loading && <p role="status">Checking tuning settings…</p>}
+    {settings.data && <p>Model: <b>{settings.data.model}</b>. This starts a paid API run with up to three proposals. The guardrail checks every proposal before activation.</p>}
+    {settings.data && !settings.data.ready && <p role="alert">Set CODEX_API_KEY in the backend environment or root .env before starting.</p>}
+    {(settings.error || error) && <p role="alert">{error || settings.error}</p>}
+    <div className="tuning-prompt-actions"><button className="primary-button" disabled={starting || !settings.data?.ready} onClick={start}>{starting ? "Starting…" : "Start tuning and play"}</button>
+      <button disabled={starting} onClick={onOriginal}>Play original alerts</button><button disabled={starting} onClick={onCancel}>Cancel</button></div>
+  </dialog>;
+}
+
+function Player({ data, requestTuning, autoPlayToken, busy }: {
+  data: SavedReplay; requestTuning: () => void; autoPlayToken: string; busy: boolean;
+}) {
   const [playback, dispatch] = useReducer(
     (state: typeof initialPlayback, action: Parameters<typeof playbackReducer>[1]) => playbackReducer(state, action, data.duration_s),
-    { ...initialPlayback, t: data.duration_s },
+    initialPlayback,
   );
   const [alertLimit, setAlertLimit] = useState(50), [groupLimit, setGroupLimit] = useState(50);
   const byId = useMemo(() => new Map(data.alerts.map(a => [a.id, a])), [data.alerts]);
   useEffect(() => {
-    if (!playback.playing) return;
+    if (!autoPlayToken) return;
+    const now = performance.now();
+    dispatch({ type: "restart", now }); dispatch({ type: "play", now });
+  }, [autoPlayToken]);
+  useEffect(() => { if (busy) dispatch({ type: "restart", now: performance.now() }); }, [busy]);
+  useEffect(() => {
+    if (!playback.playing || busy) return;
     const timer = window.setInterval(() => dispatch({ type: "tick", now: performance.now() }), 50);
     return () => window.clearInterval(timer);
-  }, [playback.playing]);
-  const snapshot = selectFrame(data.frames, playback.t);
-  const alerts = data.alerts.filter(a => a.t <= playback.t);
+  }, [playback.playing, busy]);
+  const t = busy ? 0 : playback.t;
+  const snapshot = selectFrame(data.frames, t);
+  const alerts = data.alerts.filter(a => a.t <= t);
   const groups = data.groups.flatMap(group => {
-    const point = group.timeline.findLast(p => p.t <= playback.t);
+    const point = group.timeline.findLast(p => p.t <= t);
     return point ? [{ ...group, ...point }] : [];
   }).sort((a, b) => b.score - a.score || b.last_t - a.last_t || a.group_id - b.group_id);
   const ended = playback.t >= data.duration_s, benign = data.evaluation?.benign_groups_raised;
   const pause = () => dispatch({ type: "pause", now: performance.now() });
   function play() {
+    if (!playback.playing && data.tuned_run_id === null) { requestTuning(); return; }
     const now = performance.now();
     if (ended) dispatch({ type: "restart", now });
     dispatch({ type: playback.playing ? "pause" : "play", now });
@@ -123,9 +166,9 @@ function Player({ data }: { data: SavedReplay }) {
   return <>
     {data.notice && <p className="notice saved-replay-notice" role="status">{data.notice}</p>}
     <div className="controls"><div className="playback" role="group" aria-label="Replay playback">
-      <button className="primary-button" onClick={play}>{playback.playing ? "Pause" : ended ? "Play replay" : "Play"}</button>
-      <button onClick={() => dispatch({ type: "restart", now: performance.now() })}>Restart</button>
-      <button disabled={ended} onClick={() => dispatch({ type: "finish", now: performance.now() })}>Show final</button>
+      <button className="primary-button" disabled={busy} onClick={play}>{playback.playing ? "Pause" : "Play"}</button>
+      <button disabled={busy} onClick={() => dispatch({ type: "restart", now: performance.now() })}>Restart</button>
+      <button disabled={busy || ended} onClick={() => dispatch({ type: "finish", now: performance.now() })}>Show final</button>
       <div className="speed" role="group" aria-label="Playback speed">{([60, 120, 360] as Speed[]).map(speed => <button key={speed} className={speed === playback.speed ? "selected" : ""} aria-pressed={speed === playback.speed} onClick={() => dispatch({ type: "speed", speed, now: performance.now() })}>{speed}×</button>)}</div>
     </div><span className="mono">{clock(playback.t)} / {clock(data.duration_s)}</span><span role="status">{ended ? "Saved final results" : playback.playing ? "Playing saved events" : "Paused"}</span>
       <span className="run-label">Original #{data.baseline_run_id} · {data.tuned_run_id === null ? "Tuned: unavailable" : `Tuned #${data.tuned_run_id}`}</span></div>
@@ -135,7 +178,8 @@ function Player({ data }: { data: SavedReplay }) {
       <div className={`stat ${benign === undefined ? "" : benign > 0 ? "fail" : "good"}`}><strong>{benign ?? "N/A"}</strong><span>benign groups raised · saved full-run evaluation</span></div>
       <div className="stat"><strong>{data.total_alerts.toLocaleString()}</strong><span>source alerts loaded · full dataset</span></div>
     </section>
-    <Timeline data={data} t={playback.t} frame={snapshot}/>
+    <p className="notice">Repeated alerts are grouped to reduce alert fatigue. All original alerts remain visible in the left lane and inside each group.</p>
+    <Timeline data={data} t={t} frame={snapshot}/>
     <div className="lanes saved-replay">
       <section className="panel lane" aria-label="Original rules alerts"><LaneSummary data={snapshot.original}/>
         <ol>{alerts.slice().reverse().slice(0, alertLimit).map(alert => <AlertRow key={alert.id} alert={alert}/>)}</ol>
@@ -144,8 +188,8 @@ function Player({ data }: { data: SavedReplay }) {
           {alerts.length > alertLimit && <button onClick={() => setAlertLimit(n => n + 50)}>Show 50 more</button>}</div>
       </section>
       <section className="panel lane" aria-label="Tuned rules grouped alerts"><LaneSummary data={snapshot.tuned} tuned/>
-        {data.tuned_run_id === null ? <p className="empty-state">No accepted tuned results for Original run #{data.baseline_run_id}. Run offline tuning, then reload saved results.</p>
-          : <><div className="groups">{groups.slice(0, groupLimit).map(group => <GroupCard key={group.group_id} group={group} alerts={byId} t={playback.t} pause={pause}/>)}</div>
+        {data.tuned_run_id === null ? <p className="empty-state">No accepted tuned results for Original run #{data.baseline_run_id}. Press Play to tune and replay both lanes together.</p>
+          : <><div className="groups">{groups.slice(0, groupLimit).map(group => <GroupCard key={group.group_id} group={group} alerts={byId} t={t} pause={pause}/>)}</div>
             <div className="saved-list-footer">Showing {Math.min(groupLimit, groups.length)} of {snapshot.tuned?.total.toLocaleString()} groups.
               {groups.length > groupLimit && <button onClick={() => setGroupLimit(n => n + 50)}>Show 50 more groups</button>}</div></>}
       </section>
@@ -162,29 +206,70 @@ function Player({ data }: { data: SavedReplay }) {
 }
 
 export default function SavedReplayScreen({ initialSelection }: { initialSelection?: { dataset: string; run: string; error: string | null } }) {
-  const [revision, refresh] = useState(0), [chosenDataset, setDataset] = useState(initialSelection?.dataset ?? ""), [chosenRun, setRun] = useState(initialSelection?.run ?? "");
-  const [linkError, clearLinkError] = useState(initialSelection?.error ?? null);
+  const [revision, refresh] = useState(0);
+  const chosenDataset = initialSelection?.dataset ?? "", chosenRun = initialSelection?.run ?? "";
+  const linkError = initialSelection?.error;
+  const [prompt, setPrompt] = useState(false), [job, setJob] = useState<TuningJob | null>(null);
+  const [jobError, setJobError] = useState<string | null>(null), [pollRevision, retryPoll] = useState(0);
+  const [originalPlayToken, setOriginalPlayToken] = useState("");
   const datasets = useRead<{ items: Dataset[] }>("/api/baseline?resource=datasets", revision);
   const dataset = chosenDataset || String(datasets.data?.items.find(d => d.name === "eve_demo_FINAL.json")?.id ?? datasets.data?.items.at(-1)?.id ?? "");
   const runs = useRead<{ items: BaselineRun[] }>(dataset ? `/api/baseline?resource=runs&dataset_id=${dataset}` : null, revision);
   const run = chosenRun || String(runs.data?.items.findLast(r => r.mode === "baseline" && r.status === "completed")?.id ?? "");
   const replay = useRead<SavedReplay>(dataset && run ? `/api/replay?dataset_id=${dataset}&run_id=${run}` : null, revision);
   const error = datasets.error || runs.error || replay.error;
+  const busy = job?.status === "running";
+  const jobId = job?.id, jobStatus = job?.status, jobBaseline = job?.baseline_run_id;
+  useEffect(() => {
+    if (!jobId || jobStatus !== "running" || jobBaseline === undefined) return;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
+    const selectedJob = { id: jobId, baseline_run_id: jobBaseline };
+    async function poll() {
+      try {
+        const response = await fetch(`/api/tuning-jobs?job_id=${selectedJob.id}`, { cache: "no-store", signal: controller.signal });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error || "Unable to read tuning progress.");
+        const next = parseJob(body);
+        if (next.id !== selectedJob.id || next.baseline_run_id !== selectedJob.baseline_run_id) throw new Error("Tuning progress belongs to another run.");
+        if (controller.signal.aborted) return;
+        setJob(next); setJobError(null);
+        if (next.status === "running") timer = setTimeout(poll, 1500);
+        else refresh(n => n + 1);
+      } catch (error) {
+        if (!controller.signal.aborted) setJobError(error instanceof Error ? error.message : "Unable to read tuning progress.");
+      }
+    }
+    void poll();
+    return () => { controller.abort(); clearTimeout(timer); };
+  }, [jobId, jobStatus, jobBaseline, pollRevision]);
+  const autoPlayToken = originalPlayToken || (job?.status === "completed" && replay.data?.tuned_run_id === job.tuned_run_id ? job.id : "");
   return <><a href="#saved-replay" className="skip-link">Skip to replay</a>
     <AppHeader active="replay" sample={false} source={replay.data ? `${replay.data.dataset.name} · ${replay.data.total_alerts.toLocaleString()} alerts` : "Saved runs · read-only"}/>
-    <main id="saved-replay"><ReplayModes active="saved"/>
+    <main id="saved-replay">
       {linkError && <p className="baseline-message" role="alert">{linkError}</p>}
-      <div className="baseline-heading"><div><h1>Original vs Tuned rules</h1><p>Saved backend results · opens at the final snapshot</p></div><div className="baseline-tuning"><button disabled aria-describedby="saved-tuning-disabled">Run tuning</button><small id="saved-tuning-disabled">Tuning runs offline in the backend</small></div></div>
-      <section className="panel baseline-panel"><h2>Select saved results</h2><div className="baseline-selectors">
-        <label>Dataset<select disabled={datasets.loading || !datasets.data?.items.length} value={dataset} onChange={event => { setDataset(event.target.value); setRun(""); clearLinkError(null); }}><option value="" disabled>Choose a dataset</option>{datasets.data?.items.map(d => <option key={d.id} value={d.id}>#{d.id} · {d.name} · {d.event_count.toLocaleString()} events</option>)}</select></label>
-        <label>Original run<select disabled={!dataset || runs.loading} value={run} onChange={event => { setRun(event.target.value); clearLinkError(null); }}><option value="" disabled>Choose a completed baseline</option>{runs.data?.items.map(r => <option key={r.id} value={r.id} disabled={r.mode !== "baseline" || r.status !== "completed"}>#{r.id} · {r.mode === "baseline" ? "Original rules" : "Tuned rules"} · {r.status}</option>)}</select></label>
-        <button disabled={datasets.loading || runs.loading || replay.loading} onClick={() => refresh(n => n + 1)}>{error ? "Retry saved results" : "Reload saved results"}</button>
-      </div>
+      <div className="baseline-heading"><div><h1>Original rules vs Tuned rules</h1><p>Compare grouped alerts on the same events; all original evidence stays visible</p></div><div className="baseline-tuning"><button disabled={busy || datasets.loading || runs.loading || replay.loading} onClick={() => refresh(n => n + 1)}>{error ? "Retry comparison" : "Refresh comparison"}</button></div></div>
         {(datasets.loading || runs.loading || replay.loading) && <p role="status">Loading saved results and every alert. Previously loaded results remain visible where available.</p>}
         {error && <p className="baseline-message" role="alert">{error} {replay.data ? "Showing the previously loaded run." : "No sample data substituted."}</p>}
         {datasets.data?.items.length === 0 && <p>No imported datasets. Import and score a dataset in the backend first.</p>}
         {dataset && runs.data && !run && <p>No completed Original rules run exists for this dataset. Failed and unfinished runs cannot play.</p>}
-      </section>
-      {replay.data && <Player key={`${replay.data.baseline_run_id}:${replay.data.tuned_run_id}`} data={replay.data}/>}
+      {job && <section className="panel baseline-panel" aria-label="Tuning progress"><h2>Tuning run{job.attempt_id ? ` · attempt #${job.attempt_id}` : ""}</h2>
+        <p role="status">{job.model} · {busy ? `Running · proposal ${job.iteration || 1} of 3 · ${job.iteration_status}` : job.status === "completed" ? `Passed · tuned run #${job.tuned_run_id}` : "Failed · saved original alerts remain available"}</p>
+        {(jobError || job.error) && <p role="alert">{jobError || job.error}</p>}
+        <h3>Progress log</h3>
+        {job.logs.length ? <ol className="tuning-job-log" aria-label="Tuning progress log">{job.logs.map((entry, index) =>
+          <li key={index}><time className="mono" dateTime={entry.timestamp}>{new Date(entry.timestamp).toLocaleTimeString()}</time>{" "}
+            <strong>{entry.stage}{entry.iteration ? ` · proposal ${entry.iteration}` : ""}</strong>{" — "}{entry.message}</li>)}</ol>
+          : <p>No progress log was supplied by this backend. Restart the updated backend before retrying.</p>}
+        {jobError && <button onClick={() => retryPoll(n => n + 1)}>Retry tuning status</button>}
+        {busy && <p>Both replay lanes are held at the start while tuning. After acceptance, original alerts and grouped alerts replay together.</p>}
+        {job.status === "failed" && <button onClick={() => setOriginalPlayToken(crypto.randomUUID())}>Play original alerts</button>}
+        <a href="/audit">View saved audit history</a>
+      </section>}
+      {replay.data && !busy && !(job?.status === "completed" && replay.data.tuned_run_id !== job.tuned_run_id) && <Player key={`${replay.data.baseline_run_id}:${replay.data.tuned_run_id}`} data={replay.data} busy={busy} autoPlayToken={autoPlayToken} requestTuning={() => setPrompt(true)}/>}
+      {job?.status === "completed" && replay.data?.tuned_run_id !== job.tuned_run_id && <p role="status">Loading the accepted comparison. Both lanes will start together once the saved results are available.</p>}
+      {prompt && replay.data && <TuningPrompt baseline={replay.data.baseline_run_id} onCancel={() => setPrompt(false)}
+        onOriginal={() => { setPrompt(false); setOriginalPlayToken(crypto.randomUUID()); }}
+        onStarted={next => { setPrompt(false); setOriginalPlayToken(""); setJobError(null); setJob(next); }}/>}
     </main></>;
 }

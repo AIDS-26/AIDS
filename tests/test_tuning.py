@@ -28,6 +28,7 @@ from app.tuning.scorecard import Scorecard, define_attack_groups
 
 def policy():
     result = load_document(PROJECT_ROOT / 'config/tuning_policy.json')
+    result['benign_evaluation'] = 'any-benign-member-raised'
     result['scanner_attack_types'] = ['scan']
     result['immediate_attack_types'] = ['exploit']
     return result
@@ -138,6 +139,30 @@ class ReplayTests(unittest.TestCase):
 
 
 class ScorecardTests(unittest.TestCase):
+    def test_warning_policy_preserves_evidence_and_reports_benign_escalation(self):
+        events = [event(i, i) for i in range(3)]
+        card = Scorecard(events, {0: 'attack', 1: 'benign', 2: 'attack'},
+                         [{'id': 'a', 'event_ids': [0, 2]}], provenance='test', definition='fixed')
+        p, base = policy(), base_rules(events)
+        p['benign_evaluation'] = 'warn-any-benign-member-raised'
+        validate_policy(p)
+        rules = initial_rules(base, p)
+        groups = replay(events, rules, base, p)
+        report = card.evaluate(events, groups, observation_seconds=3600, budget=20,
+                               benign_evaluation=p['benign_evaluation'])
+        gate = check(events, groups, rules, base, p, report)
+        self.assertTrue(gate['passed'], gate)
+        self.assertEqual(report['benign_groups_raised'], 1)
+        self.assertTrue(gate['warnings'])
+        self.assertEqual(sorted(i for g in groups for i in g['event_ids']), [0, 1, 2])
+        p['benign_evaluation'] = 'any-benign-member-raised'
+        self.assertFalse(check(events, groups, rules, base, p, report)['passed'])
+        p['benign_evaluation'] = 'warn-any-benign-member-raised'
+        groups[0]['event_ids'].pop()
+        report = card.evaluate(events, groups, observation_seconds=3600, budget=20,
+                               benign_evaluation=p['benign_evaluation'])
+        self.assertFalse(check(events, groups, rules, base, p, report)['passed'])
+
     def test_independent_denominator_merges_splits_and_empty_attacks(self):
         events = [event(i, t) for i, t in enumerate([0, 10, 600, 1200])]
         labels = {e['id']: 'attack' for e in events}

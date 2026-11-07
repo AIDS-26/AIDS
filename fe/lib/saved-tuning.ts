@@ -25,7 +25,7 @@ function guardrail(value: unknown) {
   if (value == null) return null;
   const r = row(value);
   if (typeof r.passed !== "boolean") throw new BackendError("Invalid guardrail result.");
-  return { passed: r.passed, errors: list(r.errors).map(text), budget_met: typeof r.budget_met === "boolean" ? r.budget_met : null, remaining_budget_gap: numeric(r.remaining_budget_gap) };
+  return { passed: r.passed, errors: list(r.errors).map(text), warnings: r.warnings == null ? [] : list(r.warnings).map(text), budget_met: typeof r.budget_met === "boolean" ? r.budget_met : null, remaining_budget_gap: numeric(r.remaining_budget_gap) };
 }
 function evaluation(value: unknown) {
   if (value == null) return null;

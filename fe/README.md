@@ -1,136 +1,43 @@
 # IDEA-X frontend
 
-Next.js App Router + TypeScript + Tailwind. `/` redirects to `/replay`.
+Next.js App Router + TypeScript + Tailwind. Run commands in this directory.
 
-## Default dashboard: saved backend results
+## Screens
 
-`/replay`, `/tuning`, and `/audit` now open real saved backend results. The earlier
-sample implementation notes below describe the preserved sample screens at
-`/replay/sample`, `/tuning/sample`, and `/audit/sample`. Emails remains a labeled
-sample. `/replay/baseline` and the `/tuning/backend` / `/audit/backend` URLs remain
-available; `/replay/comparison` remains an explicitly labeled sample preview.
+- /replay: the single SIEM 1 (Original rules) vs SIEM 2 (Tuned rules) comparison. The canonical dataset and latest completed baseline load automatically, without data-source tabs or saved-result selectors. Old Replay variants redirect here.
+- /audit: all saved tuning attempts, including failures. The latest attempt opens automatically. Each iteration shows grouping counts, evaluation, guardrail outcomes, rule changes, and candidate rule history. Refresh log reloads both the attempts and the open detail. Old Tuning and Audit variants redirect here; there is no separate Tuning page.
+- /emails: titled Email, explicitly sample-only. Shows tuned group email details and all clustered source logs. Notification-time scores/counts remain separate from the complete saved group snapshot; later members are marked Joined later. No emails are sent.
 
-Start the updated Python read API from the repository root: `python -m app.api`.
-Restart an already running API after updating its route definitions. The existing
-server-only `IDEAX_BACKEND_URL` setting applies to every saved-results screen,
-defaulting to `http://127.0.0.1:8000`; no CORS changes are required.
+## Backend connection and Replay
 
-Replay selects the canonical imported demo dataset and latest completed baseline
-by default, and initially shows the saved final counts. Choose another dataset or
-baseline with the selectors. Play replay starts from the beginning; Restart pauses
-at zero; Show final returns to the complete result. All three speeds use the same
-saved score histories and count frames. The list initially renders 50 rows to keep
-playback responsive; Show 50 more reveals additional rows without changing totals.
+Start the Python API from the repository root with python -m app.api. Prepare the database separately using the root README. The frontend never imports source events, connects to SQLite, attaches evaluation labels, or reads the backend environment file.
 
-The server adapter in `lib/saved-replay.ts` validates dataset/run ownership and
-the complete Python `/api/runs/{baseline_run_id}/replay` snapshot. Every baseline
-alert is loaded; tuned memberships must cover all originals exactly once. The
-backend selects only a completed, accepted tuned version on the exact baseline,
-including later deterministic replays of accepted versions. Without one, the
-right lane and comparison metrics say unavailable. Failed reloads retain the
-previously loaded snapshot. There is no sample fallback or frontend score,
-severity, reduction, or evaluation calculation.
+The server-only IDEAX_BACKEND_URL defaults to http://127.0.0.1:8000. Configure another origin in .env.local using .env.example and restart Next.js. Keep credentials out of frontend environment files. The browser uses same-origin /api/baseline, /api/replay, /api/saved-tuning, and /api/rule-history adapters. These validate ownership, pagination and allowed response fields.
 
-Group expansion uses elapsed membership and persisted effective score histories,
-pauses playback, and preserves the existing Ask IDEA-X interface. Full-run saved
-evaluation results are labeled with their evaluated run ID. Empty attack sets
-display N/A. Email delivery counts and attack-window overlays are unavailable in
-this read model; no emails or model calls are made by loading the dashboard.
+Replay starts at the saved final snapshot. Play/Pause, Restart, Show final, and 60x/120x/360x use the same saved frames. Opening grouped evidence pauses playback. Lists initially render 50 entries, with Show more controls; totals include all records. Validated links such as /replay?dataset_id=1&run_id=2 still open a particular baseline.
 
-Live verification: dataset/run #1 contains 5,483 alerts over 9,600 seconds and no
-accepted tuned run. Chrome checks passed for initial totals, playback, loading
-additional rows, retained results on failed reload, retry, saved empty Tuning/Audit
-history, separate samples, and 1440/1280/400px widths with no page overflow or
-uncaught exceptions. Backend tests exercise accepted pairing and causal tuned
-trajectories using temporary databases; the live database was not tuned or changed.
+Only completed, accepted tuned runs on the same baseline with complete same-event evidence populate the tuned lane. Without one, tuned results remain unavailable. No synthetic fallback or frontend scoring occurs. Failed reloads retain the previous snapshot with an error. Empty attack-group denominators show N/A; positive benign escalation counts are red. Labels grade offline results only and never determine runtime benign status.
+
+## Local tuning jobs
+
+Run tuning, or Play without an accepted tuned result, opens the existing Tune and play prompt. Start tuning and play explicitly starts a paid backend job with up to three proposals; Play original alerts starts baseline playback. The deterministic guardrail controls activation. A passing job reloads the accepted results and plays; a failure preserves original alerts and links to Audit log.
+
+The /api/tuning-jobs control forwards only validated baseline/request IDs to the loopback Python API. Python alone reads CODEX_API_KEY and CODEX_MODEL from its environment or root .env. The dashboard default model is gpt-6.1-sol. Remote read APIs are supported, but tuning control requires a local backend. Jobs are transient across API restarts; saved audit history remains in SQLite. Loading any page never starts a model call.
+
+## Email sample and chat
+
+lib/data.ts is the fixture boundary. Email joins the existing notification fixtures to saved tuned group memberships and sanitized original alerts; scores and bands are displayed unchanged. Sample email previews are separate from real Replay results and never represent production delivery.
+
+The existing Ask IDEA-X interface uses the proposed same-origin POST /api/chat contract in CHATBOT.md. Without that endpoint it reports a connection error and does not fabricate answers.
 
 ## Commands
 
-- `npm install`: install dependencies.
-- `npm run dev`: development server at http://localhost:3000.
-- `npm run build`: production build.
-- `npm run start`: serve the production build.
-- `npm run lint`: ESLint.
-- `npx tsc --noEmit`: TypeScript check.
-- `npm test`: Node tests for playback timing, frame boundaries, speed equivalence, and fixture integrity (Node 22.6+ with TypeScript stripping).
+- npm install
+- npm run dev (http://localhost:3000)
+- npm run build
+- npm run start
+- npm run lint
+- npx tsc --noEmit
+- npm test (Node 22.6+ with TypeScript stripping)
 
-## Sample replay
-
-Press Play to begin at zero. Pause freezes the clock. Choose 60×, 120×, or 360× without resetting progress. Restart returns to zero and pauses, retaining the selected speed. Playback stops at 2:41:00; all speeds finish with 12 original alerts and five groups. Expand group cards with mouse or keyboard to inspect the original alerts available at the current clock.
-
-The fixture source is isolated in `lib/data.ts`. Scores, bands, reductions, and summary totals are saved in `fixtures/replay_frames.json`; the client only selects the current frame. This sample shape remains provisional pending the backend API agreement. The page labels its synthetic data and run `sample-001` throughout.
-
-Live tuning remains deferred. All four sample tabs are available; backend baseline Replay is separate. No emails are sent and no evaluator claim is made. Routes remain in the existing `app/` directory.
-
-Dev/build scripts use Webpack and Tailwind PostCSS because the original Turbopack CSS worker repeatedly failed to connect on this Windows environment. Inter and JetBrains Mono use `next/font/google`, requiring font access at build time and self-hosting at runtime.
-
-## Sample Tuning
-
-`/tuning` follows the Figma export with a saved budget, flow/gap table, selectable failed/passed attempts, guardrail checks, rule changes, YAML preview, and sample logs. `lib/data.ts` is shared by Replay and Tuning; all fixture imports stay there.
-
-The Tuning design example (`sample-tuning-003`) is separate from Replay's 12-event sample. Its 5,483-alert figures are illustrative, not measured results. Selecting an attempt updates its proposed count, changes, checks, YAML, and log together. No evaluator runs. The YAML preview is a sample change list, not a loadable rules schema.
-
-The budget is read-only and Run tuning again is disabled. The frontend will call the backend's endpoint once agreed; it never starts Codex. Empty attack-group denominators display recall as N/A.
-
-## Sample Audit log
-
-`/audit` uses `getAuditData()` in the shared `lib/data.ts` module. Three illustrative run records come from `fixtures/audit.json`; selecting a row or its keyboard-accessible run button updates the before/change/after cards, outcome, and expandable attempt history.
-
-Run #3 agrees with the existing Tuning fixture. Failed run #2 retains all three failed attempts, labels its 31-group proposal as not used, and shows the 5,483-alert baseline retained. Artifact names are informational references, not downloadable files. Metrics are supplied in JSON; no evaluator or backend is invoked.
-
-## Sample Emails
-
-`/emails` follows the three-column Figma layout: Original rules previews, Tuned rules previews, and a selectable message detail. `getEmailsData()` in `lib/data.ts` supplies `fixtures/emails.json`. Both lists support pointer and keyboard selection, and the preview links back to Replay.
-
-Counts agree with Replay (`sample-001`): four original previews and three tuned previews at the saved 1:55:26 snapshot. Preview content preserves the score, band, membership, and event count at notification time; it does not borrow the final group state. Missing rule settings are displayed as not supplied. No inbox is connected and nothing is sent.
-
-## Backend baseline Replay
-
-Open `/replay/baseline`, or choose **Backend · Original rules** on Replay. `/replay` remains the separate synthetic sample demo. Choose a dataset, then a completed Original rules run. Failed, unfinished, and tuned runs are listed but cannot be selected. Run tuning stays disabled.
-
-Start the backend read API from the repository root with `python -m app.api --port 8000`. Its database must already be migrated, imported, and baseline-scored by the backend team; the frontend does not perform those operations. Copy `.env.example` to `.env.local` only if configuring a different API origin, then restart Next.js. The default is `http://127.0.0.1:8000`. `IDEAX_BACKEND_URL` is server-only, accepts HTTP loopback or HTTPS origins, and must not contain credentials or a path. Browsers call the same-origin Next.js route, so backend CORS configuration is not needed for this adapter.
-
-`lib/data.ts` delegates to the validated read-only adapter in `lib/backend-client.ts`. `GET /api/baseline` supports datasets, runs, calculated alerts, and evidence only. All pages are loaded before playback; duplicate or invalid pages, missing scores, and partial failures are rejected. Requests bypass caches, time out after 20 seconds per paginated resource, and stop at 100,000 records. No database, frozen input, backend environment file, or raw labels are accessed by frontend code. No synthetic fallback is used.
-
-The demo clock starts at the first calculated alert and uses the saved run's observation duration. Ordering is event timestamp, source line, then alert ID; events at the clock boundary are included. Play/Pause, Restart, and 60×/120×/360× share the tested playback reducer. The table shows the latest 50 elapsed records, with selectable saved evidence. Record counts are presentation counts; scores and severities are passed through unchanged. Tuned results, evaluator metrics, comparison chart, and email metrics remain unavailable. A failed reload retains the previously loaded run with a visible notice.
-
-Verification used the real Python API with a temporary backend database and all 5,483 frozen input events, imported and scored by backend code. This does not initialize the configured backend database or certify recall. Frontend tests, lint, TypeScript, production build, and Chrome checks covered pagination, selection, evidence, playback, disabled tuning, and 1440/1280/400px layouts.
-
-### Baseline Replay polish
-
-Alert signatures lead each row; full rule IDs and run provenance expand on demand. Opening evidence pauses playback, highlights the selected alert, and exposes its expanded state to assistive technology. Evidence requests can be retried independently. Connection and loading notices provide recovery steps, and failed reloads preserve the last loaded run. Run tuning stays disabled with a visible explanation.
-
-Connection check when the backend is ready:
-1. Set the server-only API origin if different from the default, then restart Next.js.
-2. Refresh datasets and choose the dataset/run IDs supplied by the backend owner.
-3. Confirm the displayed rule version and observation duration under run provenance.
-4. Replay to completion and compare loaded record count, saved scores/severity, and selected evidence with that same backend run.
-5. Confirm the sample demo stays separate and no tuned/evaluator metrics are claimed.
-
-Polish verification: lint, production build/TypeScript, and all 20 tests passed. Chrome checks covered keyboard evidence opening and pause, evidence retry, expanded identifiers, retained results on failed reload, initial connection errors, and 1440/1280/400px layouts without page overflow or runtime errors.
-
-## Comparison preview and backend connection
-
-`/replay/comparison` reuses the comparison chart, paired lanes, saved metrics, and playback from sample Replay, with dataset and paired-run selectors above them. It is explicitly SAMPLE, independently of backend baseline Replay. A failed sample proposal remains selectable for inspection but cannot play. `fixtures/comparison.json` supplies pair metadata; `getComparisonPreview()` is the source boundary, and `lib/comparison.ts` checks dataset, tuned run, duration, and availability before showing frames. Empty attack sets display recall as N/A.
-
-To connect real comparison results later, the server adapter must provide paired run IDs, identical event provenance and observation duration, saved original alerts, tuned group membership and score/band histories, cumulative frames, and evaluator results. The current API has only a completed baseline run; no tuned endpoint is assumed. The fixture shapes remain a presentation proposal for Melvin to confirm. Never combine real baseline alerts with these sample tuned groups.
-
-The public backend handoff was verified through the frontend adapter: dataset 1, completed baseline run 1, 5,483 alerts, 9,600 seconds, and saved evidence. Configure its current URL locally using `IDEAX_BACKEND_URL`; never commit `.env.local` or API keys. Free ngrok origins receive the browser-warning bypass header on server-side requests. Pagination allows 20 seconds per page and 120 seconds per collection, bounded to 100,000 records. Run tuning remains disabled.
-
-## Saved backend Tuning and Audit
-
-Use **Backend · Saved results** on Tuning or Audit log (`/tuning/backend`, `/audit/backend`). The original `/tuning` and `/audit` screens remain clearly labeled samples. Select a dataset, then a saved attempt. Failed and completed attempts stay visible; iterations show backend evaluation, guardrail outcomes, candidate run/version IDs, and recorded parameter changes. Tuning also displays the saved flow/delta-gap table. A passing iteration is labeled accepted only when it matches the completed attempt's selected version; historical acceptance does not claim current activation. Empty attack denominators display N/A and benign groups raised above zero display red.
-
-`GET /api/saved-tuning?dataset_id=…[&attempt_id=…]` calls the existing dataset attempt-list and attempt-detail routes through `lib/data.ts` and `lib/saved-tuning.ts`. The adapter validates dataset/baseline ownership, unwraps nested iteration pagination, rejects changed attempt status during loading, and allowlists display fields. Backend artifact paths, raw policy/outcome/proposal JSON, and provider/persistence errors are not forwarded. Failed refreshes retain the previous saved view with a notice; switching datasets clears selection. No sample fallback and no POST endpoint are supplied.
-
-Verification: production build/TypeScript, lint, and 27 tests pass. Live API checks confirmed the reachable empty-history state on both screens. Isolated browser responses covered failed/completed attempts, keyboard selection, retained views on errors, zero-denominator recall, red benign counts, and 1440/1280/400px layouts without runtime errors or mutation requests. Populated results from Melvin's deployed database remain unverified until it contains attempts. Run tuning remains disabled; a model is never invoked by these views.
-
-## Navigation, Replay links, and rule history
-
-Replay shows two source tabs: **Backend** (`/replay`, the complete saved Original/Tuned dashboard) and **Sample demo** (`/replay/comparison`, including the sample dataset/pair picker). The standalone baseline evidence table remains at `/replay/baseline`; the small synthetic replay remains at `/replay/sample`. Backend headers keep Replay, Tuning, and Audit on their real-data default routes. Sample headers link to the explicit sample routes; Emails is marked sample-only when leaving backend mode.
-
-Saved Tuning/Audit attempts link to `/replay?dataset_id=…&run_id=…`. Both Replay routes validate link IDs and initialize the selectors; the server adapter still validates actual run ownership and completion. Dataset-only links initialize just the dataset. Invalid link values display a notice rather than issuing invalid run requests.
-
-Expand **Rule-version history** on a loaded Replay run or saved attempt. In attempt details it follows the selected iteration's candidate run, or the baseline when there is no candidate. `GET /api/rule-history` validates dataset/run membership and reads the backend's version-depth cursor pages. The adapter checks the first version matches the run and validates the complete ancestor chain; raw rule snapshots are not forwarded. The view shows saved statuses, parents, rationale, and recorded parameter changes. Loading failures do not replace history with samples; failed refreshes retain the last loaded history.
-
-Reconciliation verification: build/TypeScript, lint, and all 35 frontend tests pass. Chrome confirmed live dataset/run deep links into the full 5,483-alert replay, live root-version history, two source tabs, separate backend/sample navigation, invalid-ID and unavailable-run handling, retained history on a simulated outage, and 1440/1280/400px layouts without overflow or runtime exceptions. The standalone baseline route remains functional.
+On Windows PowerShell with script execution disabled, use npm.cmd and npx.cmd. Dev/build use Webpack following earlier Windows Turbopack worker failures. Google fonts require build-time network access and are self-hosted at runtime.

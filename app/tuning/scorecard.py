@@ -68,7 +68,10 @@ class Scorecard:
                                           else policy['other_evidence'])
         return {key: sum(values) / len(values) for key, values in buckets.items()}
 
-    def evaluate(self, events, groups, *, observation_seconds, budget):
+    def evaluate(self, events, groups, *, observation_seconds, budget,
+                 benign_evaluation='any-benign-member-raised'):
+        if benign_evaluation not in ('any-benign-member-raised', 'warn-any-benign-member-raised'):
+            raise ValueError('Unsupported benign_evaluation policy')
         original = {e['id']: e for e in events}
         counts = Counter(i for g in groups for i in g['event_ids'])
         trajectory = {}
@@ -122,7 +125,8 @@ class Scorecard:
         hours = observation_seconds / 3600
         before, after = len(events), len(groups)
         reduction = 1 - after / before if before else None
-        passed = not errors and total > 0 and retained == total and benign_raised == 0 and unconfirmed == 0
+        benign_ok = benign_raised == 0 or benign_evaluation == 'warn-any-benign-member-raised'
+        passed = not errors and total > 0 and retained == total and benign_ok and unconfirmed == 0
         return {'baseline_alerts': before, 'grouped_alerts': after,
                 'alert_reduction': reduction, 'reduction_pct': reduction * 100 if reduction is not None else None,
                 'observed_per_hour': before / hours, 'grouped_per_hour': after / hours,
@@ -133,6 +137,7 @@ class Scorecard:
                 'grouped_high': sum(g['score'] >= 8 for g in groups),
                 'attack_groups_total': total, 'attack_groups_retained': retained,
                 'attack_group_recall': recall, 'benign_groups_raised': benign_raised,
+                'benign_evaluation': benign_evaluation,
                 'unconfirmed_events': unconfirmed, 'integrity_errors': sorted(set(errors)),
                 'per_rule_feedback': dict(rule_feedback),
                 'acceptance_status': 'passed' if passed else 'not_certified',
