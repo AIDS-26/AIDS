@@ -2,7 +2,7 @@
 Agentic Intrusion Detection System
 
 `app/` is the backend: processing, database access, and the future HTTP API.
-`siem/` is the frontend: the client-facing SIEM interface. It will request data
+`fe/` is the frontend: the client-facing SIEM interface (Next.js + Tailwind). It will request data
 through the backend API; SQLite access stays in backend Python code.
 This setup supplies database infrastructure, not a UI, HTTP server, scoring engine,
 or tuner yet. The evaluation module provides trusted label access, not scoring or
@@ -13,7 +13,7 @@ third-party Python packages or database service are required.
 
 ```text
 app/                  Backend processing and database infrastructure
-siem/                 SIEM frontend (placeholder; framework undecided)
+fe/                   SIEM frontend (Next.js + Tailwind)
 config/               attack_rules.json and service_rules.json
 migrations/           Runtime schema and separate label-store migrations
 scripts/              Database administration commands
