@@ -1,4 +1,9 @@
 {
+  "default": {
+    "service": "Unmapped asset",
+    "weight": 0,
+    "basis": "Default service contribution for unmapped assets"
+  },
   "rules": [
     {
       "cidr": "192.168.10.0/24",

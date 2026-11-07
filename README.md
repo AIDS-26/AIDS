@@ -1,11 +1,11 @@
 # AIDS
 Agentic Intrusion Detection System
 
-`app/` is the backend: processing, database access, and the future HTTP API.
+`app/` is the backend: processing, database access, and the SIEM read API.
 `siem/` is the frontend: the client-facing SIEM interface. It will request data
 through the backend API; SQLite access stays in backend Python code.
-This setup supplies database infrastructure, not a UI, HTTP server, scoring engine,
-or tuner yet. The evaluation module provides trusted label access, not scoring or
+This setup supplies ingestion, database infrastructure, and a local HTTP read API.
+The UI, scoring engine, and tuner remain unimplemented. The evaluation module provides trusted label access, not scoring or
 recall calculations. It requires Python 3.10+ and SQLite 3.31+ with JSON functions. No
 third-party Python packages or database service are required.
 
@@ -29,6 +29,13 @@ sources. Their values and matching behavior have not been changed by the move;
 a runtime mapping loader is not implemented yet. Use
 `demo_freeze/eve_demo_FINAL.json` as the single canonical extracted demo dataset.
 The existing `demo_freeze.zip` archive is retained.
+
+The reviewed Windows checkout has CRLF source lines: its actual SHA-256 is
+`8ed31f8aa0cb716d4773d4c87621ca543353160ee2719994c8067dd66ca1883b`.
+The manifest SHA-256 (`53d4fa05ba7dfe08f3f87e42d47188e5ccd7becff28bb2aea28d2f63f9750c87`)
+matches the same source with LF line endings. Ingestion hashes actual source bytes;
+it does not normalize or modify frozen inputs. Files with changed line endings
+therefore have different dataset identities. Both reviewed forms contain 5,483 alerts.
 
 ## Initialize the database
 
@@ -116,10 +123,97 @@ connection. Always bind query parameters. Do not hold a write transaction while
 calling Codex, sending messages, or waiting for network operations.
 
 The SIEM frontend must not open SQLite files, import Python database modules, or
-receive database paths or label-store credentials. Its integration point will be
-the API in `app/`; endpoints and ports have not been implemented yet. Separate
+receive database paths or label-store credentials. Its integration point is
+the API in `app/`, described below. Separate
 backend hosts should communicate through an API or use a client/server database
 instead of sharing the SQLite file.
+
+## EVE to SIEM 1
+
+The current flow is `EVE JSON Lines -> import-eve -> datasets/events -> HTTP API -> SIEM`.
+The separate label store is used only for trusted evaluation. Ingestion preserves
+one event per alert source line, including identical records on different lines.
+It does not create calculated `alerts` or `runs` rows. This is a finite-file import;
+stop/rotate an actively written EVE file before importing it. Live tailing is not implemented.
+
+Set `DATABASE_PATH` and `LABEL_DATABASE_PATH` to local paths outside OneDrive before
+running the commands below. For example, use an existing local directory under
+`C:/Users/Melvin/AppData/Local/AIDS/`. The server reads the configured database;
+it never runs migrations or imports during a request.
+
+```powershell
+python -m scripts.manage_db migrate
+python -m scripts.manage_db import-eve demo_freeze/eve_demo_FINAL.json --split tune
+python -m app.api --port 8000 --allowed-origin http://localhost:5173
+```
+
+`--allowed-origin` is optional; use the exact scheme, host, and port of the frontend
+if it is served from another origin. This development API binds to loopback by
+default and has no authentication or TLS; keep it local. The frontend can use:
+
+```javascript
+const datasets = await fetch('http://127.0.0.1:8000/api/datasets').then(r => r.json());
+const id = datasets.items[0].id; // Present a dataset picker if there are several.
+const alerts = await fetch(`http://127.0.0.1:8000/api/datasets/${id}/alerts?limit=100`)
+  .then(r => r.json());
+```
+
+| GET route | Contents |
+| --- | --- |
+| `/api/datasets` | Source IDs, hashes, counts, split and known versions; no local paths |
+| `/api/datasets/{id}/alerts` | Imported source alerts with event IDs and source-line provenance |
+| `/api/datasets/{id}/runs` | Calculation run IDs, status, mode and rule-version IDs |
+| `/api/runs/{id}/alerts` | Application scores/groups from a completed baseline or tuned run |
+| `/api/runs/{id}/alerts/{alert_id}/events` | Evidence membership and stored score trajectory |
+
+All list routes accept `limit` (1–500, default 100) and `after_id` (default 0).
+Responses contain `items` and `next_after_id`; pass that cursor to get the next
+page, and stop when it is `null`. Pagination uses increasing IDs, not event time.
+Missing resources return JSON 404; invalid queries and unfinished result runs
+return JSON 400; database failures return JSON 503 without file paths.
+
+Source alerts have `kind: "source_alerts"`, `score: null`, `severity: null`, and
+`calculation_status: "pending"`. Display “Not calculated” for those scores.
+`suricata_severity` is Suricata's original 1–3 value, **not** the application's
+Low/Medium/High score. `flow_id` is a string to preserve large integers in JavaScript.
+No raw JSON, demo labels, label paths or original source paths are exposed.
+
+### Calculation handoff
+
+Your calculation worker can use `app.db.connect()` against the same configured
+runtime database. Read sanitized events ordered by `(timestamp_us, source_line)`.
+Use the canonical JSON mappings in `config/`; matching policies and a validated
+runtime rule loader still need implementation. Create an immutable rule snapshot
+in `rule_versions` and a fresh baseline `runs` row referencing it, with an explicit
+positive observation duration. Record stable attack-type/service identities in
+`rules`, calculated groups in `alerts`, and every evidence event in `alert_events`
+with its actual rolling `n_in_window` and `raised_score`. The existing constraints
+and triggers maintain counts and enforce score bounds and dataset membership.
+Mark a run completed only after all results are committed; record errors and mark
+failed runs accordingly. The API exposes calculated alerts only for completed runs.
+The API does not validate a worker's full scoring/grouping policy or certify recall.
+
+### PDF and rule review
+
+The PDF describes offline parameter search over rules (`W`, `N_sat`) with deterministic
+replay and guardrails. Its embedded tuning prompt is a future task specification;
+its synthetic performance figures are not results for this dataset. `AGENTS.md`
+already captures this concept. No tuning or runtime score calculation is performed
+by the ingestion/API flow.
+
+Before calculation is connected, resolve these mapping decisions: ordered attack
+patterns overlap (for example “Reverse Shell Connection” also matches “Reverse Shell”),
+asset subnet and host entries overlap, and service IPs are traffic-derived hypotheses.
+`service_rules.json` now has an explicit `default` entry for unmatched endpoints.
+Its weight is currently `0`, as set in the shared workspace: an unmapped asset
+contributes no additional service weight. The calculation loader must explicitly
+validate support for zero service weight; attack weights and final score bounds
+remain separate requirements.
+Attack matching, including any semantic classification, is assigned to the
+calculation developer; define a reproducible contract before replacing the current
+category/signature patterns. Offline preparation of a saved mapping can preserve
+the documented separation between AI work and deterministic runtime scoring.
+Runtime cannot use demo labels to decide benign behavior.
 
 ## Data layout
 
