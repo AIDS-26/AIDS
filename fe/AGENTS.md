@@ -139,3 +139,11 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - Nested iteration pagination, ownership/selection checks, allowlisted flow/evaluation/guardrail/change fields, failure retention, and explicit empty states. No backend paths or raw provider diagnostics forwarded.
 - Run tuning is disabled. Accepted-in-attempt history is distinct from current activation. Zero-denominator recall is N/A; benign raised > 0 is red.
 - Build, lint, TypeScript, 27 tests, and browser checks passed. The public API currently returns no attempts; populated-state UI checks used test-only browser responses, not shipped fixtures.
+
+## Navigation and history (7 Nov 2026)
+
+- Replay source tabs consolidated to Backend and Sample demo; the latter opens `/replay/comparison`. `/replay` remains a directly accessible fallback.
+- Backend main navigation stays backend for Replay/Tuning/Audit. Emails is sample-only and labelled accordingly.
+- Saved attempt links include dataset and baseline-run IDs. Replay validates query values and backend ownership/completion before showing data.
+- Rule history uses the read-only `/api/rule-history` frontend adapter, with backend depth-cursor pagination and lineage checks; Replay and saved attempt details show statuses, ancestors, and recorded changes. No full raw snapshots or rule writes.
+- Build, lint, TypeScript, 31 tests, and live browser deep-link/history/navigation/responsive checks passed.

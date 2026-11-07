@@ -57,3 +57,8 @@ export async function getSavedTuningData(query: import("./saved-tuning").SavedQu
   const { readSavedTuning } = await import("./saved-tuning");
   return readSavedTuning(query, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
 }
+
+export async function getRuleHistoryData(datasetId: number, runId: number) {
+  const { readRuleHistory } = await import("./rule-history");
+  return readRuleHistory(datasetId, runId, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
+}
