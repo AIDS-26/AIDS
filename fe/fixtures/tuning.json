@@ -1,0 +1,334 @@
+{
+  "run": {
+    "sample": true,
+    "run_id": "sample-tuning-003",
+    "started_at": "2026-11-07T13:40:00+07:00",
+    "started_label": "7 Nov 2026, 13:40 WIB",
+    "duration_s": 192,
+    "duration_label": "3 min 12 s",
+    "budget_per_hour": 20,
+    "result": "passed",
+    "accepted_attempt": 2,
+    "attempts": [
+      {
+        "n": 1,
+        "evaluate": {
+          "before": 5483,
+          "after": 38,
+          "reduction": 0.993069487,
+          "reduction_label": "99.3%",
+          "recall": {
+            "caught": 7,
+            "total": 7
+          },
+          "benign_raised": 0
+        },
+        "guardrail": {
+          "passed": false,
+          "checks": [
+            {
+              "name": "No score below its base S",
+              "passed": true,
+              "detail": "Sample score-floor check."
+            },
+            {
+              "name": "Rules with S ≥ 8 keep W ≤ 5 min",
+              "passed": false,
+              "detail": "web_probe window = 15 min; maximum = 5 min"
+            },
+            {
+              "name": "Immediate exploit alerts stay unmerged",
+              "passed": true,
+              "detail": "Exploit policy unchanged."
+            },
+            {
+              "name": "Only permitted rule settings changed",
+              "passed": true,
+              "detail": "Illustrative rule-schema check."
+            }
+          ]
+        },
+        "changes": [
+          {
+            "rule_id": "web_probe@web_server",
+            "field": "window_min",
+            "old": 2,
+            "new": 15,
+            "gap": 46.42857142857143,
+            "reason": "Illustrative rejected proposal: this exceeds the High-rule window limit."
+          },
+          {
+            "rule_id": "brute_force@web_server",
+            "field": "window_min",
+            "old": 5,
+            "new": 30,
+            "gap": 191.14285714285714,
+            "reason": "Group repeated events to address the positive sample load gap."
+          },
+          {
+            "rule_id": "brute_force@web_server",
+            "field": "n_sat",
+            "old": 60,
+            "new": 120,
+            "gap": 191.14285714285714,
+            "reason": "Use the supplied sample p95 count as the saturation setting."
+          },
+          {
+            "rule_id": "benign_policy@internal",
+            "field": "window_min",
+            "old": 5,
+            "new": 60,
+            "gap": 82.77142857142857,
+            "reason": "Group benign repeats while retaining the base score."
+          },
+          {
+            "rule_id": "port_scan@internal",
+            "field": "n_sat",
+            "old": 60,
+            "new": 6,
+            "gap": 2.5857142857142854,
+            "reason": "Use the supplied sample p95 count for scanner sensitivity."
+          }
+        ],
+        "log": [
+          {
+            "tone": "command",
+            "text": "SAMPLE · Offline Codex tuning transcript (not executed)"
+          },
+          {
+            "tone": "plain",
+            "text": "Read aggregate flow: 373 alerts/h; analyst budget: 20/h."
+          },
+          {
+            "tone": "plain",
+            "text": "Attempt 1: propose 5 setting changes."
+          },
+          {
+            "tone": "plain",
+            "text": "Sample evaluation: 5483 → 38 grouped alerts; recall 7/7; benign raised 0."
+          },
+          {
+            "tone": "fail",
+            "text": "Guardrail FAIL · High-rule window 15 min exceeds sample maximum 5 min."
+          },
+          {
+            "tone": "plain",
+            "text": "Rejected proposal retained for inspection; baseline stays active."
+          }
+        ],
+        "rules_yaml": "# SAMPLE ONLY — illustrative proposal, not a runtime configuration\n# Attempt 1 · Failed, not used (sample)\nchanges:\n  - rule_id: web_probe@web_server\n    field: window_min\n    old: 2\n    new: 15\n  - rule_id: brute_force@web_server\n    field: window_min\n    old: 5\n    new: 30\n  - rule_id: brute_force@web_server\n    field: n_sat\n    old: 60\n    new: 120\n  - rule_id: benign_policy@internal\n    field: window_min\n    old: 5\n    new: 60\n  - rule_id: port_scan@internal\n    field: n_sat\n    old: 60\n    new: 6\n"
+      },
+      {
+        "n": 2,
+        "evaluate": {
+          "before": 5483,
+          "after": 46,
+          "reduction": 0.991610432,
+          "reduction_label": "99.2%",
+          "recall": {
+            "caught": 7,
+            "total": 7
+          },
+          "benign_raised": 0
+        },
+        "guardrail": {
+          "passed": true,
+          "checks": [
+            {
+              "name": "No score below its base S",
+              "passed": true,
+              "detail": "Sample score-floor check."
+            },
+            {
+              "name": "Rules with S ≥ 8 keep W ≤ 5 min",
+              "passed": true,
+              "detail": "web_probe window = 5 min (sample configuration)"
+            },
+            {
+              "name": "Immediate exploit alerts stay unmerged",
+              "passed": true,
+              "detail": "Exploit policy unchanged."
+            },
+            {
+              "name": "Only permitted rule settings changed",
+              "passed": true,
+              "detail": "Illustrative rule-schema check."
+            }
+          ]
+        },
+        "changes": [
+          {
+            "rule_id": "web_probe@web_server",
+            "field": "window_min",
+            "old": 2,
+            "new": 5,
+            "gap": 46.42857142857143,
+            "reason": "Keep this High rule within the sample five-minute maximum."
+          },
+          {
+            "rule_id": "brute_force@web_server",
+            "field": "window_min",
+            "old": 5,
+            "new": 30,
+            "gap": 191.14285714285714,
+            "reason": "Group repeated events to address the positive sample load gap."
+          },
+          {
+            "rule_id": "brute_force@web_server",
+            "field": "n_sat",
+            "old": 60,
+            "new": 120,
+            "gap": 191.14285714285714,
+            "reason": "Use the supplied sample p95 count as the saturation setting."
+          },
+          {
+            "rule_id": "benign_policy@internal",
+            "field": "window_min",
+            "old": 5,
+            "new": 60,
+            "gap": 82.77142857142857,
+            "reason": "Group benign repeats while retaining the base score."
+          },
+          {
+            "rule_id": "port_scan@internal",
+            "field": "n_sat",
+            "old": 60,
+            "new": 6,
+            "gap": 2.5857142857142854,
+            "reason": "Use the supplied sample p95 count for scanner sensitivity."
+          }
+        ],
+        "log": [
+          {
+            "tone": "command",
+            "text": "SAMPLE · Offline Codex tuning transcript (not executed)"
+          },
+          {
+            "tone": "plain",
+            "text": "Read aggregate flow: 373 alerts/h; analyst budget: 20/h."
+          },
+          {
+            "tone": "plain",
+            "text": "Attempt 2: propose 5 setting changes."
+          },
+          {
+            "tone": "plain",
+            "text": "Sample evaluation: 5483 → 46 grouped alerts; recall 7/7; benign raised 0."
+          },
+          {
+            "tone": "pass",
+            "text": "Guardrail PASS · All sample checks passed."
+          },
+          {
+            "tone": "plain",
+            "text": "Illustrative proposal retained. No live rules loaded."
+          }
+        ],
+        "rules_yaml": "# SAMPLE ONLY — illustrative proposal, not a runtime configuration\n# Attempt 2 · Passed (sample)\nchanges:\n  - rule_id: web_probe@web_server\n    field: window_min\n    old: 2\n    new: 5\n  - rule_id: brute_force@web_server\n    field: window_min\n    old: 5\n    new: 30\n  - rule_id: brute_force@web_server\n    field: n_sat\n    old: 60\n    new: 120\n  - rule_id: benign_policy@internal\n    field: window_min\n    old: 5\n    new: 60\n  - rule_id: port_scan@internal\n    field: n_sat\n    old: 60\n    new: 6\n"
+      }
+    ]
+  },
+  "flow": {
+    "budget_per_hour": 20,
+    "observed_per_hour": 373,
+    "burn_rate": 18.65,
+    "rules": [
+      {
+        "rule_id": "brute_force@web_server",
+        "rule_name": "Brute force at web server",
+        "base_score": 5,
+        "evidence": 1,
+        "observed_per_hour": 194,
+        "peak_n": null,
+        "p95_n": 120,
+        "allowed_per_hour": 2.857142857142857,
+        "gap": 191.14285714285714,
+        "direction": "over"
+      },
+      {
+        "rule_id": "benign_policy@internal",
+        "rule_name": "Benign policy at internal hosts",
+        "base_score": 2,
+        "evidence": 0.2,
+        "observed_per_hour": 83,
+        "peak_n": null,
+        "p95_n": 60,
+        "allowed_per_hour": 0.22857142857142856,
+        "gap": 82.77142857142857,
+        "direction": "over"
+      },
+      {
+        "rule_id": "web_probe@web_server",
+        "rule_name": "Web probe at web server",
+        "base_score": 8,
+        "evidence": 1,
+        "observed_per_hour": 51,
+        "peak_n": null,
+        "p95_n": 40,
+        "allowed_per_hour": 4.571428571428571,
+        "gap": 46.42857142857143,
+        "direction": "over"
+      },
+      {
+        "rule_id": "benign_policy@web_server",
+        "rule_name": "Benign policy at web server",
+        "base_score": 3,
+        "evidence": 0.2,
+        "observed_per_hour": 25,
+        "peak_n": null,
+        "p95_n": 60,
+        "allowed_per_hour": 0.34285714285714286,
+        "gap": 24.65714285714286,
+        "direction": "over"
+      },
+      {
+        "rule_id": "sql_injection@web_server",
+        "rule_name": "SQL injection at web server",
+        "base_score": 7,
+        "evidence": 1,
+        "observed_per_hour": 9.1,
+        "peak_n": null,
+        "p95_n": 9,
+        "allowed_per_hour": 4,
+        "gap": 5.1,
+        "direction": "over"
+      },
+      {
+        "rule_id": "port_scan@internal",
+        "rule_name": "Port scan, internal",
+        "base_score": 3,
+        "evidence": 1,
+        "observed_per_hour": 4.3,
+        "peak_n": null,
+        "p95_n": 6,
+        "allowed_per_hour": 1.7142857142857142,
+        "gap": 2.5857142857142854,
+        "direction": "over"
+      },
+      {
+        "rule_id": "exploit@win_vista_host",
+        "rule_name": "Exploit at Windows Vista host",
+        "base_score": 9,
+        "evidence": 1,
+        "observed_per_hour": 3.9,
+        "peak_n": null,
+        "p95_n": 3,
+        "allowed_per_hour": 5.142857142857143,
+        "gap": -1.2428571428571433,
+        "direction": "under"
+      },
+      {
+        "rule_id": "ping_sweep@internal",
+        "rule_name": "Ping sweep, internal",
+        "base_score": 2,
+        "evidence": 1,
+        "observed_per_hour": 2.7,
+        "peak_n": null,
+        "p95_n": 4,
+        "allowed_per_hour": 1.1428571428571428,
+        "gap": 1.5571428571428574,
+        "direction": "over"
+      }
+    ]
+  }
+}
