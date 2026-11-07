@@ -1,0 +1,132 @@
+{
+  "dataset": "demo_freeze\\eve_demo_FINAL.json",
+  "sha256": "8ed31f8aa0cb716d4773d4c87621ca543353160ee2719994c8067dd66ca1883b",
+  "observation_seconds": 9600,
+  "observation_assumption": "manifest demo_length_min=160; explicit smoke-test input",
+  "baseline_alerts": 5483,
+  "evidence_links": 5483,
+  "severity_counts": {
+    "High": 5291,
+    "Low": 186,
+    "Medium": 6
+  },
+  "rule_version_id": "baseline/c47b0e4f828189f898f19481c8ba8c8a78cdaee6b06122793c41f7598cd8c912",
+  "by_rule": [
+    {
+      "attack_type": "credential_brute_force",
+      "service": "Secondary web and file-transfer service",
+      "alerts": 2374,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "malware_or_reverse_shell",
+      "service": "Unmapped asset",
+      "alerts": 1535,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "web_application_attack",
+      "service": "Application and file-transfer service",
+      "alerts": 987,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "suspicious_external_communication",
+      "service": "Core identity and DNS service",
+      "alerts": 186,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "unclassified_detection",
+      "service": "Unmapped asset",
+      "alerts": 100,
+      "min_score": 3,
+      "max_score": 3
+    },
+    {
+      "attack_type": "suspicious_external_communication",
+      "service": "Unmapped asset",
+      "alerts": 86,
+      "min_score": 4,
+      "max_score": 4
+    },
+    {
+      "attack_type": "suspicious_external_communication",
+      "service": "Gateway and DNS resolver service",
+      "alerts": 64,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "authentication_protocol_anomaly",
+      "service": "Core identity and DNS service",
+      "alerts": 55,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "authentication_protocol_anomaly",
+      "service": "Internal LAN and user endpoint zone",
+      "alerts": 53,
+      "min_score": 8,
+      "max_score": 8
+    },
+    {
+      "attack_type": "suspicious_dns_or_web_request",
+      "service": "Core identity and DNS service",
+      "alerts": 15,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "authentication_protocol_anomaly",
+      "service": "Application and file-transfer service",
+      "alerts": 8,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "suspicious_dns_or_web_request",
+      "service": "Gateway and DNS resolver service",
+      "alerts": 8,
+      "min_score": 10,
+      "max_score": 10
+    },
+    {
+      "attack_type": "reconnaissance_or_port_scan",
+      "service": "Internal LAN and user endpoint zone",
+      "alerts": 5,
+      "min_score": 8,
+      "max_score": 8
+    },
+    {
+      "attack_type": "unclassified_detection",
+      "service": "Internal LAN and user endpoint zone",
+      "alerts": 5,
+      "min_score": 6,
+      "max_score": 6
+    },
+    {
+      "attack_type": "suspicious_external_communication",
+      "service": "Internal LAN and user endpoint zone",
+      "alerts": 1,
+      "min_score": 7,
+      "max_score": 7
+    },
+    {
+      "attack_type": "web_application_attack",
+      "service": "Secondary web and file-transfer service",
+      "alerts": 1,
+      "min_score": 10,
+      "max_score": 10
+    }
+  ],
+  "http_pagination": "passed",
+  "database_integrity": "passed",
+  "tuned_replay": "not run; tuning and recall policy incomplete",
+  "storage": "temporary local database removed after verification"
+}
