@@ -2,9 +2,11 @@
 
 import json
 from pathlib import Path
+import sqlite3
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -65,6 +67,21 @@ class SiemApiTests(unittest.TestCase):
             self.assertEqual(len(db.execute("PRAGMA database_list").fetchall()), 1)
             self.assertEqual(db.execute("SELECT count(*) FROM runs").fetchone()[0], 0)
 
+    def test_health_checks_database_without_exposing_application_data(self):
+        for route in ("/api/health", "/health"):
+            with self.subTest(route=route):
+                payload, headers = self.get(route)
+                self.assertEqual(payload, {"status": "ok", "database": "ok"})
+                self.assertEqual(headers["Cache-Control"], "no-store")
+
+    def test_health_returns_503_when_database_is_unavailable(self):
+        with patch("app.api.connect", side_effect=sqlite3.OperationalError("private database path")):
+            with self.assertRaises(HTTPError) as raised:
+                self.get("/api/health")
+            self.assertEqual(raised.exception.code, 503)
+            self.assertEqual(json.load(raised.exception), {"error": "Database unavailable"})
+            raised.exception.close()
+
     def test_bad_queries_missing_resources_and_exact_cors(self):
         for route, status in (("/api/datasets?limit=501", 400),
                               ("/api/datasets?after_id=-1", 400),
@@ -112,7 +129,6 @@ class SiemApiTests(unittest.TestCase):
 
     def test_server_does_not_create_missing_database(self):
         missing = self.root / "missing.sqlite3"
-        import sqlite3
         with self.assertRaises(sqlite3.OperationalError):
             make_server(missing, port=0)
         self.assertFalse(missing.exists())

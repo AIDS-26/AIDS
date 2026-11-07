@@ -5,10 +5,13 @@ Intrusion Detection Escalation through Agentic reasoning with Codex, eXtended
 `fe/` is the client-facing SIEM frontend (Next.js + Tailwind). It will request data
 through the backend API; SQLite access stays in backend Python code.
 This setup supplies ingestion, database infrastructure, and a local HTTP read API.
-Original-rule scoring is integrated with SQLite and the API. `app/calculation_base/`
-also contains prototype grouping, flow, evaluation, guardrail and tuner helpers;
-the complete tuned replay/acceptance loop remains unfinished. `app/evaluate.py`
-provides trusted label access, not attack-group recall calculations.
+Original-rule scoring and offline tuning are integrated with SQLite and the API.
+`app/tuning/` implements deterministic session replay, budget-aware search,
+aggregate-only model proposals, evaluation, the guardrail and immutable rule
+version history. See [tuning setup, policies and measured limitations](docs/tuning.md).
+The earlier grouping/tuner helpers in `app/calculation_base/` remain prototypes;
+they are not used for tuned activation. `app/evaluate.py` is the trusted offline
+label access layer. The tuning UI still uses its existing fixtures.
 It requires Python 3.10+ and SQLite 3.31+ with JSON functions. No
 third-party Python packages or database service are required.
 
@@ -17,13 +20,14 @@ third-party Python packages or database service are required.
 ```text
 app/                  Backend processing, baseline worker and database/API
 app/calculation_base/ Original scoring and prototype offline tuning helpers
+app/tuning/           Offline loop, deterministic replay, evaluation and versioning
 fe/                   SIEM frontend (Next.js + Tailwind)
 siem/                 Earlier frontend placeholder and API integration notes
 config/               attack_rules.json and service_rules.json
 migrations/           Runtime schema and separate label-store migrations
 scripts/              Database administration commands
 tests/                Backend/database tests
-tuner/                Future offline tuning component
+tuner/                Earlier tuning workspace placeholders (unused)
 demo_freeze/          Canonical frozen demo source and manifest
 data/                 Local databases and other input data
 output/               Generated reports and run artifacts
@@ -176,6 +180,7 @@ const alerts = await fetch(`http://127.0.0.1:8000/api/runs/${run.id}/alerts?limi
 
 | GET route | Contents |
 | --- | --- |
+| `/api/health` (alias `/health`) | API and read-only database connectivity; HTTP 200 with `{"status":"ok","database":"ok"}`, or HTTP 503 if the database is unavailable |
 | `/api/datasets` | Source IDs, hashes, counts, split and known versions; no local paths |
 | `/api/datasets/{id}/alerts` | Imported source alerts with event IDs and source-line provenance |
 | `/api/datasets/{id}/runs` | Calculation run IDs, status, mode and rule-version IDs |

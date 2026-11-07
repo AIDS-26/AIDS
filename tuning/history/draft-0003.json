@@ -1,0 +1,11 @@
+{
+  "version_id": "draft-0003",
+  "parent_id": "draft-0002",
+  "status": "rejected",
+  "sha256": "8a32b5c533bdd928c88ebc2959d28b8d443eaad290673659b138294e17ed13ee",
+  "hash_mode": "utf8_lf",
+  "attack_sha256": "49dc8819a3e5d28b9f8bf370894a795e92e0e3b5596a168baf2de587784146e7",
+  "service_sha256": "6261788152c95a87a53f6475d44a5e2d9f1c9b5fa0a4511416ff1506e36acf12",
+  "archived_at_utc": "2026-11-07T06:12:52.0439624Z",
+  "snapshot": "draft-0003.yaml"
+}
