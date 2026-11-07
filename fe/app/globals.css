@@ -343,6 +343,10 @@ button:not(:disabled):hover { filter: brightness(.94); }
 .comparison-provenance dd { overflow-wrap: anywhere; }
 .comparison-failed { color: var(--color-accent); }
 .saved-version { overflow-wrap: anywhere; max-width: 420px; white-space: normal; }
+.history-version { border-top: 1px solid var(--color-border); padding: 12px 0; }
+.history-version summary { cursor: pointer; overflow-wrap: anywhere; }
+.history-version summary .mono { display: block; margin-top: 4px; color: var(--color-muted); }
+.baseline-loadbar { flex-wrap: wrap; }
 .saved-iteration h3 { font-size: 16px; font-weight: 600; }
 .saved-iteration h4 { margin: 20px 0 8px; font-weight: 600; }
 .saved-iteration ul { list-style: disc; padding-left: 20px; }

@@ -4,6 +4,7 @@ import ReplayModes from "../replay-modes";
 import { useEffect, useReducer, useState } from "react";
 import AppHeader from "@/app/components/app-header";
 import ChatAssistant from "@/app/components/chat-assistant";
+import RuleHistory from "@/app/components/rule-history";
 import type { BaselineAlert, BaselineRun, Dataset, Evidence } from "@/lib/backend-client";
 import { initialPlayback, playbackReducer, type Speed } from "@/lib/replay";
 
@@ -67,6 +68,7 @@ function Player({ run, items }: Result["alerts"]) {
       {items.length === 0 ? <div className="baseline-message"><strong>No calculated alerts</strong><p>This completed run has no saved alert records. Choose another run or refresh after the backend has saved its results.</p></div> : <div className="table-scroll" tabIndex={0} role="region" aria-label="Original alerts; scroll horizontally on smaller screens"><table className="baseline-table"><caption className="sr-only">Latest elapsed Original rules alerts. Opening evidence pauses playback.</caption><thead><tr><th scope="col">Elapsed</th><th scope="col">Signature / rule</th><th scope="col">Target</th><th scope="col">Score</th><th scope="col">Severity</th><th scope="col">Evidence</th></tr></thead><tbody>{visible.slice(-50).reverse().map(alert => <tr key={alert.id} data-chat-id={String(alert.id)} className={selected === alert.id ? "baseline-selected" : undefined}><td className="mono">{clock((alert.first_timestamp_us-origin)/1e6)}</td><td><strong>{alert.signature ?? alert.attack_type}</strong><details className="baseline-rule"><summary>Rule ID</summary><span className="mono">{alert.rule_id}</span></details></td><td className="mono">{alert.dest_ip ?? "Not supplied"}</td><td>{alert.score}</td><td><span className={`badge ${alert.severity.toLowerCase()}`}>{alert.severity}</span></td><td><button aria-expanded={selected === alert.id} aria-controls={selected === alert.id ? `evidence-${alert.id}` : undefined} onClick={() => { if (selected !== alert.id) dispatch({ type: "pause", now: performance.now() }); select(selected === alert.id ? null : alert.id); }}>Alert #{alert.id}</button></td></tr>)}</tbody></table></div>}
       {selected !== null && visible.some(alert => alert.id === selected) && <EvidencePanel key={selected} dataset={run.dataset_id} run={run.id} alert={selected}/>}
     </section>
+    <RuleHistory datasetId={run.dataset_id} runId={run.id}/>
     <section className="panel baseline-panel"><h2>Tuned rules · unavailable</h2><p>No tuned run is connected. Reduction, recall, benign groups raised, comparison chart, and email metrics are unavailable in baseline-only mode.</p></section>
     <ChatAssistant context={{ source: "baseline", sample: false, dataset_id: run.dataset_id, run_id: run.id, replay_time_s: playback.t }} targets={visible.slice(-50).map(alert => ({ id: String(alert.id), label: `${alert.signature ?? alert.attack_type} · ${alert.dest_ip ?? "Unknown target"}` }))}/>
   </>;
@@ -78,14 +80,15 @@ function RunLoader({ dataset, run }: { dataset: number; run: number }) {
   return <><div className="baseline-loadbar"><span>Selected run <strong>#{run}</strong></span><button disabled={result.loading} onClick={() => refresh(revision + 1)}>{result.loading ? "Loading run…" : result.error ? "Retry loading run" : "Reload saved run"}</button></div>{result.loading && <p className="baseline-message" role="status">Loading all saved alerts before playback. {result.data ? "The previously loaded run remains available below." : "Larger datasets may take a few seconds."}</p>}{result.error && <p className="baseline-message" role="alert">{result.error} {result.data ? "Showing the previously loaded run." : "No sample data substituted."}</p>}{result.data && <Player key={run} {...result.data}/>}</>;
 }
 
-export default function BaselineScreen() {
+export default function BaselineScreen({ initialSelection = { dataset: "", run: "", error: null } }: { initialSelection?: { dataset: string; run: string; error: string | null } }) {
   const [revision, refresh] = useState(0);
   const datasets = useBackend("datasets", "", revision);
-  const [dataset, setDataset] = useState("");
-  const [run, setRun] = useState("");
+  const [dataset, setDataset] = useState(initialSelection.dataset);
+  const [run, setRun] = useState(initialSelection.run);
   const runs = useBackend("runs", dataset ? `&dataset_id=${dataset}` : null, revision);
   return <><a className="skip-link" href="#baseline">Skip to replay</a><AppHeader active="replay" sample={false} source="Original rules · read-only"/>
     <main id="baseline"><ReplayModes active="baseline"/>
+      {initialSelection.error && <p role="alert" className="baseline-message">{initialSelection.error}</p>}
       <div className="baseline-heading"><div><h1>Original rules replay</h1><p>Saved backend results · baseline only</p></div><div className="baseline-tuning"><button disabled aria-describedby="tuning-unavailable">Run tuning</button><small id="tuning-unavailable">Live tuning is not connected</small></div></div>
       <section className="panel baseline-panel"><h2>Select a saved baseline</h2><div className="baseline-selectors">
         <label>Dataset<select disabled={datasets.loading || !datasets.data?.items.length} value={dataset} onChange={event => { setDataset(event.target.value); setRun(""); }}><option value="">{datasets.loading ? "Loading datasets…" : "Choose a dataset"}</option>{datasets.data?.items.map(item => <option key={item.id} value={item.id}>#{item.id} · {item.name} · {item.event_count} events</option>)}</select></label>
@@ -97,6 +100,6 @@ export default function BaselineScreen() {
         {dataset && runs.data && !runs.data.items.some(item => item.mode === "baseline" && item.status === "completed") && <p>No completed Original rules run. Failed and unfinished runs cannot be replayed.</p>}
       </section>
       {dataset && run && <RunLoader key={`${dataset}:${run}`} dataset={Number(dataset)} run={Number(run)}/>}
-      <p className="baseline-note">Evaluation labels are not used by this replay. At runtime, benign comes from the rule definition. Curated labels may be used only for evaluation and offline tuning evidence. Tuning, Audit log, and Emails remain separately labelled sample screens.</p>
+      <p className="baseline-note">Evaluation labels are not used by this replay. At runtime, benign comes from the rule definition. Curated labels may be used only for evaluation and offline tuning evidence. Sample screens remain separately labelled; Emails is sample-only.</p>
     </main></>;
 }
