@@ -1,12 +1,34 @@
 # AIDS
 Agentic Intrusion Detection System
 
-The processing application and SIEM share a local SQLite database. All client-facing
-features belong in `siem/`; `app/` contains processing and shared infrastructure.
+`app/` is the backend: processing, database access, and the future HTTP API.
+`siem/` is the frontend: the client-facing SIEM interface. It will request data
+through the backend API; SQLite access stays in backend Python code.
 This setup supplies database infrastructure, not a UI, HTTP server, scoring engine,
 or tuner yet. The evaluation module provides trusted label access, not scoring or
 recall calculations. It requires Python 3.10+ and SQLite 3.31+ with JSON functions. No
 third-party Python packages or database service are required.
+
+## Project structure
+
+```text
+app/                  Backend processing and database infrastructure
+siem/                 SIEM frontend (placeholder; framework undecided)
+config/               attack_rules.json and service_rules.json
+migrations/           Runtime schema and separate label-store migrations
+scripts/              Database administration commands
+tests/                Backend/database tests
+tuner/                Future offline tuning component
+demo_freeze/          Canonical frozen demo source and manifest
+data/                 Local databases and other input data
+output/               Generated reports and run artifacts
+```
+
+Use `config/attack_rules.json` and `config/service_rules.json` as the mapping
+sources. Their values and matching behavior have not been changed by the move;
+a runtime mapping loader is not implemented yet. Use
+`demo_freeze/eve_demo_FINAL.json` as the single canonical extracted demo dataset.
+The existing `demo_freeze.zip` archive is retained.
 
 ## Initialize the database
 
@@ -58,8 +80,8 @@ You can also select a database for an individual administrative command:
 python -m scripts.manage_db --database data/scratch.sqlite3 migrate
 ```
 
-Both processes must use the **same absolute file on the same machine**. Different
-ports do not affect SQLite access. Keep the live database on a local disk, outside
+Backend workers must use the **same absolute file on the same machine**. The
+frontend's port does not affect SQLite access. Keep the live database on a local disk, outside
 OneDrive synchronization or network shares; set an absolute `DATABASE_PATH` there
 if needed. Keep the repository's frozen input files wherever they already live.
 SQLite WAL allows simultaneous readers and a writer; writes are serialized with a
@@ -72,10 +94,10 @@ also accept `--labels-database` before the subcommand. Never select the main fil
 the label file. For runtime-tool isolation, put the labels outside the tool's allowed
 workspace and restrict access to the original labeled EVE files as well.
 
-## Use from processing or SIEM Python code
+## Use from backend Python code
 
-Import shared infrastructure from either component, running Python from the
-repository root (for example, `python -m siem.some_module` once implemented):
+Import database infrastructure from backend processing, API handlers, or trusted
+tuning/evaluation tools. Run Python modules from the repository root:
 
 ```python
 from app.db import connect
@@ -93,10 +115,11 @@ The context manager commits on success, rolls back on exception, and closes the
 connection. Always bind query parameters. Do not hold a write transaction while
 calling Codex, sending messages, or waiting for network operations.
 
-If SIEM uses a different language, configure its SQLite driver with the same file,
-`foreign_keys=ON`, and a 10-second busy timeout. All database access belongs in
-server-side code. Separate hosts should communicate through an API or use a
-client/server database instead of sharing the SQLite file.
+The SIEM frontend must not open SQLite files, import Python database modules, or
+receive database paths or label-store credentials. Its integration point will be
+the API in `app/`; endpoints and ports have not been implemented yet. Separate
+backend hosts should communicate through an API or use a client/server database
+instead of sharing the SQLite file.
 
 ## Data layout
 

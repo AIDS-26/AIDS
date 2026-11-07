@@ -1,1 +1,1 @@
-"""Processing application and shared infrastructure."""
+"""Backend processing and database infrastructure for the SIEM frontend."""
