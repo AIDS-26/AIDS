@@ -1,18 +1,22 @@
-# AIDS
-Agentic Intrusion Detection System
+# IDEA-X
+Intrusion Detection Escalation through Agentic reasoning with Codex, eXtended
 
 `app/` is the backend: processing, database access, and the SIEM read API.
 `siem/` is the frontend: the client-facing SIEM interface. It will request data
 through the backend API; SQLite access stays in backend Python code.
 This setup supplies ingestion, database infrastructure, and a local HTTP read API.
-The UI, scoring engine, and tuner remain unimplemented. The evaluation module provides trusted label access, not scoring or
-recall calculations. It requires Python 3.10+ and SQLite 3.31+ with JSON functions. No
+Original-rule scoring is integrated with SQLite and the API. `app/calculation_base/`
+also contains prototype grouping, flow, evaluation, guardrail and tuner helpers;
+the complete tuned replay/acceptance loop remains unfinished. `app/evaluate.py`
+provides trusted label access, not attack-group recall calculations.
+It requires Python 3.10+ and SQLite 3.31+ with JSON functions. No
 third-party Python packages or database service are required.
 
 ## Project structure
 
 ```text
-app/                  Backend processing and database infrastructure
+app/                  Backend processing, baseline worker and database/API
+app/calculation_base/ Original scoring and prototype offline tuning helpers
 siem/                 SIEM frontend (placeholder; framework undecided)
 config/               attack_rules.json and service_rules.json
 migrations/           Runtime schema and separate label-store migrations
@@ -25,8 +29,9 @@ output/               Generated reports and run artifacts
 ```
 
 Use `config/attack_rules.json` and `config/service_rules.json` as the mapping
-sources. Their values and matching behavior have not been changed by the move;
-a runtime mapping loader is not implemented yet. Use
+sources. Baseline loading validates weights and asset CIDRs; attack patterns match
+in file order, case-insensitively, with category/signature OR semantics. Services
+use destination IP, longest CIDR prefix, then the configured default. Use
 `demo_freeze/eve_demo_FINAL.json` as the single canonical extracted demo dataset.
 The existing `demo_freeze.zip` archive is retained.
 
@@ -130,22 +135,29 @@ instead of sharing the SQLite file.
 
 ## EVE to SIEM 1
 
-The current flow is `EVE JSON Lines -> import-eve -> datasets/events -> HTTP API -> SIEM`.
+The scored flow is `EVE JSON Lines -> import-eve -> datasets/events -> score-baseline -> runs/alerts/alert_events -> HTTP API -> SIEM`.
 The separate label store is used only for trusted evaluation. Ingestion preserves
 one event per alert source line, including identical records on different lines.
-It does not create calculated `alerts` or `runs` rows. This is a finite-file import;
+Import itself does not create calculated `alerts` or `runs` rows; the baseline worker does.
+This is a finite-file import;
 stop/rotate an actively written EVE file before importing it. Live tailing is not implemented.
 
 Set `DATABASE_PATH` and `LABEL_DATABASE_PATH` to local paths outside OneDrive before
 running the commands below. For example, use an existing local directory under
-`C:/Users/Melvin/AppData/Local/AIDS/`. The server reads the configured database;
+`C:/Users/Melvin/AppData/Local/IDEA-X/`. The server reads the configured database;
 it never runs migrations or imports during a request.
 
 ```powershell
 python -m scripts.manage_db migrate
 python -m scripts.manage_db import-eve demo_freeze/eve_demo_FINAL.json --split tune
+python -m scripts.manage_db score-baseline 1 --observation-seconds 9600
 python -m app.api --port 8000 --allowed-origin http://localhost:5173
 ```
+
+Replace `1` with the dataset ID returned by import. The example explicitly uses
+the manifest's 160-minute demo duration (9600 seconds); choose the actual observation
+duration for other sources. It must be finite, positive and cover the event span.
+The command returns a fresh `run_id` for the frontend to select. It never sends email.
 
 `--allowed-origin` is optional; use the exact scheme, host, and port of the frontend
 if it is served from another origin. This development API binds to loopback by
@@ -154,7 +166,10 @@ default and has no authentication or TLS; keep it local. The frontend can use:
 ```javascript
 const datasets = await fetch('http://127.0.0.1:8000/api/datasets').then(r => r.json());
 const id = datasets.items[0].id; // Present a dataset picker if there are several.
-const alerts = await fetch(`http://127.0.0.1:8000/api/datasets/${id}/alerts?limit=100`)
+const runs = await fetch(`http://127.0.0.1:8000/api/datasets/${id}/runs`).then(r => r.json());
+const run = runs.items.find(r => r.mode === 'baseline' && r.status === 'completed');
+// Show a run picker and an empty state when no completed run exists.
+const alerts = await fetch(`http://127.0.0.1:8000/api/runs/${run.id}/alerts?limit=100`)
   .then(r => r.json());
 ```
 
@@ -173,42 +188,50 @@ Missing resources return JSON 404; invalid queries and unfinished result runs
 return JSON 400; database failures return JSON 503 without file paths.
 
 Source alerts have `kind: "source_alerts"`, `score: null`, `severity: null`, and
-`calculation_status: "pending"`. Display “Not calculated” for those scores.
+`calculation_status: "pending"`. This source route always represents raw input;
+use the completed-run route for calculated scores even after a replay exists.
 `suricata_severity` is Suricata's original 1–3 value, **not** the application's
 Low/Medium/High score. `flow_id` is a string to preserve large integers in JavaScript.
 No raw JSON, demo labels, label paths or original source paths are exposed.
 
-### Calculation handoff
+### Calculation integration
 
-Your calculation worker can use `app.db.connect()` against the same configured
-runtime database. Read sanitized events ordered by `(timestamp_us, source_line)`.
-Use the canonical JSON mappings in `config/`; matching policies and a validated
-runtime rule loader still need implementation. Create an immutable rule snapshot
-in `rule_versions` and a fresh baseline `runs` row referencing it, with an explicit
-positive observation duration. Record stable attack-type/service identities in
-`rules`, calculated groups in `alerts`, and every evidence event in `alert_events`
-with its actual rolling `n_in_window` and `raised_score`. The existing constraints
-and triggers maintain counts and enforce score bounds and dataset membership.
-Mark a run completed only after all results are committed; record errors and mark
-failed runs accordingly. The API exposes calculated alerts only for completed runs.
-The API does not validate a worker's full scoring/grouping policy or certify recall.
+`app/baseline.py` calls `score_events()` from `siem_1_calculation_base.py` using
+sanitized events ordered by `(timestamp_us, source_line)`. It preserves DB event IDs,
+creates an immutable snapshot and fresh run, and stores one alert/evidence link per
+event with `n_in_window=1`, `raised_score=S`. Failed writes roll back all results and
+record a failed run; completed results become visible through the API. Snapshot
+content determines version identity; a replay always creates a new run.
+
+The scorer uses rule metadata (`benign_rule`, or the existing `severity_override: S`)
+for benign behavior; it neither reads nor emits evaluation labels/evidence weights.
+The API adds first-event timestamp, network endpoints and signature to calculated
+alerts. Full membership remains available through each alert's evidence route.
+No schema migration was necessary. No tuned-run persistence/activation was added.
+
+Offline helper interfaces changed intentionally: `analyze(events, budget,
+observation_seconds=..., window_minutes=..., evidence_by_rule=...)` requires explicit
+duration/window and separate offline evidence; `evaluate(events, rules, labels=...)`
+takes evaluation labels separately by event ID. `validate_rules(...,
+max_window_high=...)` requires an explicit high-severity window limit. It checks
+configuration only; event coverage is not attack-group recall and cannot certify acceptance.
+See [the calculation review](docs/calculation-review.md) for remaining policy gaps.
 
 ### PDF and rule review
 
 The PDF describes offline parameter search over rules (`W`, `N_sat`) with deterministic
 replay and guardrails. Its embedded tuning prompt is a future task specification;
 its synthetic performance figures are not results for this dataset. `AGENTS.md`
-already captures this concept. No tuning or runtime score calculation is performed
-by the ingestion/API flow.
+already captures this concept. The worker now scores originals; ingestion and API
+handlers themselves still perform no scoring or tuning.
 
-Before calculation is connected, resolve these mapping decisions: ordered attack
+The integrated calculation follows the supplied implementation: ordered attack
 patterns overlap (for example “Reverse Shell Connection” also matches “Reverse Shell”),
 asset subnet and host entries overlap, and service IPs are traffic-derived hypotheses.
 `service_rules.json` now has an explicit `default` entry for unmatched endpoints.
 Its weight is currently `0`, as set in the shared workspace: an unmapped asset
-contributes no additional service weight. The calculation loader must explicitly
-validate support for zero service weight; attack weights and final score bounds
-remain separate requirements.
+contributes no additional service weight. The loader accepts C=0 and validates
+attack weights in 1–10, service weights in 0–10 and final score bounds separately.
 Attack matching, including any semantic classification, is assigned to the
 calculation developer; define a reproducible contract before replacing the current
 category/signature patterns. Offline preparation of a saved mapping can preserve

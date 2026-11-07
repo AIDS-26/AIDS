@@ -76,10 +76,15 @@ def calculated_alerts(run_id: int, path: str | Path | None = None, *,
         if run["status"] != "completed":
             raise ValueError("Run is not completed")
         return {"run_id": run_id, "mode": run["mode"], "kind": "calculated_alerts",
-                **_page(db.execute("""SELECT id, run_id, rule_id, group_key, attack_type,
-                    service, first_timestamp_us, last_timestamp_us, base_score, score,
-                    severity, event_count FROM alerts WHERE run_id = ? AND id > ?
-                    ORDER BY id LIMIT ?""", (run_id, after_id, limit + 1)).fetchall(), limit)}
+                **_page(db.execute("""SELECT a.id, a.run_id, a.rule_id, a.group_key, a.attack_type,
+                    a.service, a.first_timestamp_us, a.last_timestamp_us, a.base_score, a.score,
+                    a.severity, a.event_count, e.id AS first_event_id, e.source_line,
+                    e.timestamp, e.src_ip, e.dest_ip, e.dest_port, e.signature_id, e.signature
+                    FROM alerts a LEFT JOIN events e ON e.id = (
+                        SELECT ae.event_id FROM alert_events ae JOIN events member ON member.id=ae.event_id
+                        WHERE ae.alert_id=a.id ORDER BY member.timestamp_us, member.source_line LIMIT 1)
+                    WHERE a.run_id = ? AND a.id > ?
+                    ORDER BY a.id LIMIT ?""", (run_id, after_id, limit + 1)).fetchall(), limit)}
 
 
 def evidence(run_id: int, alert_id: int, path: str | Path | None = None, *,
