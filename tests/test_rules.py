@@ -1,9 +1,7 @@
 import copy
-import sqlite3
 import unittest
 from pathlib import Path
 
-from tuner.history import initialize, list_versions, record
 from tuner.rules import RuleError, build_base, dump, validate
 
 
@@ -63,18 +61,6 @@ class RuleSnapshotTests(unittest.TestCase):
                                  "window_min": 5, "n_sat": 3}]
         with self.assertRaises(RuleError):
             validate(changed, ATTACK, SERVICE, self.base)
-
-    def test_history_keeps_failed_and_passed_snapshots(self):
-        connection = sqlite3.connect(":memory:")
-        connection.execute("PRAGMA foreign_keys = ON")
-        initialize(connection)
-        parent = record(connection, dump(self.base), kind="base", status="passed")
-        child = record(connection, dump(self.base), kind="tuned", status="failed",
-                       parent_id=parent, evaluation_json='{"recall": 0.5}')
-        rows = list_versions(connection)
-        self.assertEqual([(r[0], r[1], r[4]) for r in rows],
-                         [(parent, None, "passed"), (child, parent, "failed")])
-
 
 if __name__ == "__main__":
     unittest.main()

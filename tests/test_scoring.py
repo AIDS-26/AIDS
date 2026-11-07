@@ -1,6 +1,6 @@
 import unittest
 
-from siem.scoring import calculate_score
+from app.scoring import calculate_score
 
 
 class CalculateScoreTests(unittest.TestCase):

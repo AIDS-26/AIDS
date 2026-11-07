@@ -23,10 +23,13 @@ and `N_sat`. A tuned snapshot retains the full baseline definitions; each
 changed override has an audit entry with `old`, `new`, `gap`, and `rationale`.
 See `tuner.rules.validate(candidate, attack_json, service_json, base)`.
 
-The SQLite history API in `tuner.history` records immutable YAML snapshots,
-parent version, checksum, status, and evaluation report. A failed attempt is
-retained. There is no activation API yet: the deterministic evaluator and
-guardrail must be integrated before a tuned snapshot can be loaded as active.
+The application's `rule_versions`, `tuning_attempts`, `tuning_iterations`, and
+`evaluations` tables in `migrations/` own version history and iteration reports.
+Store the parsed, validated YAML mapping serialized as JSON in the existing
+`rule_versions.rules_json` column, with its parent and structured changes. Keep
+the human-readable YAML file as the rule artifact. There is no activation API yet: the
+deterministic evaluator and guardrail must be integrated before a tuned snapshot
+can be loaded as active.
 The current frontend displays pipeline outputs; it must not recalculate scores.
 
 The tuning loop is offline and has at most three proposals per run. It does
