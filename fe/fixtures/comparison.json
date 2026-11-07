@@ -1,0 +1,10 @@
+{
+  "sample": true,
+  "datasets": [
+    { "id": "sample-dataset-001", "name": "Synthetic comparison · 12 events", "sha256": "sample-not-a-measured-dataset-hash", "observation_seconds": 9660 }
+  ],
+  "pairs": [
+    { "id": "sample-pair-001", "dataset_id": "sample-dataset-001", "original_run_id": "sample-original-001", "tuned_run_id": "sample-001", "status": "completed", "guardrail": "passed", "observation_seconds": 9660, "recall": { "caught": 4, "total": 4 }, "recall_display": "100%", "note": "Illustrative saved results; no evaluator has run." },
+    { "id": "sample-pair-failed", "dataset_id": "sample-dataset-001", "original_run_id": "sample-original-001", "tuned_run_id": "sample-tuned-failed", "status": "failed", "guardrail": "failed", "observation_seconds": 9660, "recall": null, "recall_display": null, "note": "Illustrative failed proposal. Not available for replay; Original rules remain active." }
+  ]
+}

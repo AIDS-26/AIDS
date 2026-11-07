@@ -105,9 +105,30 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - `npm test` includes email identity/count consistency and notification-time snapshot checks.
 - Verification: production build, lint, TypeScript, all ten tests, and browser checks passed for every email preview, keyboard selection, notification-time values, all four navigation tabs, and 1440/1280/400px layouts. No runtime exceptions or backend mutation requests were observed.
 
+## Implemented backend baseline Replay (7 Nov 2026)
+
+- `/replay/baseline` is separate from the `/replay` sample demo. All four sample navigation tabs are enabled; earlier inactive-tab notes are historical.
+- Server-only `IDEAX_BACKEND_URL` defaults to `http://127.0.0.1:8000`; see `.env.example` and README. The backend must prepare its database separately.
+- `GET /api/baseline` uses `lib/data.ts` and `lib/backend-client.ts` for allowlisted read-only API requests, response validation, and complete pagination. No frontend SQLite, Python, frozen-input, or backend `.env` access.
+- Only completed baseline runs play. Scores and severities remain API values. The clock filters event-time records; unavailable tuned/evaluator/email metrics stay explicitly unavailable. No sample fallback. Failed reloads retain the previously loaded run.
+- Run tuning remains disabled. Tuning, Audit log, and Emails are still clearly marked sample screens.
+- `npm test` includes backend adapter validation and pagination checks (15 tests total). Browser verification used a temporary backend database; the configured backend database was unavailable and was not created or modified.
+
 ## Implemented Ask IDEA-X frontend (7 Nov 2026)
 
 - Floating chat follows the supplied Chat screenshots, with suggestions, keyboard/pointer Pick on Replay alerts/groups, frozen snapshot context, in-memory history, source references, cancellation, retry and edit recovery.
 - Available on sample Replay, a loaded backend baseline run, Tuning, Audit log and Emails. Selected run/attempt/email changes reset the conversation.
 - Frontend only by explicit team split: no OpenAI key, provider call or chat server route is implemented. `lib/chat.ts` calls the proposed same-origin `POST /api/chat`; `CHATBOT.md` defines the teammate handoff contract. Until connected, the UI reports that chat is not connected and never fabricates answers.
 - Production build, lint, TypeScript and all 20 tests passed. Browser checks covered keyboard picking, questions/error recovery, selected-attempt context, Emails integration and 400/1280px layouts. Live OpenAI answers remain unverified until the teammate connects the endpoint.
+
+## Baseline Replay polish (7 Nov 2026)
+
+- Signature-first rows, expandable rule IDs and provenance, selected-row styling, and keyboard-scrollable tables.
+- Opening evidence pauses playback; evidence has its own retry. Loading, empty, and connection failure states include recovery guidance. Run tuning remains disabled with a visible explanation.
+- Verified lint, build/TypeScript, 20 tests, and Chrome keyboard/retry/outage/responsive checks. Existing chat integration preserved.
+
+## Comparison preview (7 Nov 2026)
+
+- `/replay/comparison` uses shared Replay rendering with sample dataset/pair selectors and explicit SAMPLE labels. Failed pairs cannot play; actual backend results are never mixed with fixtures.
+- `lib/comparison.ts` defines the provisional presentation boundary. Real tuned comparison integration still needs paired saved outputs and evaluator metrics from Melvin.
+- Public API baseline verified: dataset/run 1, 5,483 alerts, duration 9,600 seconds, evidence available. Connection URL belongs in ignored `.env.local`. No keys in Git.
