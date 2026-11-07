@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, type ReactNode } from "react";
 import { initialPlayback, playbackReducer, selectFrame, type Speed } from "@/lib/replay";
 import type { ReplayData } from "@/lib/data";
 import AppHeader from "@/app/components/app-header";
+import ReplayModes from "./replay-modes";
 import ChatAssistant from "@/app/components/chat-assistant";
 
 function clock(seconds: number) {
@@ -65,7 +66,12 @@ function Timeline({ data, t, frame }: { data: ReplayData; t: number; frame: Repl
   </section>;
 }
 
-export default function Replay({ data }: { data: ReplayData }) {
+export default function Replay({ data, comparisonSelection }: { data?: ReplayData; comparisonSelection?: ReactNode }) {
+  if (!data) return <><AppHeader active="replay" source="Comparison preview · synthetic fixtures"/><main id="replay"><ReplayModes active="comparison"/>{comparisonSelection}</main></>;
+  return <LoadedReplay data={data} comparisonSelection={comparisonSelection}/>;
+}
+
+function LoadedReplay({ data, comparisonSelection }: { data: ReplayData; comparisonSelection?: ReactNode }) {
   const [playback, dispatch] = useReducer(
     (state: typeof initialPlayback, action: Parameters<typeof playbackReducer>[1]) => playbackReducer(state, action, data.duration_s),
     initialPlayback,
@@ -84,6 +90,8 @@ export default function Replay({ data }: { data: ReplayData }) {
     <a href="#replay" className="skip-link">Skip to replay</a>
     <AppHeader active="replay" source={`Synthetic fixtures · ${data.total_alerts} alerts`}/>
     <main id="replay">
+      <ReplayModes active={comparisonSelection ? "comparison" : "sample"}/>
+      {comparisonSelection}
       <h1 className="sr-only">Replay — original and tuned rules</h1>
       <div className="controls">
         <div className="playback" role="group" aria-label="Replay playback">

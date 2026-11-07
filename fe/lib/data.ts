@@ -6,6 +6,8 @@ import frames from "@/fixtures/replay_frames.json";
 import tuning from "@/fixtures/tuning.json";
 import audit from "@/fixtures/audit.json";
 import emails from "@/fixtures/emails.json";
+import comparison from "@/fixtures/comparison.json";
+import type { ComparisonPreview } from "./comparison";
 
 // Only this source module knows about fixtures. Replace this loader when the API is agreed.
 // The sample response is provisional; no backend endpoint is assumed.
@@ -22,6 +24,10 @@ export function getReplayData() {
 }
 
 export type ReplayData = ReturnType<typeof getReplayData>;
+
+export function getComparisonPreview(): ComparisonPreview {
+  return { ...comparison, sample: true, replays: { "sample-pair-001": getReplayData() } };
+}
 
 export function getTuningData() {
   return tuning;
@@ -40,3 +46,9 @@ export function getEmailsData() {
 }
 
 export type EmailsData = ReturnType<typeof getEmailsData>;
+
+// Called by the server route only; never reads the backend .env or database.
+export async function getBaselineData(query: import("./backend-client").BaselineQuery) {
+  const { readBaseline } = await import("./backend-client");
+  return readBaseline(query, process.env.IDEAX_BACKEND_URL ?? "http://127.0.0.1:8000");
+}
