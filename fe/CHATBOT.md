@@ -1,6 +1,14 @@
-# Ask IDEA-X — frontend handoff
+# Ask IDEA-X — connected API
 
-Frontend only, per the team's split of work. OpenAI authentication, context retrieval and response generation belong to the backend owner. No OpenAI dependency, key, server route or fake assistant answer is added here.
+The existing panel now calls same-origin `POST /api/chat`. `lib/chat-backend.ts` proxies to Python `POST /api/chat` using server-only `IDEAX_BACKEND_URL` (default `http://127.0.0.1:8000`). Restart the Python API after updating it. No new dependency or migration is needed.
+
+Python `app/chat.py` loads existing backend `CODEX_API_KEY` / `CODEX_MODEL` settings from the environment, then root `.env`; default model is `gpt-6.1-sol`. Never copy credentials into frontend configuration. It calls the Responses API with `store: false`, bounded output and a 40-second provider timeout. Two concurrent requests per backend process are allowed. The proxy bounds JSON request size, validates same-origin requests, forwards cancellation and hides backend error bodies. Python requires a loopback peer, dashboard marker and no browser Origin. This is a local demo integration, not an authenticated public chat service.
+
+The model receives canonical attack/service mappings and saved run mappings/settings. Saved mappings govern historical scores; current defaults are labeled separately. Retrieval validates dataset/run membership, exact baseline pairing, selected alert/group membership and replay time. It supplies saved snapshot counts/scores, at most 20 recent visible alerts and at most 20 visible selected-group members. Future events and final totals are excluded. References come from retrieval. Chat never reads raw event JSON, labels or frozen sources and has no action tools or writes.
+
+Live Replay now sends `baseline_run_id` alongside its displayed run. Item IDs use `alert-ID` / `group-ID`. Sample Email records are unavailable to retrieval; chat explicitly discloses this and supports general mapping explanations only. The original UI contract below remains applicable; old sample source examples describe the frontend contract, not implemented sample retrieval.
+
+Verification on 7 Nov 2026: frontend tests, lint and production build passed; focused Python chat tests passed. One live API check correctly answered credential brute force weight 7 and the unmapped-asset service contribution 0. Provider integration follows the [official text generation guide](https://developers.openai.com/api/docs/guides/text).
 
 ## UI
 
@@ -8,9 +16,9 @@ The floating panel follows the supplied Chat screenshots: open, minimize/close (
 
 Picking freezes the run/time/item context shown in the chip and starts a fresh conversation. Without a selection, the first Send freezes the current context for follow-up questions. Clearing selection restores current screen context. New conversation clears history (and uses the current clock when no item is selected). Changing run/attempt/email or navigating resets the panel. Conversation lives in memory only. A failed question can be retried with the exact original context or edited. Stop cancels the browser request. Timeout is 60 seconds. Closing/minimizing does not cancel an in-flight request.
 
-## Backend contract to implement
+## Request and response contract
 
-Implement same-origin `POST /api/chat`, or change `CHAT_ENDPOINT` in `lib/chat.ts` to an agreed backend route. Example request:
+Same-origin `POST /api/chat` uses this request shape (sample records themselves are unavailable to backend retrieval):
 
 ```json
 {
@@ -54,6 +62,6 @@ User questions are limited to 2,000 characters; the last five complete exchanges
 
 Run `npm test`, `npm run lint`, `npx tsc --noEmit`, and `npm run build` in fe.
 `tests/chat.test.mjs` covers request context, bounded history, response validation, endpoint failures and cancellation signal propagation.
-Live model answers require the teammate's endpoint. Frontend interaction tests can intercept `/api/chat` with clearly test-only responses; no such mock is shipped in the app.
+`tests/chat-backend.test.mjs` verifies the proxy and error boundaries; `tests/test_chat.py` verifies backend validation, causal selected alert/group evidence, saved mappings, safe provider errors and the HTTP endpoint. Frontend interaction tests can intercept `/api/chat` with clearly test-only responses; no such mock is shipped in the app.
 
 Verified on 7 Nov 2026: production build, lint, TypeScript and all 20 tests passed. Browser checks covered empty state, suggested questions, Enter submission, the unconnected notice, editing a failed question, closing/reopening, keyboard group picking, selected-attempt changes and Emails context. Layout checked at 400px and 1280px; a mobile scrollbar overflow was fixed. No live OpenAI response was requested or verified.

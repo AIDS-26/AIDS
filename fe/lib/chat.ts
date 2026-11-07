@@ -3,6 +3,7 @@ export type ChatContext = {
   sample: boolean;
   run_id: string | number;
   dataset_id?: number;
+  baseline_run_id?: number;
   replay_time_s?: number;
   attempt?: number;
   item_id?: string;

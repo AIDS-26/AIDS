@@ -124,7 +124,7 @@ function ChatPanel({ context, targets }: { context: ChatContext; targets: Target
           {busy ? <button type="button" aria-label="Stop response" onClick={cancel}>■</button> : <button type="submit" aria-label="Send question" disabled={!draft.trim() || !!failed}>➜</button>}
         </form>
         {failed && <button className={styles.newChat} onClick={() => { setDraft(failed.messages.at(-1)!.content); setEntries(previous => previous.slice(0, -1)); setFailed(null); setError(""); input.current?.focus(); }}>Edit question</button>}
-        <small>Questions and selected result context will be sent to the OpenAI API when connected. It explains only; it can’t change rules or take actions.</small>
+        <small>Questions and selected result context are sent to the OpenAI API. The assistant explains results; it can’t change rules or take actions.</small>
       </footer>
     </section>}
     <button ref={launcher} className={styles.launcher} aria-label={open ? "Minimize Ask IDEA-X" : "Open Ask IDEA-X"} aria-expanded={open} onClick={() => { setPicking(false); setOpen(!open); }}><Image src="/ideax-mark.svg" width={32} height={32} alt=""/>{!open && <span>Ask IDEA-X</span>}</button>
