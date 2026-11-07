@@ -1,0 +1,79 @@
+{
+  "built_at": "2026-11-05T17:06:09",
+  "raw_alerts": 30075,
+  "raw_attack_signature_alerts": 27132,
+  "demo_alerts": 5483,
+  "demo_attack": 4904,
+  "demo_benign": 579,
+  "demo_length_min": 160.0,
+  "parameters": {
+    "OFFSET_H": 10,
+    "TARGET_MIN": 180,
+    "PAD": 2,
+    "GAP": 4,
+    "MIN_ATTACK": 5,
+    "MERGE_GAP": 6,
+    "MAX_PER_SIG_MIN": 120,
+    "SEED": 11,
+    "ATTACK_RE": "^ET (MALWARE|SCAN|WEB_SERVER|WEB_SPECIFIC_APPS|EXPLOIT|ATTACK_RESPONSE|SHELLCODE|TROJAN|CNC|SQL|DOS)\\b"
+  },
+  "windows": [
+    {
+      "name": "attack_1",
+      "start": "Tue 09:17",
+      "end": "10:23",
+      "main_signature": "ET SCAN Potential FTP Brute-Force attempt response",
+      "demo_alerts": 2651
+    },
+    {
+      "name": "attack_2",
+      "start": "Thu 10:14",
+      "end": "10:38",
+      "main_signature": "ET WEB_SERVER Script tag in URI Possible Cross Site Scripting Attempt",
+      "demo_alerts": 992
+    },
+    {
+      "name": "attack_3",
+      "start": "Thu 13:58",
+      "end": "14:03",
+      "main_signature": "ET SCAN Suspicious inbound to mySQL port 3306",
+      "demo_alerts": 13
+    },
+    {
+      "name": "attack_4",
+      "start": "Thu 14:26",
+      "end": "14:43",
+      "main_signature": "ET MALWARE Windows Microsoft Windows DOS prompt command Error not recognized",
+      "demo_alerts": 1545
+    },
+    {
+      "name": "attack_5",
+      "start": "Thu 15:11",
+      "end": "15:16",
+      "main_signature": "ET SCAN Possible Nmap User-Agent Observed",
+      "demo_alerts": 38
+    },
+    {
+      "name": "attack_6",
+      "start": "Thu 15:21",
+      "end": "15:26",
+      "main_signature": "ET SCAN Possible Nmap User-Agent Observed",
+      "demo_alerts": 48
+    },
+    {
+      "name": "attack_7",
+      "start": "Thu 15:30",
+      "end": "15:35",
+      "main_signature": "ET SCAN Possible Nmap User-Agent Observed",
+      "demo_alerts": 66
+    },
+    {
+      "name": "attack_8",
+      "start": "Thu 15:39",
+      "end": "15:44",
+      "main_signature": "ET SCAN Possible Nmap User-Agent Observed",
+      "demo_alerts": 36
+    }
+  ],
+  "sha256": "53d4fa05ba7dfe08f3f87e42d47188e5ccd7becff28bb2aea28d2f63f9750c87"
+}
