@@ -1,0 +1,2237 @@
+{
+  "dataset_sha256": "8ed31f8aa0cb716d4773d4c87621ca543353160ee2719994c8067dd66ca1883b",
+  "observation_seconds": 9600,
+  "proposer": "deterministic-search (no model)",
+  "outcome": {
+    "attempt_id": 1,
+    "baseline_run_id": 1,
+    "status": "failed",
+    "selected_version_id": null,
+    "attempts": 3,
+    "fallback_run_id": 1,
+    "artifact_directory": null,
+    "error": "No candidate passed within three proposal/evaluation iterations"
+  },
+  "health": {
+    "integrity": "ok",
+    "foreign_key_errors": 0
+  },
+  "run_counts": [
+    {
+      "id": 1,
+      "mode": "baseline",
+      "status": "completed",
+      "alerts": 5483,
+      "memberships": 5483
+    },
+    {
+      "id": 2,
+      "mode": "tuned",
+      "status": "failed",
+      "alerts": 1656,
+      "memberships": 5483
+    },
+    {
+      "id": 3,
+      "mode": "tuned",
+      "status": "failed",
+      "alerts": 1656,
+      "memberships": 5483
+    },
+    {
+      "id": 4,
+      "mode": "tuned",
+      "status": "failed",
+      "alerts": 1656,
+      "memberships": 5483
+    }
+  ],
+  "iterations": [
+    {
+      "id": 1,
+      "iteration": 1,
+      "rule_version_id": "tuned/92f2038467574f97bc3f955deeebb0aa",
+      "evaluation_id": 1,
+      "model_name": "deterministic-search (no model)",
+      "status": "evaluated",
+      "error_message": null,
+      "tuned_run_id": 2,
+      "proposal": {
+        "rules": {
+          "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+            "n_sat": 6,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+            "n_sat": 5,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+            "n_sat": 4,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+            "n_sat": 7,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+            "n_sat": 44,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+            "n_sat": 4,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+            "n_sat": 55,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+            "n_sat": 3,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 5
+          },
+          "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+            "n_sat": 48,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+            "n_sat": 12,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+            "n_sat": 18,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+            "n_sat": 94,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          }
+        }
+      },
+      "guardrail": {
+        "budget_met": false,
+        "errors": [
+          "Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised"
+        ],
+        "passed": false,
+        "remaining_budget_gap": 601.0
+      },
+      "report": {
+        "changes": [
+          {
+            "delta_gap": 5.032582938388625,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f"
+          },
+          {
+            "delta_gap": 5.032582938388625,
+            "new_value": 6,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f"
+          },
+          {
+            "delta_gap": -0.4946682464454981,
+            "new_value": 1,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761"
+          },
+          {
+            "delta_gap": -0.4946682464454981,
+            "new_value": 5,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761"
+          },
+          {
+            "delta_gap": -2.587085308056873,
+            "new_value": 1,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1"
+          },
+          {
+            "delta_gap": -2.587085308056873,
+            "new_value": 2,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1"
+          },
+          {
+            "delta_gap": 2.4075829383886256,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9"
+          },
+          {
+            "delta_gap": 2.4075829383886256,
+            "new_value": 4,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9"
+          },
+          {
+            "delta_gap": 32.01303317535545,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797"
+          },
+          {
+            "delta_gap": 32.01303317535545,
+            "new_value": 7,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797"
+          },
+          {
+            "delta_gap": 887.2879146919431,
+            "new_value": 1,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1"
+          },
+          {
+            "delta_gap": 887.2879146919431,
+            "new_value": 44,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1"
+          },
+          {
+            "delta_gap": 19.401066350710902,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74"
+          },
+          {
+            "delta_gap": 19.401066350710902,
+            "new_value": 4,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74"
+          },
+          {
+            "delta_gap": 37.32227488151659,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058"
+          },
+          {
+            "delta_gap": 37.32227488151659,
+            "new_value": 55,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058"
+          },
+          {
+            "delta_gap": 2.4075829383886256,
+            "new_value": 3,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847"
+          },
+          {
+            "delta_gap": 0.9508293838862556,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840"
+          },
+          {
+            "delta_gap": 0.9508293838862556,
+            "new_value": 2,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840"
+          },
+          {
+            "delta_gap": 572.6629146919431,
+            "new_value": 1,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0"
+          },
+          {
+            "delta_gap": 572.6629146919431,
+            "new_value": 2,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0"
+          },
+          {
+            "delta_gap": -0.03969194312796226,
+            "new_value": 1,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869"
+          },
+          {
+            "delta_gap": -0.03969194312796226,
+            "new_value": 2,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869"
+          },
+          {
+            "delta_gap": 367.1629146919431,
+            "new_value": 1,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6"
+          },
+          {
+            "delta_gap": 367.1629146919431,
+            "new_value": 48,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6"
+          },
+          {
+            "delta_gap": 20.032582938388625,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665"
+          },
+          {
+            "delta_gap": 20.032582938388625,
+            "new_value": 12,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665"
+          },
+          {
+            "delta_gap": 23.407582938388625,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0"
+          },
+          {
+            "delta_gap": 23.407582938388625,
+            "new_value": 18,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0"
+          },
+          {
+            "delta_gap": 69.15758293838863,
+            "new_value": 10,
+            "old_value": 5,
+            "parameter": "window_minutes",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2"
+          },
+          {
+            "delta_gap": 69.15758293838863,
+            "new_value": 94,
+            "old_value": 60,
+            "parameter": "n_sat",
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "rule_id": "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2"
+          }
+        ],
+        "evaluation": {
+          "acceptance_status": "not_certified",
+          "alert_reduction": 0.6979755608243663,
+          "attack_group_definition": {
+            "boundary": "gap >= silence starts a new group",
+            "key": [
+              "source",
+              "target",
+              "attack_type"
+            ],
+            "method": "fixed-evaluation-sessions",
+            "silence_minutes": 10,
+            "warning": "Operator-approved demo assumption. Revisit if retention hides distinct incidents."
+          },
+          "attack_group_recall": 1.0,
+          "attack_groups_retained": 7,
+          "attack_groups_total": 7,
+          "baseline_alerts": 5483,
+          "baseline_high": 5291,
+          "benign_definition": "any benign-labeled member raised above its own baseline, including mixed groups",
+          "benign_groups_raised": 33,
+          "budget_per_hour": 20,
+          "burn_rate": 102.80625,
+          "grouped_alerts": 1656,
+          "grouped_burn_rate": 31.05,
+          "grouped_high": 1641,
+          "grouped_per_hour": 621.0,
+          "integrity_errors": [],
+          "label_provenance": "{\"operator\": \"Curated demo.label; manifest preparation uses Suricata ATTACK_RE, not independent ground truth\", \"stored_sources\": [\"source demo.label (curated)\"]}",
+          "observed_per_hour": 2056.125,
+          "per_rule_feedback": {
+            "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+              "attack_events": 0,
+              "benign_events": 15,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+              "attack_events": 5,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+              "attack_events": 1,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+              "attack_events": 0,
+              "benign_events": 8,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+              "attack_events": 0,
+              "benign_events": 86,
+              "benign_events_raised": 62,
+              "unconfirmed_events": 0
+            },
+            "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+              "attack_events": 2374,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+              "attack_events": 0,
+              "benign_events": 53,
+              "benign_events_raised": 31,
+              "unconfirmed_events": 0
+            },
+            "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+              "attack_events": 0,
+              "benign_events": 100,
+              "benign_events_raised": 92,
+              "unconfirmed_events": 0
+            },
+            "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+              "attack_events": 0,
+              "benign_events": 8,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+              "attack_events": 2,
+              "benign_events": 3,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+              "attack_events": 1535,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+              "attack_events": 0,
+              "benign_events": 1,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+              "attack_events": 987,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+              "attack_events": 0,
+              "benign_events": 55,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+              "attack_events": 0,
+              "benign_events": 64,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+              "attack_events": 0,
+              "benign_events": 186,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            }
+          },
+          "recall_scope": "curated-label evidence retention; not independent detection recall",
+          "reduction_pct": 69.79755608243663,
+          "remaining_budget_gap": 601.0,
+          "retention_definition": "all members visible at their baseline score or higher; splits/merges allowed",
+          "unconfirmed_events": 0
+        },
+        "guardrail": {
+          "budget_met": false,
+          "errors": [
+            "Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised"
+          ],
+          "passed": false,
+          "remaining_budget_gap": 601.0
+        },
+        "joint_rule_statistics": {
+          "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "p95_n": 6,
+            "peak_n": 6,
+            "remaining_gap": 0.9075829383886254
+          },
+          "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 5,
+            "peak_n": 5,
+            "remaining_gap": 0
+          },
+          "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 0
+          },
+          "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 4,
+            "peak_n": 4,
+            "remaining_gap": 0
+          },
+          "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+            "grouped_count": 24,
+            "grouped_per_hour": 9.0,
+            "p95_n": 7,
+            "peak_n": 8,
+            "remaining_gap": 8.763033175355451
+          },
+          "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 44,
+            "peak_n": 50,
+            "remaining_gap": 0
+          },
+          "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+            "grouped_count": 22,
+            "grouped_per_hour": 8.25,
+            "p95_n": 4,
+            "peak_n": 5,
+            "remaining_gap": 7.7760663507109005
+          },
+          "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+            "grouped_count": 8,
+            "grouped_per_hour": 3.0,
+            "p95_n": 55,
+            "peak_n": 60,
+            "remaining_gap": 2.822274881516588
+          },
+          "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "p95_n": 3,
+            "peak_n": 3,
+            "remaining_gap": 1.2825829383886256
+          },
+          "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "p95_n": 2,
+            "peak_n": 2,
+            "remaining_gap": 0.5758293838862556
+          },
+          "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 572.6629146919431
+          },
+          "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 0
+          },
+          "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "p95_n": 48,
+            "peak_n": 48,
+            "remaining_gap": 0
+          },
+          "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+            "grouped_count": 7,
+            "grouped_per_hour": 2.625,
+            "p95_n": 12,
+            "peak_n": 13,
+            "remaining_gap": 2.032582938388626
+          },
+          "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+            "grouped_count": 19,
+            "grouped_per_hour": 7.125,
+            "p95_n": 9,
+            "peak_n": 11,
+            "remaining_gap": 6.532582938388626
+          },
+          "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+            "grouped_count": 18,
+            "grouped_per_hour": 6.75,
+            "p95_n": 43,
+            "peak_n": 48,
+            "remaining_gap": 6.157582938388626
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "iteration": 2,
+      "rule_version_id": "tuned/fcddffa168424c2ba406f2ddb10c63da",
+      "evaluation_id": 2,
+      "model_name": "deterministic-search (no model)",
+      "status": "evaluated",
+      "error_message": null,
+      "tuned_run_id": 3,
+      "proposal": {
+        "rules": {
+          "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+            "n_sat": 6,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+            "n_sat": 5,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+            "n_sat": 4,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+            "n_sat": 7,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+            "n_sat": 44,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+            "n_sat": 4,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+            "n_sat": 55,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+            "n_sat": 3,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 5
+          },
+          "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+            "n_sat": 48,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+            "n_sat": 12,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+            "n_sat": 18,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+            "n_sat": 94,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          }
+        }
+      },
+      "guardrail": {
+        "budget_met": false,
+        "errors": [
+          "Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised"
+        ],
+        "passed": false,
+        "remaining_budget_gap": 601.0
+      },
+      "report": {
+        "changes": [],
+        "evaluation": {
+          "acceptance_status": "not_certified",
+          "alert_reduction": 0.6979755608243663,
+          "attack_group_definition": {
+            "boundary": "gap >= silence starts a new group",
+            "key": [
+              "source",
+              "target",
+              "attack_type"
+            ],
+            "method": "fixed-evaluation-sessions",
+            "silence_minutes": 10,
+            "warning": "Operator-approved demo assumption. Revisit if retention hides distinct incidents."
+          },
+          "attack_group_recall": 1.0,
+          "attack_groups_retained": 7,
+          "attack_groups_total": 7,
+          "baseline_alerts": 5483,
+          "baseline_high": 5291,
+          "benign_definition": "any benign-labeled member raised above its own baseline, including mixed groups",
+          "benign_groups_raised": 33,
+          "budget_per_hour": 20,
+          "burn_rate": 102.80625,
+          "grouped_alerts": 1656,
+          "grouped_burn_rate": 31.05,
+          "grouped_high": 1641,
+          "grouped_per_hour": 621.0,
+          "integrity_errors": [],
+          "label_provenance": "{\"operator\": \"Curated demo.label; manifest preparation uses Suricata ATTACK_RE, not independent ground truth\", \"stored_sources\": [\"source demo.label (curated)\"]}",
+          "observed_per_hour": 2056.125,
+          "per_rule_feedback": {
+            "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+              "attack_events": 0,
+              "benign_events": 15,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+              "attack_events": 5,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+              "attack_events": 1,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+              "attack_events": 0,
+              "benign_events": 8,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+              "attack_events": 0,
+              "benign_events": 86,
+              "benign_events_raised": 62,
+              "unconfirmed_events": 0
+            },
+            "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+              "attack_events": 2374,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+              "attack_events": 0,
+              "benign_events": 53,
+              "benign_events_raised": 31,
+              "unconfirmed_events": 0
+            },
+            "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+              "attack_events": 0,
+              "benign_events": 100,
+              "benign_events_raised": 92,
+              "unconfirmed_events": 0
+            },
+            "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+              "attack_events": 0,
+              "benign_events": 8,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+              "attack_events": 2,
+              "benign_events": 3,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+              "attack_events": 1535,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+              "attack_events": 0,
+              "benign_events": 1,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+              "attack_events": 987,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+              "attack_events": 0,
+              "benign_events": 55,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+              "attack_events": 0,
+              "benign_events": 64,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+              "attack_events": 0,
+              "benign_events": 186,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            }
+          },
+          "recall_scope": "curated-label evidence retention; not independent detection recall",
+          "reduction_pct": 69.79755608243663,
+          "remaining_budget_gap": 601.0,
+          "retention_definition": "all members visible at their baseline score or higher; splits/merges allowed",
+          "unconfirmed_events": 0
+        },
+        "guardrail": {
+          "budget_met": false,
+          "errors": [
+            "Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised"
+          ],
+          "passed": false,
+          "remaining_budget_gap": 601.0
+        },
+        "joint_rule_statistics": {
+          "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "p95_n": 6,
+            "peak_n": 6,
+            "remaining_gap": 0.9075829383886254
+          },
+          "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 5,
+            "peak_n": 5,
+            "remaining_gap": 0
+          },
+          "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 0
+          },
+          "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 4,
+            "peak_n": 4,
+            "remaining_gap": 0
+          },
+          "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+            "grouped_count": 24,
+            "grouped_per_hour": 9.0,
+            "p95_n": 7,
+            "peak_n": 8,
+            "remaining_gap": 8.763033175355451
+          },
+          "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 44,
+            "peak_n": 50,
+            "remaining_gap": 0
+          },
+          "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+            "grouped_count": 22,
+            "grouped_per_hour": 8.25,
+            "p95_n": 4,
+            "peak_n": 5,
+            "remaining_gap": 7.7760663507109005
+          },
+          "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+            "grouped_count": 8,
+            "grouped_per_hour": 3.0,
+            "p95_n": 55,
+            "peak_n": 60,
+            "remaining_gap": 2.822274881516588
+          },
+          "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "p95_n": 3,
+            "peak_n": 3,
+            "remaining_gap": 1.2825829383886256
+          },
+          "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "p95_n": 2,
+            "peak_n": 2,
+            "remaining_gap": 0.5758293838862556
+          },
+          "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 572.6629146919431
+          },
+          "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 0
+          },
+          "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "p95_n": 48,
+            "peak_n": 48,
+            "remaining_gap": 0
+          },
+          "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+            "grouped_count": 7,
+            "grouped_per_hour": 2.625,
+            "p95_n": 12,
+            "peak_n": 13,
+            "remaining_gap": 2.032582938388626
+          },
+          "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+            "grouped_count": 19,
+            "grouped_per_hour": 7.125,
+            "p95_n": 9,
+            "peak_n": 11,
+            "remaining_gap": 6.532582938388626
+          },
+          "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+            "grouped_count": 18,
+            "grouped_per_hour": 6.75,
+            "p95_n": 43,
+            "peak_n": 48,
+            "remaining_gap": 6.157582938388626
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "iteration": 3,
+      "rule_version_id": "tuned/a49dad1b540547dbb681f9698d1c9b77",
+      "evaluation_id": 3,
+      "model_name": "deterministic-search (no model)",
+      "status": "evaluated",
+      "error_message": null,
+      "tuned_run_id": 4,
+      "proposal": {
+        "rules": {
+          "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+            "n_sat": 6,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+            "n_sat": 5,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+            "n_sat": 4,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+            "n_sat": 7,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+            "n_sat": 44,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+            "n_sat": 4,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+            "n_sat": 55,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+            "n_sat": 3,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 5
+          },
+          "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+            "n_sat": 2,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+            "n_sat": 48,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 1
+          },
+          "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+            "n_sat": 12,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+            "n_sat": 18,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          },
+          "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+            "n_sat": 94,
+            "rationale": "Smallest feasible candidate window, or best supported reduction when share is infeasible.",
+            "window_minutes": 10
+          }
+        }
+      },
+      "guardrail": {
+        "budget_met": false,
+        "errors": [
+          "Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised"
+        ],
+        "passed": false,
+        "remaining_budget_gap": 601.0
+      },
+      "report": {
+        "changes": [],
+        "evaluation": {
+          "acceptance_status": "not_certified",
+          "alert_reduction": 0.6979755608243663,
+          "attack_group_definition": {
+            "boundary": "gap >= silence starts a new group",
+            "key": [
+              "source",
+              "target",
+              "attack_type"
+            ],
+            "method": "fixed-evaluation-sessions",
+            "silence_minutes": 10,
+            "warning": "Operator-approved demo assumption. Revisit if retention hides distinct incidents."
+          },
+          "attack_group_recall": 1.0,
+          "attack_groups_retained": 7,
+          "attack_groups_total": 7,
+          "baseline_alerts": 5483,
+          "baseline_high": 5291,
+          "benign_definition": "any benign-labeled member raised above its own baseline, including mixed groups",
+          "benign_groups_raised": 33,
+          "budget_per_hour": 20,
+          "burn_rate": 102.80625,
+          "grouped_alerts": 1656,
+          "grouped_burn_rate": 31.05,
+          "grouped_high": 1641,
+          "grouped_per_hour": 621.0,
+          "integrity_errors": [],
+          "label_provenance": "{\"operator\": \"Curated demo.label; manifest preparation uses Suricata ATTACK_RE, not independent ground truth\", \"stored_sources\": [\"source demo.label (curated)\"]}",
+          "observed_per_hour": 2056.125,
+          "per_rule_feedback": {
+            "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+              "attack_events": 0,
+              "benign_events": 15,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+              "attack_events": 5,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+              "attack_events": 1,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+              "attack_events": 0,
+              "benign_events": 8,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+              "attack_events": 0,
+              "benign_events": 86,
+              "benign_events_raised": 62,
+              "unconfirmed_events": 0
+            },
+            "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+              "attack_events": 2374,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+              "attack_events": 0,
+              "benign_events": 53,
+              "benign_events_raised": 31,
+              "unconfirmed_events": 0
+            },
+            "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+              "attack_events": 0,
+              "benign_events": 100,
+              "benign_events_raised": 92,
+              "unconfirmed_events": 0
+            },
+            "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+              "attack_events": 0,
+              "benign_events": 8,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+              "attack_events": 2,
+              "benign_events": 3,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+              "attack_events": 1535,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+              "attack_events": 0,
+              "benign_events": 1,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+              "attack_events": 987,
+              "benign_events": 0,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+              "attack_events": 0,
+              "benign_events": 55,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+              "attack_events": 0,
+              "benign_events": 64,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            },
+            "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+              "attack_events": 0,
+              "benign_events": 186,
+              "benign_events_raised": 0,
+              "unconfirmed_events": 0
+            }
+          },
+          "recall_scope": "curated-label evidence retention; not independent detection recall",
+          "reduction_pct": 69.79755608243663,
+          "remaining_budget_gap": 601.0,
+          "retention_definition": "all members visible at their baseline score or higher; splits/merges allowed",
+          "unconfirmed_events": 0
+        },
+        "guardrail": {
+          "budget_met": false,
+          "errors": [
+            "Evaluation requires a nonempty attack denominator, full retention, known labels, and zero benign raised"
+          ],
+          "passed": false,
+          "remaining_budget_gap": 601.0
+        },
+        "joint_rule_statistics": {
+          "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f": {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "p95_n": 6,
+            "peak_n": 6,
+            "remaining_gap": 0.9075829383886254
+          },
+          "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 5,
+            "peak_n": 5,
+            "remaining_gap": 0
+          },
+          "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 0
+          },
+          "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 4,
+            "peak_n": 4,
+            "remaining_gap": 0
+          },
+          "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797": {
+            "grouped_count": 24,
+            "grouped_per_hour": 9.0,
+            "p95_n": 7,
+            "peak_n": 8,
+            "remaining_gap": 8.763033175355451
+          },
+          "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 44,
+            "peak_n": 50,
+            "remaining_gap": 0
+          },
+          "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74": {
+            "grouped_count": 22,
+            "grouped_per_hour": 8.25,
+            "p95_n": 4,
+            "peak_n": 5,
+            "remaining_gap": 7.7760663507109005
+          },
+          "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058": {
+            "grouped_count": 8,
+            "grouped_per_hour": 3.0,
+            "p95_n": 55,
+            "peak_n": 60,
+            "remaining_gap": 2.822274881516588
+          },
+          "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847": {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "p95_n": 3,
+            "peak_n": 3,
+            "remaining_gap": 1.2825829383886256
+          },
+          "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840": {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "p95_n": 2,
+            "peak_n": 2,
+            "remaining_gap": 0.5758293838862556
+          },
+          "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0": {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 572.6629146919431
+          },
+          "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869": {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "p95_n": 1,
+            "peak_n": 1,
+            "remaining_gap": 0
+          },
+          "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6": {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "p95_n": 48,
+            "peak_n": 48,
+            "remaining_gap": 0
+          },
+          "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665": {
+            "grouped_count": 7,
+            "grouped_per_hour": 2.625,
+            "p95_n": 12,
+            "peak_n": 13,
+            "remaining_gap": 2.032582938388626
+          },
+          "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0": {
+            "grouped_count": 19,
+            "grouped_per_hour": 7.125,
+            "p95_n": 9,
+            "peak_n": 11,
+            "remaining_gap": 6.532582938388626
+          },
+          "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2": {
+            "grouped_count": 18,
+            "grouped_per_hour": 6.75,
+            "p95_n": 43,
+            "peak_n": 48,
+            "remaining_gap": 6.157582938388626
+          }
+        }
+      }
+    }
+  ],
+  "policy": {
+    "attack_evidence": 1.0,
+    "benign_evaluation": "any-benign-member-raised",
+    "budget_per_hour": 20,
+    "candidate_windows_minutes": [
+      1,
+      2,
+      5,
+      10
+    ],
+    "cross_service": "strictest-attack-settings",
+    "evidence_provenance": "Curated demo.label aggregates; arithmetic mean per attack/service rule. Frozen manifest ATTACK_RE indicates Suricata-signature-derived preparation; not independent ground truth.",
+    "group_lifetime": "session-open-left",
+    "immediate_attack_types": [
+      "malware_or_reverse_shell"
+    ],
+    "initial_n_sat": 60,
+    "initial_window_minutes": 5,
+    "max_window_high": 10,
+    "n_sat_max": 10000,
+    "other_evidence": 0.2,
+    "retention": "all-members-at-baseline",
+    "scanner_attack_types": [
+      "reconnaissance_or_port_scan"
+    ]
+  },
+  "flow": {
+    "allocation_status": "allocated",
+    "budget_per_hour": 20,
+    "burn_rate": 102.80625,
+    "candidate_scope": "isolated per-rule search; final joint replay uses strictest attack settings; shared groups counted once per participating rule",
+    "evidence_provenance": "Curated demo.label aggregates; arithmetic mean per attack/service rule. Frozen manifest ATTACK_RE indicates Suricata-signature-derived preparation; not independent ground truth.",
+    "observation_seconds": 9600.0,
+    "observed_per_hour": 2056.125,
+    "rules": [
+      {
+        "allowed_per_hour": 0.5924170616113743,
+        "attack_type": "suspicious_external_communication",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 18,
+            "grouped_per_hour": 6.75,
+            "n_sat": 43,
+            "p95_n": 43,
+            "peak_n": 48,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 17,
+            "grouped_per_hour": 6.375,
+            "n_sat": 57,
+            "p95_n": 57,
+            "peak_n": 66,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 13,
+            "grouped_per_hour": 4.875,
+            "n_sat": 93,
+            "p95_n": 93,
+            "peak_n": 102,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 7,
+            "grouped_per_hour": 2.625,
+            "n_sat": 94,
+            "p95_n": 94,
+            "peak_n": 103,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 69.15758293838863,
+        "event_count": 186,
+        "evidence": 0.19999999999999993,
+        "observed_per_hour": 69.75,
+        "p95_n": 93,
+        "peak_n": 102,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.9999999999999993,
+        "rule_id": "rule/c953f68526e950a6cffe2c4d2627369e9d025cafdea62ccbe326e015c6f1deb2",
+        "service": "Core identity and DNS service",
+        "suggested_remaining_gap": 2.0325829383886256,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.592417061611374,
+        "attack_type": "suspicious_external_communication",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 19,
+            "grouped_per_hour": 7.125,
+            "n_sat": 9,
+            "p95_n": 9,
+            "peak_n": 11,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 18,
+            "grouped_per_hour": 6.75,
+            "n_sat": 13,
+            "p95_n": 13,
+            "peak_n": 15,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 14,
+            "grouped_per_hour": 5.25,
+            "n_sat": 18,
+            "p95_n": 18,
+            "peak_n": 21,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 7,
+            "grouped_per_hour": 2.625,
+            "n_sat": 18,
+            "p95_n": 18,
+            "peak_n": 21,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 23.407582938388625,
+        "event_count": 64,
+        "evidence": 0.1999999999999998,
+        "observed_per_hour": 24.0,
+        "p95_n": 18,
+        "peak_n": 21,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.9999999999999978,
+        "rule_id": "rule/a84804299d0f3d1df7caa725895f1b4f1d96c42498a348ce8b2d5a27f72355d0",
+        "service": "Gateway and DNS resolver service",
+        "suggested_remaining_gap": 2.032582938388626,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.2369668246445494,
+        "attack_type": "suspicious_external_communication",
+        "base_score": 4,
+        "candidates": [
+          {
+            "grouped_count": 24,
+            "grouped_per_hour": 9.0,
+            "n_sat": 7,
+            "p95_n": 7,
+            "peak_n": 8,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 24,
+            "grouped_per_hour": 9.0,
+            "n_sat": 7,
+            "p95_n": 7,
+            "peak_n": 8,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 24,
+            "grouped_per_hour": 9.0,
+            "n_sat": 7,
+            "p95_n": 7,
+            "peak_n": 8,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 23,
+            "grouped_per_hour": 8.625,
+            "n_sat": 7,
+            "p95_n": 7,
+            "peak_n": 8,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 32.01303317535545,
+        "event_count": 86,
+        "evidence": 0.19999999999999965,
+        "observed_per_hour": 32.25,
+        "p95_n": 7,
+        "peak_n": 8,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 0.7999999999999986,
+        "rule_id": "rule/52d25634e5f952b74139e30552dbc56110fef3171fbdf74a32969082e1daa797",
+        "service": "Unmapped asset",
+        "suggested_remaining_gap": 8.388033175355451,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.17772511848341202,
+        "attack_type": "unclassified_detection",
+        "base_score": 3,
+        "candidates": [
+          {
+            "grouped_count": 11,
+            "grouped_per_hour": 4.125,
+            "n_sat": 55,
+            "p95_n": 55,
+            "peak_n": 60,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 11,
+            "grouped_per_hour": 4.125,
+            "n_sat": 55,
+            "p95_n": 55,
+            "peak_n": 60,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 9,
+            "grouped_per_hour": 3.375,
+            "n_sat": 55,
+            "p95_n": 55,
+            "peak_n": 60,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 8,
+            "grouped_per_hour": 3.0,
+            "n_sat": 55,
+            "p95_n": 55,
+            "peak_n": 60,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 37.32227488151659,
+        "event_count": 100,
+        "evidence": 0.19999999999999962,
+        "observed_per_hour": 37.5,
+        "p95_n": 55,
+        "peak_n": 60,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 0.5999999999999989,
+        "rule_id": "rule/6d2bfe56e85cbd3418d0e5b7454920b62a2c9e83b914c305c585014bfd830058",
+        "service": "Unmapped asset",
+        "suggested_remaining_gap": 2.822274881516588,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 2.962085308056873,
+        "attack_type": "credential_brute_force",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 44,
+            "p95_n": 44,
+            "peak_n": 50,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 84,
+            "p95_n": 84,
+            "peak_n": 91,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 202,
+            "p95_n": 202,
+            "peak_n": 209,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 399,
+            "p95_n": 399,
+            "peak_n": 409,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 887.2879146919431,
+        "event_count": 2374,
+        "evidence": 1.0,
+        "observed_per_hour": 890.25,
+        "p95_n": 202,
+        "peak_n": 209,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 10.0,
+        "rule_id": "rule/6360b194e7cfc4c8cbc248bb206bf7cf8c3499e55d18bc9990c0909b354c66d1",
+        "service": "Secondary web and file-transfer service",
+        "suggested_remaining_gap": 0,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.5924170616113744,
+        "attack_type": "suspicious_dns_or_web_request",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 6,
+            "grouped_per_hour": 2.25,
+            "n_sat": 2,
+            "p95_n": 2,
+            "peak_n": 2,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 6,
+            "grouped_per_hour": 2.25,
+            "n_sat": 2,
+            "p95_n": 2,
+            "peak_n": 2,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 3,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 3,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 2.4075829383886256,
+        "event_count": 8,
+        "evidence": 0.19999999999999998,
+        "observed_per_hour": 3.0,
+        "p95_n": 3,
+        "peak_n": 3,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.9999999999999998,
+        "rule_id": "rule/7c4c3aa646375715799566257e3fd46feb0fb1b266a6c6ee948a449ca8048847",
+        "service": "Gateway and DNS resolver service",
+        "suggested_remaining_gap": 1.2825829383886256,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.5924170616113742,
+        "attack_type": "authentication_protocol_anomaly",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 22,
+            "grouped_per_hour": 8.25,
+            "n_sat": 4,
+            "p95_n": 4,
+            "peak_n": 4,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 15,
+            "grouped_per_hour": 5.625,
+            "n_sat": 5,
+            "p95_n": 5,
+            "peak_n": 6,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 9,
+            "grouped_per_hour": 3.375,
+            "n_sat": 9,
+            "p95_n": 9,
+            "peak_n": 10,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 7,
+            "grouped_per_hour": 2.625,
+            "n_sat": 12,
+            "p95_n": 12,
+            "peak_n": 13,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 20.032582938388625,
+        "event_count": 55,
+        "evidence": 0.19999999999999987,
+        "observed_per_hour": 20.625,
+        "p95_n": 9,
+        "peak_n": 10,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.9999999999999987,
+        "rule_id": "rule/a5ad01d4b363c69b86d32fe7becbf759df1297b14cdb41548499090349f6a665",
+        "service": "Core identity and DNS service",
+        "suggested_remaining_gap": 2.032582938388626,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.4739336492890994,
+        "attack_type": "authentication_protocol_anomaly",
+        "base_score": 8,
+        "candidates": [
+          {
+            "grouped_count": 40,
+            "grouped_per_hour": 15.0,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 4,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 40,
+            "grouped_per_hour": 15.0,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 4,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 38,
+            "grouped_per_hour": 14.25,
+            "n_sat": 4,
+            "p95_n": 4,
+            "peak_n": 4,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 22,
+            "grouped_per_hour": 8.25,
+            "n_sat": 4,
+            "p95_n": 4,
+            "peak_n": 5,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 19.401066350710902,
+        "event_count": 53,
+        "evidence": 0.1999999999999999,
+        "observed_per_hour": 19.875,
+        "p95_n": 4,
+        "peak_n": 4,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.5999999999999992,
+        "rule_id": "rule/679a9d1668851f50926d628645b5b8a98911c6eac23526b9eb6e270141f91a74",
+        "service": "Internal LAN and user endpoint zone",
+        "suggested_remaining_gap": 7.7760663507109005,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.9241706161137444,
+        "attack_type": "unclassified_detection",
+        "base_score": 6,
+        "candidates": [
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 2,
+            "p95_n": 2,
+            "peak_n": 2,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 0.9508293838862556,
+        "event_count": 5,
+        "evidence": 0.52,
+        "observed_per_hour": 1.875,
+        "p95_n": 1,
+        "peak_n": 1,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 3.12,
+        "rule_id": "rule/84663b49b176e7cd2f874fc7ae33cc886ffc174ed9b73a9f8e0b6adada421840",
+        "service": "Internal LAN and user endpoint zone",
+        "suggested_remaining_gap": 0.5758293838862556,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.5924170616113746,
+        "attack_type": "suspicious_dns_or_web_request",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 6,
+            "p95_n": 6,
+            "peak_n": 6,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 6,
+            "p95_n": 6,
+            "peak_n": 6,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 6,
+            "p95_n": 6,
+            "peak_n": 6,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 3,
+            "grouped_per_hour": 1.125,
+            "n_sat": 6,
+            "p95_n": 6,
+            "peak_n": 6,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 5.032582938388625,
+        "event_count": 15,
+        "evidence": 0.20000000000000004,
+        "observed_per_hour": 5.625,
+        "p95_n": 6,
+        "peak_n": 6,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 2.0000000000000004,
+        "rule_id": "rule/0274094eba1e3540d9bd27cfbb3c9bbfbbd3a28abc8d4fb757ffd19dbb428b3f",
+        "service": "Core identity and DNS service",
+        "suggested_remaining_gap": 0.5325829383886254,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 2.962085308056873,
+        "attack_type": "web_application_attack",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 48,
+            "p95_n": 48,
+            "peak_n": 48,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 95,
+            "p95_n": 95,
+            "peak_n": 95,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 5,
+            "grouped_per_hour": 1.875,
+            "n_sat": 237,
+            "p95_n": 237,
+            "peak_n": 237,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 2,
+            "grouped_per_hour": 0.75,
+            "n_sat": 472,
+            "p95_n": 472,
+            "peak_n": 473,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 367.1629146919431,
+        "event_count": 987,
+        "evidence": 1.0,
+        "observed_per_hour": 370.125,
+        "p95_n": 237,
+        "peak_n": 237,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 10.0,
+        "rule_id": "rule/a12267054dc64e44ccc3383fb7cac083c8c51553f01530eb6d82a44102ad63f6",
+        "service": "Application and file-transfer service",
+        "suggested_remaining_gap": 0,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 2.962085308056873,
+        "attack_type": "web_application_attack",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": -2.587085308056873,
+        "event_count": 1,
+        "evidence": 1.0,
+        "observed_per_hour": 0.375,
+        "p95_n": 1,
+        "peak_n": 1,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 10.0,
+        "rule_id": "rule/2d81a83fc4eaf013f4884394979834a769652f8ef93ab89084a2467a57a29ca1",
+        "service": "Secondary web and file-transfer service",
+        "suggested_remaining_gap": 0,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 2.369668246445498,
+        "attack_type": "reconnaissance_or_port_scan",
+        "base_score": 8,
+        "candidates": [
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 5,
+            "p95_n": 5,
+            "peak_n": 5,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 5,
+            "p95_n": 5,
+            "peak_n": 5,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 5,
+            "p95_n": 5,
+            "peak_n": 5,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 5,
+            "p95_n": 5,
+            "peak_n": 5,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": -0.4946682464454981,
+        "event_count": 5,
+        "evidence": 1.0,
+        "observed_per_hour": 1.875,
+        "p95_n": 5,
+        "peak_n": 5,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 8.0,
+        "rule_id": "rule/068fb0e5edfc0b18b6c6c415349152b2dffdf93283da05b8fdf2d4def5a2f761",
+        "service": "Internal LAN and user endpoint zone",
+        "suggested_remaining_gap": 0,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.41469194312796226,
+        "attack_type": "suspicious_external_communication",
+        "base_score": 7,
+        "candidates": [
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": -0.03969194312796226,
+        "event_count": 1,
+        "evidence": 0.2,
+        "observed_per_hour": 0.375,
+        "p95_n": 1,
+        "peak_n": 1,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.4000000000000001,
+        "rule_id": "rule/97f060b161ec15e0c917bfa8147a75095d1211d6e8727220f25e4949dcd75869",
+        "service": "Internal LAN and user endpoint zone",
+        "suggested_remaining_gap": 0,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 2.962085308056873,
+        "attack_type": "malware_or_reverse_shell",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 1535,
+            "grouped_per_hour": 575.625,
+            "n_sat": 2,
+            "p95_n": 1,
+            "peak_n": 1,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 572.6629146919431,
+        "event_count": 1535,
+        "evidence": 1.0,
+        "observed_per_hour": 575.625,
+        "p95_n": 1,
+        "peak_n": 1,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 10.0,
+        "rule_id": "rule/92aff9470910a1253a026d0e30eaf77a047788ed622911d62ec5eb423c788fd0",
+        "service": "Unmapped asset",
+        "suggested_remaining_gap": 572.6629146919431,
+        "window_minutes": 5
+      },
+      {
+        "allowed_per_hour": 0.5924170616113744,
+        "attack_type": "authentication_protocol_anomaly",
+        "base_score": 10,
+        "candidates": [
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 3,
+            "window_minutes": 1
+          },
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 3,
+            "window_minutes": 2
+          },
+          {
+            "grouped_count": 4,
+            "grouped_per_hour": 1.5,
+            "n_sat": 3,
+            "p95_n": 3,
+            "peak_n": 3,
+            "window_minutes": 5
+          },
+          {
+            "grouped_count": 1,
+            "grouped_per_hour": 0.375,
+            "n_sat": 4,
+            "p95_n": 4,
+            "peak_n": 4,
+            "window_minutes": 10
+          }
+        ],
+        "delta_gap": 2.4075829383886256,
+        "event_count": 8,
+        "evidence": 0.19999999999999998,
+        "observed_per_hour": 3.0,
+        "p95_n": 3,
+        "peak_n": 3,
+        "percentile_method": "nearest-rank per-event rolling (t-W,t] counts",
+        "priority_weight": 1.9999999999999998,
+        "rule_id": "rule/38c6154dd00b0448e807122dcda6f12d123c199e0109260261e1e9695eeb15d9",
+        "service": "Application and file-transfer service",
+        "suggested_remaining_gap": 0,
+        "window_minutes": 5
+      }
+    ]
+  },
+  "database_lifetime": "temporary local database removed after verification"
+}

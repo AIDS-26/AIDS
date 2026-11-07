@@ -1,5 +1,13 @@
 # Calculation integration review
 
+**Implementation update, 7 November 2026:** this review documents the earlier
+prototype state. Production entry points for the demo now live in `app/tuning/`;
+the six prototype modules below were preserved. See [the tuning implementation](tuning.md)
+for approved policies, CLI/API contracts, rule versioning and current validation.
+The deterministic frozen-data proposal is rejected by the implemented gate;
+no successful live model run is claimed. The gaps below are historical findings,
+not the status of the new loop.
+
 Reviewed 7 November 2026. Scope: the six supplied calculation modules and their
 connection to the existing SQLite ingestion and SIEM read API. No offline tuning
 attempt, configuration activation, email delivery or live-database migration was performed.

@@ -24,3 +24,9 @@ legacy label content, with a durable maintenance task for interrupted cleanup.
 
 Run migrations with processing and SIEM workers stopped. Applications
 should use `app.db.connect()` so foreign keys and lock timeouts are always enabled.
+
+`0005_tuning_replay.sql` adds per-event input floors and effective grouping settings
+for mixed-service groups, exactly-once membership checks for new writes, and
+policy/proposal/outcome links for tuning audit. Existing trajectories remain
+unchanged; newly added historical JSON fields are nullable. It does not infer
+past guardrail results or activate historical versions.

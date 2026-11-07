@@ -34,7 +34,8 @@ class DatabaseTests(unittest.TestCase):
 
     def test_migration_is_repeatable_and_schema_is_healthy(self):
         self.assertEqual(migrate(self.path), ["0001_initial.sql", "0002_evaluation_bounds.sql",
-                                               "0003_rule_audit_and_metrics.sql", "0004_separate_labels.sql"])
+                                            "0003_rule_audit_and_metrics.sql", "0004_separate_labels.sql",
+                                            "0005_tuning_replay.sql"])
         self.assertEqual(migrate(self.path), [])
         with connect(self.path) as connection:
             self.assertEqual(connection.execute("PRAGMA integrity_check").fetchone()[0], "ok")
@@ -169,7 +170,7 @@ class DatabaseTests(unittest.TestCase):
                 VALUES (7, 1, 2, 1, 1, 0.5, 2, 2, 0, '{"audit":"kept"}', 'saved-time')""")
             before = tuple(connection.execute("SELECT * FROM evaluations").fetchone())
         self.assertEqual(migrate(self.path), ["0002_evaluation_bounds.sql", "0003_rule_audit_and_metrics.sql",
-                                            "0004_separate_labels.sql"])
+                                            "0004_separate_labels.sql", "0005_tuning_replay.sql"])
         with connect(self.path) as connection:
             self.assertEqual(tuple(connection.execute("SELECT * FROM evaluations").fetchone())[:len(before)], before)
             self.assertEqual(connection.execute("PRAGMA foreign_key_check").fetchall(), [])

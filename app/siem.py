@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 
 from app.db import connect
 
@@ -60,7 +61,7 @@ def runs(dataset_id: int, path: str | Path | None = None, *,
         if not db.execute("SELECT 1 FROM datasets WHERE id = ?", (dataset_id,)).fetchone():
             raise LookupError("Dataset not found")
         return _page(db.execute("""SELECT id, dataset_id, mode, status, rule_version_id,
-            observation_seconds, budget_per_hour, created_at, completed_at
+            observation_seconds, budget_per_hour, created_at, completed_at, error_message, failed_at
             FROM runs WHERE dataset_id = ? AND id > ? ORDER BY id LIMIT ?""",
             (dataset_id, after_id, limit + 1)).fetchall(), limit)
 
@@ -97,7 +98,68 @@ def evidence(run_id: int, alert_id: int, path: str | Path | None = None, *,
             raise LookupError("Completed alert not found")
         return _page(db.execute("""SELECT e.id, e.dataset_id, e.source_line, e.timestamp,
             e.timestamp_us, e.src_ip, e.dest_ip, e.signature_id, e.signature,
-            ae.n_in_window, ae.raised_score FROM alert_events ae
+            ae.n_in_window, ae.raised_score, tes.base_score AS event_base_score,
+            tes.rule_id AS event_rule_id, tes.window_minutes, tes.n_sat, tes.alert_score
+            FROM alert_events ae
             JOIN events e ON e.id = ae.event_id
+            LEFT JOIN tuned_event_scores tes ON tes.run_id=ae.run_id AND tes.event_id=ae.event_id
             WHERE ae.run_id = ? AND ae.alert_id = ? AND e.id > ?
             ORDER BY e.id LIMIT ?""", (run_id, alert_id, after_id, limit + 1)).fetchall(), limit)
+
+
+def tuning_attempts(dataset_id, path=None, *, limit=100, after_id=0):
+    page_bounds(limit, after_id)
+    with connect(path, read_only=True) as db:
+        if not db.execute('SELECT 1 FROM datasets WHERE id=?', (dataset_id,)).fetchone():
+            raise LookupError('Dataset not found')
+        return _page(db.execute('''SELECT t.id,t.baseline_run_id,t.created_by,t.status,t.error_message,
+            t.created_at,t.selected_version_id,t.outcome_json FROM tuning_attempts t
+            JOIN runs r ON r.id=t.baseline_run_id WHERE r.dataset_id=? AND t.id>?
+            ORDER BY t.id LIMIT ?''', (dataset_id, after_id, limit + 1)).fetchall(), limit)
+
+
+def tuning_detail(attempt_id, path=None, *, limit=100, after_id=0):
+    page_bounds(limit, after_id)
+    with connect(path, read_only=True) as db:
+        row = db.execute('SELECT * FROM tuning_attempts WHERE id=?', (attempt_id,)).fetchone()
+        if row is None:
+            raise LookupError('Tuning attempt not found')
+        attempt = dict(row)
+        for field in ('policy', 'flow', 'outcome', 'evaluation_policy'):
+            value = attempt.pop(field + '_json')
+            attempt[field] = json.loads(value) if value else None
+        page = _page(db.execute('''SELECT id,iteration,rule_version_id,evaluation_id,model_name,
+            report_text,status,error_message,proposal_json,guardrail_json,tuned_run_id
+            FROM tuning_iterations WHERE attempt_id=? AND id>? ORDER BY id LIMIT ?''',
+            (attempt_id, after_id, limit + 1)).fetchall(), limit)
+        for item in page['items']:
+            for field in ('proposal', 'guardrail'):
+                value = item.pop(field + '_json')
+                item[field] = json.loads(value) if value else None
+            report = item.pop('report_text')
+            try:
+                item['report'] = json.loads(report) if report else None
+            except ValueError:
+                item['report'] = report  # historical prose is not a fabricated JSON report
+        return {'attempt': attempt, 'iterations': page}
+
+
+def rule_history(run_id, path=None, *, limit=100, after_id=0):
+    """Lineage from the run's version to its ancestors, with immutable diffs."""
+    page_bounds(limit, after_id)
+    with connect(path, read_only=True) as db:
+        row = db.execute('SELECT rule_version_id FROM runs WHERE id=?', (run_id,)).fetchone()
+        if row is None:
+            raise LookupError('Run not found')
+        # Recursive depth is a stable cursor within an immutable version lineage.
+        rows = db.execute('''WITH RECURSIVE history(id,parent_id,depth) AS (
+            SELECT id,parent_id,0 FROM rule_versions WHERE id=? UNION ALL
+            SELECT v.id,v.parent_id,h.depth+1 FROM rule_versions v JOIN history h ON v.id=h.parent_id)
+            SELECT v.*,h.depth+1 AS cursor FROM history h JOIN rule_versions v ON v.id=h.id
+            WHERE h.depth+1>? ORDER BY h.depth LIMIT ?''',
+            (row['rule_version_id'], after_id, limit + 1)).fetchall()
+        items = [dict(r) for r in rows[:limit]]
+        for item in items:
+            item['rules'] = json.loads(item.pop('rules_json'))
+            item['changes'] = json.loads(item.pop('changes_json'))
+        return {'items': items, 'next_after_id': items[-1]['cursor'] if len(rows) > limit else None}
