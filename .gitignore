@@ -5,3 +5,6 @@ demo_freeze/
 Microsoft/
 
 .env
+
+__pycache__/
+*.py[cod]
